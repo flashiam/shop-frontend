@@ -299,68 +299,12 @@ const Categories = ({ route, navigation }: Props) => {
     );
   };
 
-  // Navigation view
-  // const NavigationView = () => {
-  //   return (
-  //     <View style={style.navContain}>
-  //       <Pressable style={style.profileContain}>
-  //         <Image source={testAvatar} style={style.profileAvatar} />
-  //         <View style={style.profileDetails}>
-  //           <Text style={style.userName}>Joy Pashina</Text>
-  //           <Text style={style.userEmail}>joypashina32@gmail.com</Text>
-  //         </View>
-  //       </Pressable>
-
-  //       <View style={style.navLinks}>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <FontAwesome5 name="receipt" size={20} color={primaryColor} />
-  //           <Text style={style.linkTxt}>My Orders</Text>
-  //         </Pressable>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <FontAwesome5 name="shopping-bag" size={20} color={primaryColor} />
-  //           <Text style={style.linkTxt}>Wishlist</Text>
-  //         </Pressable>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <MaterialIcons
-  //             name="support-agent"
-  //             size={20}
-  //             color={primaryColor}
-  //           />
-  //           <Text style={style.linkTxt}>Support</Text>
-  //         </Pressable>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <FontAwesome5 name="ticket-alt" size={20} color={primaryColor} />
-  //           <Text style={style.linkTxt}>Refer and earn</Text>
-  //         </Pressable>
-  //       </View>
-
-  //       <Pressable
-  //         style={style.closeNavBtn}
-  //         android_ripple={{ color: secondaryColor, borderless: true }}
-  //         onPress={() => drawer.current.closeDrawer()}
-  //       >
-  //         <AntDesign name="close" size={25} color={darkColor} />
-  //       </Pressable>
-  //     </View>
-  //   );
-  // };
-
   return (
     <DrawerLayoutAndroid
       ref={drawer}
-      renderNavigationView={() => <Drawer drawer={drawer} />}
+      renderNavigationView={() => (
+        <Drawer drawer={drawer} navigation={navigation} />
+      )}
       drawerPosition="right"
       drawerWidth={300}
     >

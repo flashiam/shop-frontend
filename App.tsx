@@ -11,6 +11,7 @@ import FoodDesc from "./components/pages/FoodDesc";
 import Categories from "./components/pages/Categories";
 import Orders from "./components/pages/Orders";
 import Wishlist from "./components/pages/Wishlist";
+import Support from "./components/pages/Support";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   Categories: { catid: number };
   Orders: undefined;
   Wishlist: undefined;
+  Support: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ export default function App() {
             <Stack.Screen name="Categories" component={Categories} />
             <Stack.Screen name="Orders" component={Orders} />
             <Stack.Screen name="Wishlist" component={Wishlist} />
+            <Stack.Screen name="Support" component={Support} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
