@@ -1,8 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, Platform } from "react-native";
-import utilStyle from "../../styles/utilStyle";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Platform,
+  Pressable,
+} from "react-native";
 import { MaterialIcons, FontAwesome, Entypo } from "@expo/vector-icons";
-import food from "../../img/indian_food_1.png";
+
+import utilStyle from "../../styles/utilStyle";
 import {
   primaryColor,
   medColor,
@@ -10,28 +17,71 @@ import {
   secondaryColor,
 } from "../../styles/_variables";
 
-const Food = () => {
+// import foodImg from "../../img/indian_food_1.png";
+
+interface Food {
+  id: number;
+  title: string;
+  price: number;
+  img: string;
+  rating: number;
+  stars: number;
+  reviews: number;
+}
+
+// Type checking
+
+type Props = {
+  navigation: any;
+  food: Food;
+};
+
+// import FoodDesc from "../pages/FoodDesc";
+
+const Food = ({ navigation, food }: Props) => {
+  const { id, title, price, img, rating, stars, reviews } = food;
+
   return (
-    <View style={[utilStyle.card, style.dealCard]}>
+    <Pressable
+      style={[utilStyle.card, style.dealCard]}
+      onPress={() => navigation.navigate("Food", { foodid: id })}
+    >
       <View style={style.imgContain}>
-        <Image source={food} style={style.dealImg} />
+        <Image source={img} style={style.dealImg} />
       </View>
 
       <View style={style.dealContent}>
         <View>
           <Text style={{ fontSize: 20, color: medColor, fontWeight: "bold" }}>
-            Mix Veg
+            {title}
           </Text>
           <View style={style.ratings}>
-            <Text style={style.txt}>4.9</Text>
+            <Text style={style.txt}>{rating}</Text>
             <View style={[style.rating]}>
+              {[1, 2, 3, 4, 5].map(star =>
+                star <= stars ? (
+                  <MaterialIcons
+                    key={star}
+                    name="star"
+                    size={8}
+                    color={primaryColor}
+                  />
+                ) : (
+                  <MaterialIcons
+                    key={star}
+                    name="star"
+                    size={8}
+                    color={medColor}
+                  />
+                )
+              )}
+              {/* <MaterialIcons name="star" size={8} color={primaryColor} /> */}
+              {/* <MaterialIcons name="star" size={8} color={primaryColor} />
               <MaterialIcons name="star" size={8} color={primaryColor} />
               <MaterialIcons name="star" size={8} color={primaryColor} />
-              <MaterialIcons name="star" size={8} color={primaryColor} />
-              <MaterialIcons name="star" size={8} color={primaryColor} />
-              <MaterialIcons name="star" size={8} color={medColor} />
+              <MaterialIcons name="star" size={8} color={medColor} /> */}
             </View>
-            <Text style={style.txt}>(150)</Text>
+            <Text style={style.txt}>({reviews})</Text>
           </View>
           <Text
             style={{
@@ -41,7 +91,7 @@ const Food = () => {
               marginTop: 10,
             }}
           >
-            ₹ 599
+            ₹ {price}
           </Text>
         </View>
       </View>
@@ -54,7 +104,7 @@ const Food = () => {
           <FontAwesome name="heart-o" size={15} color={primaryColor} />
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
