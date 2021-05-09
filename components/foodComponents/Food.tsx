@@ -34,17 +34,22 @@ interface Food {
 type Props = {
   navigation: any;
   food: Food;
+  updatePage?: boolean;
 };
 
 // import FoodDesc from "../pages/FoodDesc";
 
-const Food = ({ navigation, food }: Props) => {
+const Food = ({ navigation, food, updatePage }: Props) => {
   const { id, title, price, img, rating, stars, reviews } = food;
 
   return (
     <Pressable
       style={[utilStyle.card, style.dealCard]}
-      onPress={() => navigation.navigate("Food", { foodid: id })}
+      onPress={() =>
+        updatePage
+          ? navigation.push("Food", { foodid: id })
+          : navigation.navigate("Food", { foodid: id })
+      }
     >
       <View style={style.imgContain}>
         <Image source={img} style={style.dealImg} />
@@ -75,11 +80,6 @@ const Food = ({ navigation, food }: Props) => {
                   />
                 )
               )}
-              {/* <MaterialIcons name="star" size={8} color={primaryColor} /> */}
-              {/* <MaterialIcons name="star" size={8} color={primaryColor} />
-              <MaterialIcons name="star" size={8} color={primaryColor} />
-              <MaterialIcons name="star" size={8} color={primaryColor} />
-              <MaterialIcons name="star" size={8} color={medColor} /> */}
             </View>
             <Text style={style.txt}>({reviews})</Text>
           </View>

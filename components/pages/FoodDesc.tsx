@@ -483,7 +483,12 @@ const FoodDesc = ({ route, navigation }: Prop) => {
           <View style={style.relatedContain}>
             {related &&
               related.map(relFood => (
-                <Food key={relFood.id} navigation={navigation} food={relFood} />
+                <Food
+                  key={relFood.id}
+                  navigation={navigation}
+                  food={relFood}
+                  updatePage
+                />
               ))}
           </View>
         </View>

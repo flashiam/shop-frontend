@@ -63,6 +63,7 @@ const Drawer = ({ drawer, navigation }: Props) => {
           <Text style={style.linkTxt}>Support</Text>
         </Pressable>
         <Pressable
+          onPress={() => navigation.navigate("Refer")}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
         >

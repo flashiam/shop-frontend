@@ -12,6 +12,7 @@ import Categories from "./components/pages/Categories";
 import Orders from "./components/pages/Orders";
 import Wishlist from "./components/pages/Wishlist";
 import Support from "./components/pages/Support";
+import Refer from "./components/pages/Refer";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   Orders: undefined;
   Wishlist: undefined;
   Support: undefined;
+  Refer: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -49,6 +51,7 @@ export default function App() {
             <Stack.Screen name="Orders" component={Orders} />
             <Stack.Screen name="Wishlist" component={Wishlist} />
             <Stack.Screen name="Support" component={Support} />
+            <Stack.Screen name="Refer" component={Refer} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>

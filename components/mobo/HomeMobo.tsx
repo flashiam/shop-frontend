@@ -221,20 +221,17 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   const CatItem = ({ item, index }: { item: any; index: number }) => {
     return (
       <View style={style.catContain}>
-        <View style={{ borderRadius: 8, overflow: "hidden" }}>
-          <Pressable
-            android_ripple={{ color: secondaryColor }}
-            style={[utilStyle.card, style.category]}
-            onPress={() =>
-              navigation.navigate("Categories", { catid: item.id })
-            }
-          >
-            <Image
-              style={[style.catImg, { borderRadius: 8 }]}
-              source={{ uri: item.img }}
-            />
-          </Pressable>
-        </View>
+        {/* <View style={{ borderRadius: 8, overflow: "hidden" }}> */}
+        <Pressable
+          style={[utilStyle.card, style.category]}
+          onPress={() => navigation.navigate("Categories", { catid: item.id })}
+        >
+          <Image
+            style={[style.catImg, { borderRadius: 8 }]}
+            source={{ uri: item.img }}
+          />
+        </Pressable>
+        {/* </View> */}
         <Text style={style.catTxt}>{item.title}</Text>
       </View>
     );
@@ -387,7 +384,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
               renderItem={CatItem}
               sliderWidth={SliderWidth}
               itemWidth={90}
-              activeAnimationType={"spring"}
               inactiveSlideOpacity={1}
               inactiveSlideScale={1}
             />

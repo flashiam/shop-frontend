@@ -61,19 +61,19 @@ const Support = ({ navigation }: Props) => {
         </View>
         <View style={style.section}>
           <Text style={utilStyle.head}>Support</Text>
-          <ScrollView style={style.msgSection}>
+          <ScrollView>
             <View style={[utilStyle.card, style.msg]}>
               <Text style={style.time}>12:34</Text>
-              <View style={style.msgContent}>
+              <View>
                 <Text style={{ fontWeight: "bold" }}>How can we help you?</Text>
-                <View style={style.option}>
+                <View>
                   <RadioButton options={options} />
                 </View>
               </View>
             </View>
             <View style={[utilStyle.card, style.msg, style.right]}>
               <Text style={style.time}>12:36</Text>
-              <View style={style.msgContent}>
+              <View>
                 <Text>I want a refund</Text>
               </View>
             </View>
@@ -137,6 +137,8 @@ const style = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
+    fontSize: 12,
+    color: secondaryColor,
   },
   btnContain: {
     display: "flex",
@@ -145,10 +147,12 @@ const style = StyleSheet.create({
   },
   msgInput: {
     width: "60%",
+    marginLeft: 15,
+    fontSize: 19,
   },
   sendBtn: {
     backgroundColor: primaryColor,
-    padding: 8,
+    padding: 13,
     borderRadius: 100 / 2,
     display: "flex",
     flexDirection: "row",
