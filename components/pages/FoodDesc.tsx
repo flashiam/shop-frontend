@@ -312,7 +312,10 @@ const FoodDesc = ({ route, navigation }: Prop) => {
                 <Text style={{ fontWeight: "bold", fontSize: 20 }}>₹ 423</Text>
                 <Text style={{ fontWeight: "bold", fontSize: 20 }}>Total</Text>
               </View>
-              <Pressable style={style.paymentBtn}>
+              <Pressable
+                style={style.paymentBtn}
+                onPress={() => navigation.navigate("OrderLoading")}
+              >
                 <Text style={{ color: lightColor }}>Proceed to payment</Text>
               </Pressable>
             </View>
