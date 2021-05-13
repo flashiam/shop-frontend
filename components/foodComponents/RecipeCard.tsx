@@ -10,7 +10,20 @@ import utilStyle from "../../styles/utilStyle";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import testAvatar from "../../img/test_avatar.jpg";
 
-const RecipeCard = () => {
+interface Recipe {
+  id: number;
+  name: string;
+  date: string;
+  title: string;
+  desc: string;
+  avatar: string;
+}
+
+type Props = {
+  recipe: Recipe;
+};
+
+const RecipeCard = ({ recipe }: Props) => {
   return (
     <View style={[utilStyle.card, style.recipeCard]}>
       <View style={style.recipeHeader}>
@@ -18,18 +31,13 @@ const RecipeCard = () => {
           <Image source={testAvatar} style={style.avatar} />
         </View>
         <View style={style.headerDesc}>
-          <Text style={style.name}>Fred</Text>
-          <Text style={style.date}>January 25,2021</Text>
+          <Text style={style.name}>{recipe.name}</Text>
+          <Text style={style.date}>{recipe.date}</Text>
         </View>
       </View>
       <View style={utilStyle.mt1}>
-        <Text style={style.question}>
-          How to follow a high protien diet plan with indian meals?
-        </Text>
-        <Text>
-          This specialised diet plan lives up to the spoiler in its nomenclature
-          by asking you to do just that: flood your system with friendly...
-        </Text>
+        <Text style={style.question}>{recipe.title}</Text>
+        <Text>{recipe.desc}</Text>
       </View>
       <View style={[utilStyle.mt1, style.recipeFooter]}>
         <MaterialCommunityIcons
@@ -55,8 +63,9 @@ const style = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 20,
-    marginRight: 5,
+    marginRight: 15,
     marginBottom: 5,
+    width: 290,
   },
   recipeHeader: {
     display: "flex",

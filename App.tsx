@@ -15,6 +15,7 @@ import Support from "./components/pages/Support";
 import Refer from "./components/pages/Refer";
 import OrderLoading from "./components/pages/OrderLoading";
 import Receipt from "./components/pages/Receipt";
+import Promo from "./components/pages/Promo";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -29,6 +30,7 @@ export type RootStackParamList = {
   Refer: undefined;
   OrderLoading: undefined;
   Receipt: undefined;
+  Promo: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -58,6 +60,7 @@ export default function App() {
             <Stack.Screen name="Refer" component={Refer} />
             <Stack.Screen name="OrderLoading" component={OrderLoading} />
             <Stack.Screen name="Receipt" component={Receipt} />
+            <Stack.Screen name="Promo" component={Promo} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>

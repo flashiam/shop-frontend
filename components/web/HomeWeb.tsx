@@ -19,6 +19,14 @@ import {
   FontAwesome5,
   MaterialIcons,
 } from "@expo/vector-icons";
+// import {
+//   IonContent,
+//   IonCard,
+//   IonCardContent,
+//   IonCardHeader,
+//   IonCardSubtitle,
+//   IonCardTitle,
+// } from "@ionic/react";
 import Carousel from "react-native-snap-carousel";
 
 import OfferItem from "../foodComponents/OfferItem";
@@ -34,6 +42,7 @@ import suggestFood from "../../img/suggest_food.jpg";
 import testAvatar from "../../img/test_avatar.jpg";
 import playStore from "../../img/play_store.png";
 import appStore from "../../img/app_store.png";
+import foodImg from "../../img/indian_food_1.png";
 
 import { medColor, secondaryColor } from "../../styles/_variables";
 
@@ -176,6 +185,28 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
     },
   ]);
 
+  // State for showcase food
+  const [foods, setFoods] = useState<Food[] | null>([
+    {
+      id: 1,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 4.9,
+      stars: 4,
+      img: foodImg,
+    },
+    {
+      id: 2,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      img: foodImg,
+    },
+  ]);
+
   // State for the recipes
   const [recipes, setRecipes] = useState<Recipe[]>([
     {
@@ -183,8 +214,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
       name: "Fred",
       date: "January 25,2021",
       title: "How to follow a high protien diet plan with indian meals?",
-      desc:
-        "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      desc: "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
       avatar: testAvatar,
     },
     {
@@ -192,8 +222,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
       name: "Fred",
       date: "January 25,2021",
       title: "How to follow a high protien diet plan with indian meals?",
-      desc:
-        "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      desc: "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
       avatar: testAvatar,
     },
   ]);
@@ -203,21 +232,18 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
     {
       id: 1,
       title: "We only sell products that we eat ourselves..",
-      msg:
-        "At Freshfred, we are big carnivorous lovers. So when it comes to the range of meat/fish/chicken/ other products we put it on your plate, we are very choosy and each product is handpicked by an experienced team with years of experience.",
+      msg: "At Freshfred, we are big carnivorous lovers. So when it comes to the range of meat/fish/chicken/ other products we put it on your plate, we are very choosy and each product is handpicked by an experienced team with years of experience.",
     },
     {
       id: 2,
       title:
         "You will only find what is fresh, if not fresh, we will not sell..",
-      msg:
-        "To keep all non-veg products fresh and hygienic with their natural juices, it is necessary to store them at temperatures between 0 ° and 5 ° C. Here at FreshFred we are committed and maintain all freshness and adherence to optimal hygiene standards. We maintain this temperature from the time of purchase until the product is cleaned, cut, stored, and delivered. You will find all of your ordered products chilled until it arrives at your doorstep. Don’t you think… it’s all about our true love for freshness and hygiene?",
+      msg: "To keep all non-veg products fresh and hygienic with their natural juices, it is necessary to store them at temperatures between 0 ° and 5 ° C. Here at FreshFred we are committed and maintain all freshness and adherence to optimal hygiene standards. We maintain this temperature from the time of purchase until the product is cleaned, cut, stored, and delivered. You will find all of your ordered products chilled until it arrives at your doorstep. Don’t you think… it’s all about our true love for freshness and hygiene?",
     },
     {
       id: 3,
       title: "We only charge for the weight of the product delivered..",
-      msg:
-        "Do other people follow it? not necessarily. Most of the places get the weight of the meat first, then cutting it into pieces, they exclude fractions that are unfit to eat, such as offal, fat, gizzards, etc. In the end, what you are getting is 10% to 30% less product. It doesn’t matter that you paid for the whole.",
+      msg: "Do other people follow it? not necessarily. Most of the places get the weight of the meat first, then cutting it into pieces, they exclude fractions that are unfit to eat, such as offal, fat, gizzards, etc. In the end, what you are getting is 10% to 30% less product. It doesn’t matter that you paid for the whole.",
     },
   ]);
 
@@ -285,6 +311,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
   return (
     <View>
       <View style={[utilStyle.container, style.container]}>
+        {/* <ProtonText>This is the proton</ProtonText> */}
         {/* Navbar */}
         <View style={style.nav}>
           {/* Access location */}
@@ -363,8 +390,10 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
           <Text style={[utilStyle.head]}>Today's deal</Text>
 
           <View style={style.dealContain}>
-            <Food navigation={navigation} />
-            <Food navigation={navigation} />
+            {foods &&
+              foods.map(food => (
+                <Food key={food.id} navigation={navigation} food={food} />
+              ))}
           </View>
         </View>
 
@@ -373,24 +402,28 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
           <Text style={utilStyle.head}>Most Selling</Text>
 
           <View style={style.dealContain}>
-            <Food navigation={navigation} />
-            <Food navigation={navigation} />
+            {foods &&
+              foods.map(food => (
+                <Food key={food.id} navigation={navigation} food={food} />
+              ))}
           </View>
         </View>
 
         {/* Suggested */}
         <View style={utilStyle.mt1}>
           <Text style={utilStyle.head}>Suggested</Text>
-          {/* <Carousel
-              ref={ref}
-              data={suggested}
-              renderItem={FoodWide}
-              sliderWidth={SliderWidth}
-              itemWidth={320}
-              inactiveSlideOpacity={1}
-              inactiveSlideScale={1}
-            /> */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {suggested &&
+              suggested.map(food => <FoodWide key={food.id} food={food} />)}
+          </ScrollView>
         </View>
+        {/* 
+        <IonCard>
+          <IonCardHeader>
+            <IonCardTitle>Hello !</IonCardTitle>
+          </IonCardHeader>
+          <IonCardContent>We are awesome AF!!</IonCardContent>
+        </IonCard> */}
 
         {/* Offers */}
         <View style={utilStyle.mt1}>

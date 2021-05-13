@@ -19,7 +19,6 @@ import {
   FontAwesome5,
   MaterialIcons,
 } from "@expo/vector-icons";
-import Carousel from "react-native-snap-carousel";
 
 import OfferItem from "../foodComponents/OfferItem";
 import Food from "../foodComponents/Food";
@@ -189,6 +188,24 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
         "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
       avatar: testAvatar,
     },
+    {
+      id: 3,
+      name: "Fred",
+      date: "January 25,2021",
+      title: "How to follow a high protien diet plan with indian meals?",
+      desc:
+        "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      avatar: testAvatar,
+    },
+    {
+      id: 4,
+      name: "Fred",
+      date: "January 25,2021",
+      title: "How to follow a high protien diet plan with indian meals?",
+      desc:
+        "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      avatar: testAvatar,
+    },
   ]);
 
   // State for conclusions
@@ -217,30 +234,34 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   const ref = useRef(null);
   const drawer = useRef<any>(null);
 
+  type CatProps = {
+    cat: Category;
+  };
+
   // Category item
-  const CatItem = ({ item, index }: { item: any; index: number }) => {
+  const CatItem = ({ cat }: CatProps) => {
     return (
       <View style={style.catContain}>
         {/* <View style={{ borderRadius: 8, overflow: "hidden" }}> */}
         <Pressable
           style={[utilStyle.card, style.category]}
-          onPress={() => navigation.navigate("Categories", { catid: item.id })}
+          onPress={() => navigation.navigate("Categories", { catid: cat.id })}
         >
           <Image
             style={[style.catImg, { borderRadius: 8 }]}
-            source={{ uri: item.img }}
+            source={{ uri: cat.img }}
           />
         </Pressable>
         {/* </View> */}
-        <Text style={style.catTxt}>{item.title}</Text>
+        <Text style={style.catTxt}>{cat.title}</Text>
       </View>
     );
   };
 
   // Offer item
-  const offerItem = ({ item, index }: { item: any; index: number }) => {
+  const OfferItem = () => {
     return (
-      <View>
+      <View style={{ width: 300, marginRight: 10 }}>
         <Pressable onPress={() => console.log("Show offers")}>
           <Image style={style.offerImg} source={offerImg1} />
         </Pressable>
@@ -365,19 +386,35 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
           </View>
 
           <View style={style.offersContain}>
-            <Carousel
+            <ScrollView
+              style={{ width: SliderWidth }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToOffsets={[0, 300]}
+            >
+              {offers && offers.map(offer => <OfferItem key={offer.id} />)}
+            </ScrollView>
+            {/* <Carousel
               layout={"default"}
               ref={ref}
               data={offers}
               renderItem={OfferItem}
               sliderWidth={SliderWidth}
               itemWidth={300}
-            />
+            /> */}
           </View>
 
           <View style={utilStyle.mt1}>
             <Text style={utilStyle.head}>Categories</Text>
-            <Carousel
+            <ScrollView
+              style={{ width: SliderWidth }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              {categories &&
+                categories.map(cat => <CatItem key={cat.id} cat={cat} />)}
+            </ScrollView>
+            {/* <Carousel
               layout={"default"}
               ref={ref}
               data={categories}
@@ -386,7 +423,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
               itemWidth={90}
               inactiveSlideOpacity={1}
               inactiveSlideScale={1}
-            />
+            /> */}
           </View>
 
           {/* Todays deal */}
@@ -416,7 +453,11 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
           {/* Suggested */}
           <View style={utilStyle.mt1}>
             <Text style={utilStyle.head}>Suggested</Text>
-            <Carousel
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {suggested &&
+                suggested.map(food => <FoodWide key={food.id} food={food} />)}
+            </ScrollView>
+            {/* <Carousel
               ref={ref}
               data={suggested}
               renderItem={FoodWide}
@@ -424,25 +465,43 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
               itemWidth={320}
               inactiveSlideOpacity={1}
               inactiveSlideScale={1}
-            />
+            /> */}
           </View>
 
           {/* Offers */}
           <View style={utilStyle.mt1}>
             <Text style={utilStyle.head}>Offers</Text>
-            <Carousel
+            <ScrollView
+              style={{ width: SliderWidth }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToOffsets={[100, 300]}
+            >
+              {offers && offers.map(offer => <OfferItem key={offer.id} />)}
+            </ScrollView>
+            {/* <Carousel
               ref={ref}
               data={offers}
               renderItem={offerItem}
               sliderWidth={SliderWidth}
               itemWidth={300}
-            />
+            /> */}
           </View>
 
           {/* Special recipies */}
           <View style={utilStyle.mt1}>
             <Text style={utilStyle.head}>Special Recipies</Text>
-            <Carousel
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              // snapToOffsets={[50, 200]}
+            >
+              {recipes &&
+                recipes.map(recipe => (
+                  <RecipeCard key={recipe.id} recipe={recipe} />
+                ))}
+            </ScrollView>
+            {/* <Carousel
               ref={ref}
               data={recipes}
               renderItem={RecipeCard}
@@ -450,7 +509,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
               itemWidth={320}
               inactiveSlideOpacity={1}
               inactiveSlideScale={1}
-            />
+            /> */}
           </View>
 
           {/* Advertisment */}
@@ -545,6 +604,7 @@ const style = StyleSheet.create({
   catContain: {
     marginRight: 5,
     backgroundColor: "transparent",
+    width: 90,
   },
   category: {
     borderRadius: 8,

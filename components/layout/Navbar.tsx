@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Pressable,
   DrawerLayoutAndroid,
+  Button,
 } from "react-native";
 import { Ionicons, EvilIcons } from "@expo/vector-icons";
 import { secondaryColor } from "../../styles/_variables";
@@ -58,7 +59,7 @@ const Navbar = () => {
           </View>
         </Pressable>
         {/* Navbar btn */}
-        <Pressable
+        <Button
           onPress={() => {
             drawer.current.openDrawer();
           }}
@@ -68,7 +69,7 @@ const Navbar = () => {
           }}
         >
           <EvilIcons name="navicon" size={35} color="red" />
-        </Pressable>
+        </Button>
       </View>
     </DrawerLayoutAndroid>
   );

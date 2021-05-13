@@ -73,6 +73,10 @@ type Prop = {
   navigation: FoodDescScreenNavProp;
 };
 
+type PhotoProps = {
+  photo: Photo;
+};
+
 const FoodDesc = ({ route, navigation }: Prop) => {
   // State for related
   const [related, setRelated] = useState<FoodType[]>([
@@ -154,6 +158,22 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       weight: 500,
       quantity: 1,
     },
+    {
+      id: 4,
+      title: "Chicken drumstick",
+      subtitle: "(without skin)",
+      price: 184,
+      weight: 500,
+      quantity: 1,
+    },
+    {
+      id: 5,
+      title: "Chicken drumstick",
+      subtitle: "(without skin)",
+      price: 184,
+      weight: 500,
+      quantity: 1,
+    },
   ]);
 
   // State for weight
@@ -202,10 +222,10 @@ const FoodDesc = ({ route, navigation }: Prop) => {
   };
 
   // Photo component
-  const PhotoItem = ({ item, index }: { item: any; index: number }) => {
+  const PhotoItem = ({ photo }: PhotoProps) => {
     return (
-      <Pressable>
-        <Image source={chicken} />
+      <Pressable style={{ marginRight: 10 }}>
+        <Image source={photo.img} />
       </Pressable>
     );
   };
@@ -268,44 +288,6 @@ const FoodDesc = ({ route, navigation }: Prop) => {
                     </Pressable>
                   </View>
                 ))}
-              <View style={[utilStyle.card, style.cartItem]}>
-                <View>
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                    Chicken drumstick (without skin)
-                  </Text>
-                  <View style={{ display: "flex", flexDirection: "row" }}>
-                    <Text style={{ color: primaryColor, fontWeight: "bold" }}>
-                      ₹ 184.00
-                    </Text>
-                    <Text style={{ color: primaryColor, fontWeight: "bold" }}>
-                      / 500gm
-                    </Text>
-                  </View>
-                  <View style={style.quantityContain}>
-                    <Text>Quantity</Text>
-                    <View style={[utilStyle.card, style.quantityBox]}>
-                      <Pressable style={style.btn}>
-                        <Text>-</Text>
-                      </Pressable>
-                      <TextInput
-                        style={style.quantityField}
-                        value="1"
-                        keyboardType="numeric"
-                      />
-                      <Pressable style={style.btn}>
-                        <Text>+</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </View>
-                <Pressable>
-                  <MaterialIcons
-                    name="delete-outline"
-                    color={darkColor}
-                    size={25}
-                  />
-                </Pressable>
-              </View>
             </ScrollView>
             <View style={[utilStyle.card, style.cartFooter]}>
               <View>
@@ -320,12 +302,26 @@ const FoodDesc = ({ route, navigation }: Prop) => {
               </Pressable>
             </View>
 
-            <Pressable
-              style={style.closeCartBtn}
-              onPress={() => setCart(false)}
-            >
-              <AntDesign name="close" color={darkColor} size={25} />
-            </Pressable>
+            <View style={style.topContent}>
+              <Pressable
+                style={style.closeCartBtn}
+                onPress={() => setCart(false)}
+              >
+                <AntDesign name="close" color={darkColor} size={25} />
+              </Pressable>
+              <Pressable onPress={() => navigation.navigate("Promo")}>
+                <Text
+                  style={{
+                    color: primaryColor,
+                    textDecorationLine: "underline",
+                    textDecorationStyle: "solid",
+                    paddingRight: 15,
+                  }}
+                >
+                  Add promocode
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Pressable>
       </Modal>
@@ -456,7 +452,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
               </View>
 
               <Pressable
-                style={[style.closeBtn, { padding: 5 }]}
+                style={[style.closeBtn]}
                 android_ripple={{ color: secondaryColor, borderless: true }}
                 onPress={() => navigation.goBack()}
               >
@@ -469,15 +465,10 @@ const FoodDesc = ({ route, navigation }: Prop) => {
         {/* Photos */}
         <View style={utilStyle.mt1}>
           <Text style={utilStyle.head}>Photos</Text>
-          <Carousel
-            ref={ref}
-            data={photos}
-            renderItem={PhotoItem}
-            sliderWidth={SliderWidth}
-            itemWidth={130}
-            inactiveSlideOpacity={1}
-            inactiveSlideScale={1}
-          />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {photos &&
+              photos.map(photo => <PhotoItem key={photo.id} photo={photo} />)}
+          </ScrollView>
         </View>
 
         {/* Related */}
@@ -678,10 +669,21 @@ const style = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
   },
-  closeCartBtn: {
+  topContent: {
     position: "absolute",
     top: 10,
     left: 10,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 15,
+  },
+  closeCartBtn: {
+    // position: "absolute",
+    // top: 10,
+    // left: 10,
   },
   backdrop: {
     display: "none",

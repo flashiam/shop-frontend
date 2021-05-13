@@ -10,20 +10,34 @@ import {
 } from "../../styles/_variables";
 import suggestFood from "../../img/suggest_food.jpg";
 
-const Food = ({ item, index }: { item: any; index: number }) => {
+interface Food {
+  id: number;
+  title: string;
+  price: number;
+  img: string;
+  rating: number;
+  stars: number;
+  reviews: number;
+}
+
+type Props = {
+  food: Food;
+};
+
+const Food = ({ food }: Props) => {
   return (
     <View style={[utilStyle.card, style.dealCard]}>
       <View style={style.imgContain}>
-        <Image source={suggestFood} style={style.dealImg} />
+        <Image source={food.img} style={style.dealImg} />
       </View>
 
       <View style={style.dealContent}>
         <View>
           <Text style={{ fontSize: 20, color: medColor, fontWeight: "bold" }}>
-            Mix Veg
+            {food.title}
           </Text>
           <View style={style.ratings}>
-            <Text style={style.txt}>4.9</Text>
+            <Text style={style.txt}>{food.rating}</Text>
             <View style={[style.rating]}>
               <MaterialIcons name="star" size={8} color={primaryColor} />
               <MaterialIcons name="star" size={8} color={primaryColor} />
@@ -31,7 +45,7 @@ const Food = ({ item, index }: { item: any; index: number }) => {
               <MaterialIcons name="star" size={8} color={primaryColor} />
               <MaterialIcons name="star" size={8} color={medColor} />
             </View>
-            <Text style={style.txt}>(150)</Text>
+            <Text style={style.txt}>({food.reviews})</Text>
           </View>
         </View>
         <View>
@@ -65,6 +79,7 @@ const style = StyleSheet.create({
     borderRadius: 10,
     width: 300,
     padding: 0,
+    marginRight: 10,
   },
   imgContain: {
     position: "relative",
