@@ -111,7 +111,7 @@ const style = StyleSheet.create({
   },
   wishlistContain: {
     marginTop: 15,
-    display: "flex",
+    // display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",

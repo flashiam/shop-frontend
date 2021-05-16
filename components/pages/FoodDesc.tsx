@@ -364,22 +364,20 @@ const FoodDesc = ({ route, navigation }: Prop) => {
               <View style={style.controls}>
                 <View style={style.control}>
                   <Text style={style.label}>Weight</Text>
-                  <View style={[utilStyle.card, style.weightContain]}>
-                    <Picker
-                      selectedValue={weight.toString()}
-                      onValueChange={value => ctrlWeight(value)}
-                      // style={[utilStyle.card, style.weightInput]}
-                    >
-                      <Picker.Item
-                        label="500g"
-                        value="500g"
-                        // style={utilStyle.card}
-                      />
-                      <Picker.Item label="1000g" value="1000g" />
-                      <Picker.Item label="1500g" value="1500g" />
-                      <Picker.Item label="2000g" value="2000g" />
-                    </Picker>
-                  </View>
+                  {/* <View style={[utilStyle.card, style.weightContain]}> */}
+                  <Picker
+                    // selectedValue={weight.toString()}
+                    onValueChange={value => ctrlWeight(value)}
+                    style={{ backgroundColor: "red" }}
+                    mode="dropdown"
+                    prompt="Enter weight"
+                  >
+                    <Picker.Item label="500g" value="500g" />
+                    <Picker.Item label="1000g" value="1000g" />
+                    <Picker.Item label="1500g" value="1500g" />
+                    <Picker.Item label="2000g" value="2000g" />
+                  </Picker>
+                  {/* </View> */}
                 </View>
                 <View style={style.control}>
                   <Text style={style.label}>Quantity</Text>

@@ -20,3 +20,22 @@ export type TabOneParamList = {
 export type TabTwoParamList = {
   TabTwoScreen: undefined;
 };
+
+export type DrawerParamList = {
+  Home: undefined;
+  Categories: { catid: number };
+  Food: { foodid: number };
+  Promo: undefined;
+  OrderLoading: undefined;
+  Receipt: undefined;
+  HiddenScreen1: undefined;
+  HiddenScreen2: undefined;
+  HiddenScreen3: undefined;
+  Orders: undefined;
+  Wishlist: undefined;
+  Support: undefined;
+  Refer: undefined;
+  HiddenScreen4: undefined;
+  HiddenScreen5: undefined;
+  HiddenScreen6: undefined;
+};

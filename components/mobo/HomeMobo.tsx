@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   Pressable,
   DrawerLayoutAndroid,
   StatusBar,
+  Button,
+  TouchableNativeFeedback,
 } from "react-native";
 import utilStyle from "../../styles/utilStyle";
 import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
@@ -38,6 +40,7 @@ import appStore from "../../img/app-store-badge.png";
 import foodImg from "../../img/indian_food_1.png";
 
 import { medColor, secondaryColor } from "../../styles/_variables";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 // Slider width of the carousel
 const SliderWidth = Dimensions.get("window").width - 450;
@@ -246,9 +249,22 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   const ref = useRef(null);
   const drawer = useRef<any>(null);
 
+  // const [drawer, setDrawer] = useState<any>();
+
+  // const refDrawer = useCallback(el => {
+  //   setDrawer(el);
+  // }, []);
+
   type CatProps = {
     cat: Category;
   };
+
+  // Function to open drawer
+  // const openDrawer = () => {
+  //   if (drawer) {
+  //     drawer.current.openDrawer();
+  //   }
+  // };
 
   // Category item
   const CatItem = ({ cat }: CatProps) => {
@@ -320,13 +336,11 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
             </Pressable>
             {/* Navbar btn */}
             <Pressable
-              onPress={() => {
-                drawer.current.openDrawer();
-              }}
-              android_ripple={{
-                color: secondaryColor,
-                borderless: true,
-              }}
+              onPress={() => drawer?.current.openDrawer()}
+              // android_ripple={{
+              //   color: secondaryColor,
+              //   borderless: true,
+              // }}
             >
               <EvilIcons name="navicon" size={35} color="red" />
             </Pressable>
@@ -373,7 +387,12 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
             >
               {foods &&
                 foods.map(food => (
-                  <Food key={food.id} navigation={navigation} food={food} />
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    mr={20}
+                  />
                 ))}
             </ScrollView>
           </View>
@@ -389,7 +408,12 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
             >
               {foods &&
                 foods.map(food => (
-                  <Food key={food.id} navigation={navigation} food={food} />
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    mr={20}
+                  />
                 ))}
             </ScrollView>
           </View>

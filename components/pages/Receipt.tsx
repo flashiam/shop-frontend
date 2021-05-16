@@ -82,7 +82,7 @@ const Receipt = ({ navigation }: Props) => {
             </View>
             <View>
               <View style={style.slider}>
-                {/* <MultiSlider
+                <MultiSlider
                   sliderLength={300}
                   min={1}
                   max={5}
@@ -98,7 +98,7 @@ const Receipt = ({ navigation }: Props) => {
                     marginTop: 7,
                     elevation: 2,
                   }}
-                /> */}
+                />
               </View>
               <View style={style.sliderLabel}>
                 <View style={style.label}>

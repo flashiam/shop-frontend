@@ -35,16 +35,17 @@ type Props = {
   navigation: any;
   food: Food;
   updatePage?: boolean;
+  mr?: number;
 };
 
 // import FoodDesc from "../pages/FoodDesc";
 
-const Food = ({ navigation, food, updatePage }: Props) => {
+const Food = ({ navigation, food, updatePage, mr }: Props) => {
   const { id, title, price, img, rating, stars, reviews } = food;
 
   return (
     <Pressable
-      style={[utilStyle.card, style.dealCard]}
+      style={[utilStyle.card, style.dealCard, { marginRight: mr ? mr : 0 }]}
       onPress={() =>
         updatePage
           ? navigation.push("Food", { foodid: id })
@@ -112,7 +113,6 @@ const style = StyleSheet.create({
   dealCard: {
     borderRadius: 10,
     width: 160,
-    marginRight: 20,
     // width: Platform.OS === "web" ? 300 : 150,
   },
   imgContain: {

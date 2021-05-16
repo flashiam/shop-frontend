@@ -19,6 +19,7 @@ import utilStyle from "../../styles/utilStyle";
 import {
   darkColor,
   lightColor,
+  medColor,
   primaryColor,
   secondaryColor,
 } from "../../styles/_variables";
@@ -60,16 +61,7 @@ const Support = ({ navigation }: Props) => {
     },
   ];
 
-  const [messages, setMessage] = useState<Message[]>([
-    {
-      id: 1,
-      msg: "I want a refund",
-    },
-    {
-      id: 2,
-      msg: "I want a refund",
-    },
-  ]);
+  const [messages, setMessage] = useState<Message[]>([]);
 
   const [value, setValue] = useState<string>("");
 
@@ -77,15 +69,6 @@ const Support = ({ navigation }: Props) => {
   const inputChange = (val: string) => {
     setValue(val);
   };
-
-  // Function to auto scroll the view when message is send
-  // const autoScroll = () => {
-  //   messageRef.current.scrollIntoView({ behaviour: "smooth" });
-  // };
-
-  // useEffect(() => {
-  //   // autoScroll();
-  // }, [messageRef]);
 
   // Function to send message
   const sendMessage = () => {
@@ -98,7 +81,7 @@ const Support = ({ navigation }: Props) => {
       inputRef.current.blur();
       messageRef.current.scrollTo({
         x: 0,
-        y: Dimensions.get("window").height + 2000,
+        y: Dimensions.get("window").height + 3000,
         animated: true,
       });
     } else {
@@ -157,6 +140,8 @@ const Support = ({ navigation }: Props) => {
           value={value}
           onChange={e => inputChange(e.nativeEvent.text)}
           onSubmitEditing={e => sendMessage}
+          placeholder="Type something..."
+          placeholderTextColor={secondaryColor}
         />
         <View style={style.btnContain}>
           <Pressable style={{ marginRight: 20 }}>
@@ -207,6 +192,7 @@ const style = StyleSheet.create({
     marginHorizontal: 5,
     borderRadius: 10,
     width: "85%",
+    // width: "auto",
     padding: 18,
   },
   time: {
@@ -224,7 +210,7 @@ const style = StyleSheet.create({
   msgInput: {
     width: "60%",
     marginLeft: 15,
-    fontSize: 19,
+    fontSize: 18,
   },
   sendBtn: {
     backgroundColor: primaryColor,

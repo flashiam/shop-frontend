@@ -5,6 +5,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
+import DrawerNavigator from "./navigation/DrawerNavigator";
 
 import Home from "./components/pages/Home";
 import FoodDesc from "./components/pages/FoodDesc";

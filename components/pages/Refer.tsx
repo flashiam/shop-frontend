@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
   StatusBar,
+  Share,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -35,6 +36,25 @@ type Props = {
 };
 
 const Refer = ({ navigation }: Props) => {
+  // Function to send referal manually
+  const sendReferal = async () => {
+    try {
+      const res = await Share.share({
+        title: "Earn Fred Points",
+        message: "Invite friends to earn fred points",
+        url: "https://www.fresh-fred/earn",
+      });
+
+      if (res.action === Share.sharedAction) {
+        console.log("Referal send");
+      } else if (res.action === Share.dismissedAction) {
+        console.log("Referal dismissed");
+      }
+    } catch (err) {
+      console.log("Referal failed");
+    }
+  };
+
   return (
     <ScrollView>
       <View style={utilStyle.container}>
@@ -84,7 +104,7 @@ const Refer = ({ navigation }: Props) => {
               <Pressable style={style.shareItem}>
                 <Image source={messaging} style={style.shareImg} />
               </Pressable>
-              <Pressable style={style.shareItem}>
+              <Pressable style={style.shareItem} onPress={sendReferal}>
                 <Image source={linkImg} style={style.shareImg} />
               </Pressable>
             </View>
