@@ -111,7 +111,9 @@ const Food = ({ navigation, food, updatePage }: Props) => {
 const style = StyleSheet.create({
   dealCard: {
     borderRadius: 10,
-    width: Platform.OS === "web" ? 300 : 150,
+    width: 160,
+    marginRight: 20,
+    // width: Platform.OS === "web" ? 300 : 150,
   },
   imgContain: {
     display: "flex",

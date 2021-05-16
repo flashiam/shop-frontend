@@ -9,6 +9,7 @@ import {
   Dimensions,
   Pressable,
   DrawerLayoutAndroid,
+  StatusBar,
 } from "react-native";
 import utilStyle from "../../styles/utilStyle";
 import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
@@ -32,8 +33,8 @@ import offerImg1 from "../../img/food_coupons.jpg";
 import offerImg2 from "../../img/food_coupons_2.jpg";
 import suggestFood from "../../img/suggest_food.jpg";
 import testAvatar from "../../img/test_avatar.jpg";
-import playStore from "../../img/play_store.png";
-import appStore from "../../img/app_store.png";
+import playStore from "../../img/google-play-badge.png";
+import appStore from "../../img/app-store-badge.png";
 import foodImg from "../../img/indian_food_1.png";
 
 import { medColor, secondaryColor } from "../../styles/_variables";
@@ -166,6 +167,24 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       stars: 3,
       img: foodImg,
     },
+    {
+      id: 3,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      img: foodImg,
+    },
+    {
+      id: 4,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      img: foodImg,
+    },
   ]);
 
   // State for the recipes
@@ -262,64 +281,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     );
   };
 
-  // Navigation view
-  // const navigationView = () => {
-  //   return (
-  //     <View style={style.navContain}>
-  //       <Pressable style={style.profileContain}>
-  //         <Image source={testAvatar} style={style.profileAvatar} />
-  //         <View style={style.profileDetails}>
-  //           <Text style={style.userName}>Joy Pashina</Text>
-  //           <Text style={style.userEmail}>joypashina32@gmail.com</Text>
-  //         </View>
-  //       </Pressable>
-
-  //       <View style={style.navLinks}>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <FontAwesome5 name="receipt" size={20} color={primaryColor} />
-  //           <Text style={style.linkTxt}>My Orders</Text>
-  //         </Pressable>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <FontAwesome5 name="shopping-bag" size={20} color={primaryColor} />
-  //           <Text style={style.linkTxt}>Wishlist</Text>
-  //         </Pressable>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <MaterialIcons
-  //             name="support-agent"
-  //             size={20}
-  //             color={primaryColor}
-  //           />
-  //           <Text style={style.linkTxt}>Support</Text>
-  //         </Pressable>
-  //         <Pressable
-  //           style={style.navLink}
-  //           android_ripple={{ color: secondaryColor }}
-  //         >
-  //           <FontAwesome5 name="ticket-alt" size={20} color={primaryColor} />
-  //           <Text style={style.linkTxt}>Refer and earn</Text>
-  //         </Pressable>
-  //       </View>
-
-  //       <Pressable
-  //         style={style.closeNavBtn}
-  //         android_ripple={{ color: secondaryColor, borderless: true }}
-  //         onPress={() => drawer.current.closeDrawer()}
-  //       >
-  //         <AntDesign name="close" size={25} color={darkColor} />
-  //       </Pressable>
-  //     </View>
-  //   );
-  // };
-
   return (
     <DrawerLayoutAndroid
       ref={drawer}
@@ -387,14 +348,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
             >
               {offers && offers.map(offer => <OfferItem key={offer.id} />)}
             </ScrollView>
-            {/* <Carousel
-              layout={"default"}
-              ref={ref}
-              data={offers}
-              renderItem={OfferItem}
-              sliderWidth={SliderWidth}
-              itemWidth={300}
-            /> */}
           </View>
 
           <View style={utilStyle.mt1}>
@@ -407,40 +360,38 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
               {categories &&
                 categories.map(cat => <CatItem key={cat.id} cat={cat} />)}
             </ScrollView>
-            {/* <Carousel
-              layout={"default"}
-              ref={ref}
-              data={categories}
-              renderItem={CatItem}
-              sliderWidth={SliderWidth}
-              itemWidth={90}
-              inactiveSlideOpacity={1}
-              inactiveSlideScale={1}
-            /> */}
           </View>
 
           {/* Todays deal */}
           <View style={utilStyle.mt1}>
             <Text style={[utilStyle.head]}>Today's deal</Text>
 
-            <View style={style.dealContain}>
+            <ScrollView
+              style={{ width: SliderWidth }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
               {foods &&
                 foods.map(food => (
                   <Food key={food.id} navigation={navigation} food={food} />
                 ))}
-            </View>
+            </ScrollView>
           </View>
 
           {/* Most selling */}
           <View style={utilStyle.mt1}>
             <Text style={utilStyle.head}>Most Selling</Text>
 
-            <View style={style.dealContain}>
+            <ScrollView
+              style={{ width: SliderWidth }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
               {foods &&
                 foods.map(food => (
                   <Food key={food.id} navigation={navigation} food={food} />
                 ))}
-            </View>
+            </ScrollView>
           </View>
 
           {/* Suggested */}
@@ -450,15 +401,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
               {suggested &&
                 suggested.map(food => <FoodWide key={food.id} food={food} />)}
             </ScrollView>
-            {/* <Carousel
-              ref={ref}
-              data={suggested}
-              renderItem={FoodWide}
-              sliderWidth={SliderWidth}
-              itemWidth={320}
-              inactiveSlideOpacity={1}
-              inactiveSlideScale={1}
-            /> */}
           </View>
 
           {/* Offers */}
@@ -472,13 +414,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
             >
               {offers && offers.map(offer => <OfferItem key={offer.id} />)}
             </ScrollView>
-            {/* <Carousel
-              ref={ref}
-              data={offers}
-              renderItem={offerItem}
-              sliderWidth={SliderWidth}
-              itemWidth={300}
-            /> */}
           </View>
 
           {/* Special recipies */}
@@ -494,15 +429,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
                   <RecipeCard key={recipe.id} recipe={recipe} />
                 ))}
             </ScrollView>
-            {/* <Carousel
-              ref={ref}
-              data={recipes}
-              renderItem={RecipeCard}
-              sliderWidth={SliderWidth}
-              itemWidth={320}
-              inactiveSlideOpacity={1}
-              inactiveSlideScale={1}
-            /> */}
           </View>
 
           {/* Advertisment */}
@@ -523,7 +449,17 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
           </View>
 
           {/* Illustration */}
-          <View style={utilStyle.mt1}>
+          <View
+            style={
+              (utilStyle.mt1,
+              {
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 5,
+              })
+            }
+          >
             <SvgComponent />
           </View>
 
@@ -561,7 +497,9 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 50,
+    marginTop: StatusBar.currentHeight,
+    paddingTop: 10,
+    paddingBottom: 5,
   },
   leftContent: {
     display: "flex",
@@ -630,7 +568,8 @@ const style = StyleSheet.create({
   },
   advImg: {
     width: 155,
-    marginVertical: 10,
+    height: 70,
+    // marginVertical: 10,
   },
   concludeCard: {
     position: "relative",
@@ -661,7 +600,7 @@ const style = StyleSheet.create({
     fontSize: 60,
     color: secondaryColor,
     position: "absolute",
-    top: -20,
+    top: -25,
     zIndex: 4,
   },
   leftApost: {

@@ -6,11 +6,12 @@ function SvgComponent(props: any) {
     <Svg
       width={413}
       height={216}
-      viewBox="20 10 450 216"
+      viewBox="0 0 413 216"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       {...props}
+      // style={{ transform: [{ translateX: 35 }] }}
     >
       <Rect width={413} height={216} rx={10} fill="url(#prefix__pattern0)" />
       <Defs>

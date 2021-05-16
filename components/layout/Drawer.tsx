@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import { FontAwesome5, MaterialIcons, AntDesign } from "@expo/vector-icons";
 
@@ -127,8 +128,9 @@ const style = StyleSheet.create({
   },
   closeNavBtn: {
     position: "absolute",
-    top: 50,
+    top: StatusBar.currentHeight,
     right: 30,
+    paddingTop: 10,
   },
 });
 

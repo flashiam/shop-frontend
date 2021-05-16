@@ -106,9 +106,6 @@ const style = StyleSheet.create({
     marginTop: StatusBar.currentHeight,
     paddingVertical: 15,
   },
-  section: {
-    marginTop: 10,
-  },
   wishHead: {
     fontWeight: "bold",
   },

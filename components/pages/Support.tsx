@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
   View,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   Pressable,
   StatusBar,
   TextInput,
+  Dimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -29,28 +30,82 @@ interface Option {
   label: string;
 }
 
+interface Message {
+  id: number;
+  msg: string;
+}
+
 type SupportScreenNavProp = StackNavigationProp<RootStackParamList, "Support">;
 
 type Props = {
   navigation: SupportScreenNavProp;
 };
 
-const options: Option[] = [
-  {
-    label: "I want a refund",
-    value: "refund",
-  },
-  {
-    label: "Talk to our executive",
-    value: "executive",
-  },
-  {
-    label: "I am unable to track my order",
-    value: "order",
-  },
-];
-
 const Support = ({ navigation }: Props) => {
+  const messageRef = useRef<any>(null);
+  const inputRef = useRef<any>(null);
+
+  const options: Option[] = [
+    {
+      label: "I want a refund",
+      value: "refund",
+    },
+    {
+      label: "Talk to our executive",
+      value: "executive",
+    },
+    {
+      label: "I am unable to track my order",
+      value: "order",
+    },
+  ];
+
+  const [messages, setMessage] = useState<Message[]>([
+    {
+      id: 1,
+      msg: "I want a refund",
+    },
+    {
+      id: 2,
+      msg: "I want a refund",
+    },
+  ]);
+
+  const [value, setValue] = useState<string>("");
+
+  // Function to set the text value
+  const inputChange = (val: string) => {
+    setValue(val);
+  };
+
+  // Function to auto scroll the view when message is send
+  // const autoScroll = () => {
+  //   messageRef.current.scrollIntoView({ behaviour: "smooth" });
+  // };
+
+  // useEffect(() => {
+  //   // autoScroll();
+  // }, [messageRef]);
+
+  // Function to send message
+  const sendMessage = () => {
+    if (value) {
+      setMessage([
+        ...messages,
+        { id: Math.floor(Math.random() * 100) + 1, msg: value },
+      ]);
+      setValue("");
+      inputRef.current.blur();
+      messageRef.current.scrollTo({
+        x: 0,
+        y: Dimensions.get("window").height + 2000,
+        animated: true,
+      });
+    } else {
+      console.log("Enter some message");
+    }
+  };
+
   return (
     <View style={{ position: "relative", display: "flex", flex: 1 }}>
       <View style={utilStyle.container}>
@@ -61,32 +116,53 @@ const Support = ({ navigation }: Props) => {
         </View>
         <View style={style.section}>
           <Text style={utilStyle.head}>Support</Text>
-          <ScrollView>
-            <View style={[utilStyle.card, style.msg]}>
-              <Text style={style.time}>12:34</Text>
-              <View>
-                <Text style={{ fontWeight: "bold" }}>How can we help you?</Text>
+          <ScrollView
+            ref={messageRef}
+            style={{
+              minHeight: Dimensions.get("window").height + 100,
+            }}
+          >
+            <View style={{ marginBottom: 500 }}>
+              <View style={[utilStyle.card, style.msg]}>
+                <Text style={style.time}>12:34</Text>
                 <View>
-                  <RadioButton options={options} />
+                  <Text style={{ fontWeight: "bold" }}>
+                    How can we help you?
+                  </Text>
+                  <View>
+                    <RadioButton options={options} />
+                  </View>
                 </View>
               </View>
-            </View>
-            <View style={[utilStyle.card, style.msg, style.right]}>
-              <Text style={style.time}>12:36</Text>
-              <View>
-                <Text>I want a refund</Text>
-              </View>
+              {messages &&
+                messages.map(message => (
+                  <View
+                    key={message.id}
+                    style={[utilStyle.card, style.msg, style.right]}
+                  >
+                    <Text style={style.time}>12:36</Text>
+                    <View>
+                      <Text>{message.msg}</Text>
+                    </View>
+                  </View>
+                ))}
             </View>
           </ScrollView>
         </View>
       </View>
       <View style={[utilStyle.card, style.msgFooter]}>
-        <TextInput style={style.msgInput} />
+        <TextInput
+          ref={inputRef}
+          style={style.msgInput}
+          value={value}
+          onChange={e => inputChange(e.nativeEvent.text)}
+          onSubmitEditing={e => sendMessage}
+        />
         <View style={style.btnContain}>
           <Pressable style={{ marginRight: 20 }}>
             <Entypo name="attachment" size={20} color={secondaryColor} />
           </Pressable>
-          <Pressable style={style.sendBtn}>
+          <Pressable style={style.sendBtn} onPress={sendMessage}>
             <Ionicons name="md-send-outline" size={20} color={lightColor} />
           </Pressable>
         </View>

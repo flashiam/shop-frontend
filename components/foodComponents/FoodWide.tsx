@@ -79,7 +79,7 @@ const style = StyleSheet.create({
     borderRadius: 10,
     width: 300,
     padding: 0,
-    marginRight: 10,
+    marginRight: 20,
   },
   imgContain: {
     position: "relative",

@@ -4,11 +4,12 @@ import HomeWeb from "../web/HomeWeb";
 import HomeMobo from "../mobo/HomeMobo";
 
 const Home = ({ navigation }: { navigation: any }) => {
-  return Platform.OS === "web" ? (
-    <HomeWeb navigation={navigation} />
-  ) : (
-    <HomeMobo navigation={navigation} />
-  );
+  return <HomeMobo navigation={navigation} />;
+  // return Platform.OS === "web" ? (
+  //   <HomeWeb navigation={navigation} />
+  // ) : (
+  //   <HomeMobo navigation={navigation} />
+  // );
 };
 
 export default Home;
