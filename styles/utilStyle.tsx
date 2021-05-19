@@ -9,7 +9,7 @@ const utilStyle = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    elevation: 3,
+    elevation: 6,
     backgroundColor: lightColor,
     marginBottom: 5,
     shadowOffset: {
@@ -20,6 +20,7 @@ const utilStyle = StyleSheet.create({
     shadowColor: primaryColor,
     shadowOpacity: 0.1,
     padding: 15,
+    marginHorizontal: 1,
   },
   head: {
     color: darkColor,

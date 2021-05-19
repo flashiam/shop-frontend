@@ -1,21 +1,17 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   Pressable,
   ScrollView,
   DrawerLayoutAndroid,
   TextInput,
-  Modal,
-  useWindowDimensions,
+  TouchableOpacity,
   Dimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import utilStyle from "../../styles/utilStyle";
 import {
   primaryColor,
@@ -25,7 +21,6 @@ import {
 } from "../../styles/_variables";
 
 import {
-  Ionicons,
   EvilIcons,
   MaterialIcons,
   FontAwesome5,
@@ -36,7 +31,6 @@ import Food from "../foodComponents/Food";
 import Drawer from "../layout/Drawer";
 
 import foodImg from "../../img/indian_food_1.png";
-import testAvatar from "../../img/test_avatar.jpg";
 
 // Type checking
 type RootStackParamList = {
@@ -56,12 +50,12 @@ type Props = {
   navigation: CategoryScreenNavProp;
 };
 
-let searchOpened = false;
-
 const Categories = ({ route, navigation }: Props) => {
   // Width for the tabs
   const layout = Dimensions.get("window").width;
   const selectedCat = route.params.catid - 1;
+
+  const srchInput = useRef<HTMLAllCollection>(null);
 
   interface Food {
     id: number;
@@ -73,231 +67,147 @@ const Categories = ({ route, navigation }: Props) => {
     reviews: number;
   }
 
-  interface TabRoute {
-    key: string;
-    title: string;
+  interface Category {
+    id: number;
+    catName: string;
+    catItems: Food[];
+  }
+
+  interface SubCategory {
+    id: number;
+    subCatName: string;
+    subCatItems: Food[] | any;
   }
 
   const drawer = useRef<any>(null);
 
   // Dummy foods data
-  const [foods, setFoods] = useState<Food[] | null>([
+  const [foods, setFoods] = useState<Food[]>([
     {
       id: 1,
-      title: "Mix Veg",
-      price: 599,
-      reviews: 150,
-      rating: 4.9,
+      title: "Chicken wings",
+      price: 799,
+      reviews: 120,
+      rating: 4.0,
       stars: 4,
       img: foodImg,
     },
     {
       id: 2,
-      title: "Mix Veg",
-      price: 599,
-      reviews: 150,
-      rating: 4.9,
+      title: "Chicken stew",
+      price: 650,
+      reviews: 10,
+      rating: 4.5,
       stars: 4,
       img: foodImg,
     },
     {
       id: 3,
-      title: "Mix Veg",
-      price: 599,
-      reviews: 150,
-      rating: 4.9,
-      stars: 4,
+      title: "Kadaknath",
+      price: 359,
+      reviews: 125,
+      rating: 3.9,
+      stars: 3,
       img: foodImg,
     },
     {
       id: 4,
-      title: "Mix Veg",
-      price: 599,
+      title: "Chicken legs",
+      price: 899,
       reviews: 150,
-      rating: 4.9,
+      rating: 4.3,
       stars: 4,
       img: foodImg,
     },
     {
       id: 5,
-      title: "Mix Veg",
-      price: 599,
-      reviews: 150,
-      rating: 4.9,
-      stars: 4,
+      title: "Murg mussalam",
+      price: 1299,
+      reviews: 900,
+      rating: 5.0,
+      stars: 5,
       img: foodImg,
     },
   ]);
 
-  // State for the category segment
-  const [index, setIndex] = useState<number>(selectedCat);
-
-  // State for the filter segment
-  const [filterIndex, setFilterIndex] = useState<number>(0);
-
-  // Tab routes
-  const [routes] = useState<TabRoute[]>([
+  const [categories, setCategories] = useState<Category[]>([
     {
-      key: "first",
-      title: "Chicken",
+      id: 0,
+      catName: "Chicken",
+      catItems: foods,
     },
     {
-      key: "second",
-      title: "Sea Food",
+      id: 1,
+      catName: "Sea Food",
+      catItems: foods,
     },
     {
-      key: "third",
-      title: "Mutton",
+      id: 2,
+      catName: "Mutton",
+      catItems: foods,
     },
   ]);
 
-  // Filter routes
-  const [filterRoutes] = useState<TabRoute[]>([
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([
     {
-      key: "first",
-      title: "All",
+      id: 0,
+      subCatName: "All",
+      subCatItems: [...foods].map(food => food),
     },
     {
-      key: "second",
-      title: "Low to high",
+      id: 1,
+      subCatName: "Low to high",
+      subCatItems: [...foods]
+        .map(food => food)
+        .sort((cheap, costly) => {
+          const cheapFood = cheap["price"];
+          const costlyFood = costly["price"];
+
+          if (cheapFood < costlyFood) {
+            return -1;
+          } else if (cheapFood > costlyFood) {
+            return 1;
+          }
+          return 0;
+        }),
     },
     {
-      key: "third",
-      title: "Popularity",
+      id: 2,
+      subCatName: "Popular",
+      subCatItems: [...foods]
+        .map(food => food)
+        .sort((popular, unpopular) => {
+          const popularFood = popular["reviews"];
+          const unpopularFood = unpopular["reviews"];
+
+          if (popularFood > unpopularFood) {
+            return -1;
+          } else if (popularFood < unpopularFood) {
+            return 1;
+          }
+          return 0;
+        }),
     },
     {
-      key: "fourth",
-      title: "4+ rating",
+      id: 3,
+      subCatName: "4+ rating",
+      subCatItems: [...foods].filter(food => food.rating > 4),
     },
     {
-      key: "fifth",
-      title: "Latest",
+      id: 4,
+      subCatName: "Latest",
+      subCatItems: [...foods].map(food => food),
     },
   ]);
 
-  const filterLoading = () => {
-    return (
-      <View
-        style={{
-          display: "flex",
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text>Loading...</Text>
-      </View>
-    );
-  };
+  const [activeTab, setActiveTab] = useState<number>(selectedCat | 0);
+  const [activeSubTab, setActiveSubTab] = useState<number>(0);
 
-  const filterComp = () => {
-    return (
-      <View
-        style={[
-          style.categoryContain,
-          {
-            display: "flex",
-            flex: 1,
-            paddingHorizontal: 15,
-          },
-        ]}
-      >
-        {foods &&
-          foods.map(food => (
-            <View key={food.id} style={{ marginBottom: 15 }}>
-              <Food navigation={navigation} food={food} />
-            </View>
-          ))}
-      </View>
-    );
-  };
+  const [searchOpened, setSearch] = useState<boolean>(false);
 
-  // Cusotom filter tab bar
-  const filterTabBar = (props: any) => {
-    return (
-      <TabBar
-        {...props}
-        scrollEnabled={true}
-        activeColor={primaryColor}
-        inactiveColor={secondaryColor}
-        style={{ backgroundColor: "transparent", elevation: 0 }}
-        labelStyle={{ fontSize: 15 }}
-        indicatorStyle={{ backgroundColor: "transparent" }}
-        tabStyle={{ width: 100 }}
-      />
-    );
-  };
-  // Category components
-  const Comp1 = () => {
-    return (
-      <View style={[style.categoryContain, { display: "flex", flex: 1 }]}>
-        <TabView
-          navigationState={{ index: filterIndex, routes: filterRoutes }}
-          renderScene={renderFilterScene}
-          onIndexChange={setFilterIndex}
-          initialLayout={{ width: layout }}
-          renderTabBar={filterTabBar}
-          lazy
-          renderLazyPlaceholder={filterLoading}
-        />
-      </View>
-    );
-  };
-
-  const Comp2 = () => {
-    return (
-      <View style={style.categoryContain}>
-        {/* {foods &&
-          foods.map(food => (
-            <View key={food.id} style={{ marginBottom: 15 }}>
-              <Food navigation={navigation} food={food} />
-            </View>
-          ))} */}
-      </View>
-    );
-  };
-  const Comp3 = () => {
-    return (
-      <View style={style.categoryContain}>
-        {/* {foods &&
-          foods.map(food => (
-            <View key={food.id} style={{ marginBottom: 15 }}>
-              <Food navigation={navigation} food={food} />
-            </View>
-          ))} */}
-      </View>
-    );
-  };
-
-  // Render filter scenes
-  const renderFilterScene = SceneMap({
-    first: filterComp,
-    second: filterComp,
-    third: filterComp,
-    fourth: filterComp,
-    fifth: filterComp,
-  });
-
-  // Render the scenes
-  const renderScene = SceneMap({
-    first: Comp1,
-    second: Comp1,
-    third: Comp1,
-  });
-
-  const renderTabBar = (props: any) => {
-    return (
-      <TabBar
-        {...props}
-        scrollEnabled={true}
-        activeColor={darkColor}
-        inactiveColor={secondaryColor}
-        style={{ backgroundColor: "transparent", elevation: 0 }}
-        labelStyle={{ fontWeight: "bold", fontSize: 20 }}
-        indicatorStyle={{ backgroundColor: "transparent" }}
-      />
-    );
-  };
+  useEffect(() => {
+    console.log(searchOpened);
+  }, []);
 
   return (
     <DrawerLayoutAndroid
@@ -321,10 +231,29 @@ const Categories = ({ route, navigation }: Props) => {
           </Pressable>
           <View style={style.rightContent}>
             {/* Search bar */}
-            <View style={[utilStyle.card, style.searchBar]}>
+            <Pressable
+              style={[
+                utilStyle.card,
+                style.searchBar,
+                { width: searchOpened ? 230 : "auto" },
+              ]}
+              onPress={() => {
+                setSearch(true);
+                if (srchInput.current) {
+                  srchInput.current.focus();
+                }
+              }}
+            >
               <AntDesign name="search1" color={primaryColor} size={24} />
-              <TextInput style={style.searchInput} placeholder="Search" />
-            </View>
+              <TextInput
+                ref={srchInput}
+                style={[
+                  style.searchInput,
+                  { display: searchOpened ? "flex" : "none" },
+                ]}
+                onBlur={() => setSearch(false)}
+              />
+            </Pressable>
             {/* Navbar btn */}
             <Pressable
               onPress={() => {
@@ -340,13 +269,68 @@ const Categories = ({ route, navigation }: Props) => {
           </View>
         </View>
       </View>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout }}
-        renderTabBar={renderTabBar}
-      />
+      <View style={utilStyle.container}>
+        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+          {categories &&
+            categories.map(cat => (
+              <TouchableOpacity
+                key={cat.id}
+                style={style.tab}
+                onPress={() => setActiveTab(cat.id)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    style.tabLabel,
+                    activeTab === cat.id && style.activeLabel,
+                  ]}
+                >
+                  {cat.catName}
+                </Text>
+              </TouchableOpacity>
+            ))}
+        </ScrollView>
+
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          style={style.subCategory}
+        >
+          {subCategories &&
+            subCategories.map(subCat => (
+              <TouchableOpacity
+                key={subCat.id}
+                style={style.subTab}
+                onPress={() => setActiveSubTab(subCat.id)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    style.subTabLabel,
+                    activeSubTab === subCat.id && style.activeSubLabel,
+                  ]}
+                >
+                  {subCat.subCatName}
+                </Text>
+              </TouchableOpacity>
+            ))}
+        </ScrollView>
+
+        <ScrollView style={{ marginBottom: 120 }}>
+          <View style={style.categoryContain}>
+            {subCategories &&
+              subCategories[activeSubTab].subCatItems &&
+              subCategories[activeSubTab].subCatItems.map((item: Food) => (
+                <View
+                  key={item.id}
+                  style={{ marginHorizontal: 1, marginBottom: 20 }}
+                >
+                  <Food navigation={navigation} food={item} />
+                </View>
+              ))}
+          </View>
+        </ScrollView>
+      </View>
     </DrawerLayoutAndroid>
   );
 };
@@ -381,16 +365,12 @@ const style = StyleSheet.create({
     padding: 10,
     marginRight: 15,
     width: "auto",
+    // width: 230,
   },
   searchInput: {
-    position: "absolute",
-    // transform: [{ translateY: 100 / 2 }],
-    top: "45%",
-    left: 0,
-    height: "100%",
-    width: "100%",
-    marginLeft: 50,
-    display: "none",
+    height: 20,
+    width: 150,
+    marginLeft: 10,
   },
   // Nav
   navContain: {
@@ -440,7 +420,7 @@ const style = StyleSheet.create({
     right: 30,
   },
   categoryContain: {
-    // marginTop: 30,
+    marginTop: 10,
     display: "flex",
     // flex: 1,
     // height: 90,
@@ -453,6 +433,34 @@ const style = StyleSheet.create({
   },
   filterSegment: {
     marginTop: 6,
+  },
+  tab: {
+    marginRight: 40,
+    padding: 5,
+    borderRadius: 8,
+  },
+  tabLabel: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: secondaryColor,
+  },
+  subTab: {
+    padding: 5,
+    marginRight: 20,
+  },
+  subTabLabel: {
+    color: secondaryColor,
+    fontWeight: "bold",
+  },
+  subCategory: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  activeLabel: {
+    color: darkColor,
+  },
+  activeSubLabel: {
+    color: primaryColor,
   },
 });
 

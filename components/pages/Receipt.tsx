@@ -28,7 +28,7 @@ type Props = {
 };
 
 const Receipt = ({ navigation }: Props) => {
-  const [rating, setRating] = useState<number>(1);
+  const [rating, setRating] = useState<any>(1);
 
   const mappedEmoji: any = {
     "1": "😭",

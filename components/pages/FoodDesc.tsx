@@ -9,6 +9,7 @@ import {
   TextInput,
   Dimensions,
   Modal,
+  FlatList,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
@@ -174,6 +175,30 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       weight: 500,
       quantity: 1,
     },
+    {
+      id: 6,
+      title: "Chicken drumstick",
+      subtitle: "(without skin)",
+      price: 184,
+      weight: 500,
+      quantity: 1,
+    },
+    {
+      id: 7,
+      title: "Chicken drumstick",
+      subtitle: "(without skin)",
+      price: 184,
+      weight: 500,
+      quantity: 1,
+    },
+    {
+      id: 8,
+      title: "Chicken drumstick",
+      subtitle: "(without skin)",
+      price: 184,
+      weight: 500,
+      quantity: 1,
+    },
   ]);
 
   // State for weight
@@ -186,6 +211,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
   const [price, setPrice] = useState<number>(defaultPrice);
 
   const ref = useRef(null);
+  const optionMenu = useRef(null);
 
   // Function to increment the weight
   const increaseWeight = () => {
@@ -240,7 +266,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
         transparent={true}
         statusBarTranslucent
       >
-        <Pressable style={style.modalContain}>
+        <View style={style.modalContain}>
           <View style={style.cartContain}>
             <ScrollView style={style.cartSection}>
               {cartItems &&
@@ -323,7 +349,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
               </Pressable>
             </View>
           </View>
-        </Pressable>
+        </View>
       </Modal>
       <View style={utilStyle.container}>
         <View style={style.mainHeader}>
@@ -368,9 +394,11 @@ const FoodDesc = ({ route, navigation }: Prop) => {
                   <Picker
                     // selectedValue={weight.toString()}
                     onValueChange={value => ctrlWeight(value)}
-                    style={{ backgroundColor: "red" }}
+                    style={{ width: 150, height: 44 }}
+                    itemStyle={{ height: 44, borderRadius: 10 }}
                     mode="dropdown"
                     prompt="Enter weight"
+                    selectedValue={500}
                   >
                     <Picker.Item label="500g" value="500g" />
                     <Picker.Item label="1000g" value="1000g" />
@@ -588,6 +616,7 @@ const style = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: secondaryColor,
     fontWeight: "bold",
+    height: 20,
   },
   control: {
     display: "flex",
@@ -631,14 +660,16 @@ const style = StyleSheet.create({
     display: "flex",
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.2)",
     // paddingHorizontal: 15,
     position: "relative",
   },
   cartContain: {
+    elevation: 5,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     height: "90%",
+    // backgroundColor: lightColor,
     backgroundColor: "#F4F4F4",
   },
   cartItem: {
@@ -649,10 +680,12 @@ const style = StyleSheet.create({
     justifyContent: "space-between",
     borderRadius: 15,
     marginBottom: 10,
+    zIndex: 1,
   },
   cartSection: {
     marginTop: 50,
     paddingHorizontal: 15,
+    marginBottom: 70,
   },
   quantityContain: {
     display: "flex",

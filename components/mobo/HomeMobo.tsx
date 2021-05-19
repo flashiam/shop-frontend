@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   Button,
   TouchableNativeFeedback,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import utilStyle from "../../styles/utilStyle";
 import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
 import {
@@ -481,6 +482,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
                 justifyContent: "center",
                 alignItems: "center",
                 paddingTop: 5,
+                alignContent: "center",
               })
             }
           >
