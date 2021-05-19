@@ -154,7 +154,7 @@ const Support = ({ navigation }: Props) => {
     if (value) {
       // Creating a message
       const newMsg = {
-        id: Math.floor(Math.random() * 100) + 1,
+        id: Math.floor(Math.random() * 100001) + 1,
         msg: value,
         time: genTime(),
       };

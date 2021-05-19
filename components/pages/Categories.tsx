@@ -32,13 +32,9 @@ import Drawer from "../layout/Drawer";
 
 import foodImg from "../../img/indian_food_1.png";
 
-// Type checking
-type RootStackParamList = {
-  Home: undefined;
-  Food: undefined;
-  Categories: { catid: number };
-};
+import { RootStackParamList, FoodType } from "../../App";
 
+// Type checking
 type CategoryScreenNavProp = StackNavigationProp<
   RootStackParamList,
   "Categories"
@@ -57,32 +53,32 @@ const Categories = ({ route, navigation }: Props) => {
 
   const srchInput = useRef<HTMLAllCollection>(null);
 
-  interface Food {
-    id: number;
-    title: string;
-    price: number;
-    img: string;
-    rating: number;
-    stars: number;
-    reviews: number;
-  }
+  // interface Food {
+  //   id: number;
+  //   title: string;
+  //   price: number;
+  //   img: string;
+  //   rating: number;
+  //   stars: number;
+  //   reviews: number;
+  // }
 
   interface Category {
     id: number;
     catName: string;
-    catItems: Food[];
+    catItems: FoodType[];
   }
 
   interface SubCategory {
     id: number;
     subCatName: string;
-    subCatItems: Food[] | any;
+    subCatItems: FoodType[] | any;
   }
 
   const drawer = useRef<any>(null);
 
   // Dummy foods data
-  const [foods, setFoods] = useState<Food[]>([
+  const [foods, setFoods] = useState<FoodType[]>([
     {
       id: 1,
       title: "Chicken wings",
@@ -91,6 +87,7 @@ const Categories = ({ route, navigation }: Props) => {
       rating: 4.0,
       stars: 4,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 2,
@@ -100,6 +97,7 @@ const Categories = ({ route, navigation }: Props) => {
       rating: 4.5,
       stars: 4,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 3,
@@ -109,6 +107,7 @@ const Categories = ({ route, navigation }: Props) => {
       rating: 3.9,
       stars: 3,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 4,
@@ -118,6 +117,7 @@ const Categories = ({ route, navigation }: Props) => {
       rating: 4.3,
       stars: 4,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 5,
@@ -127,6 +127,7 @@ const Categories = ({ route, navigation }: Props) => {
       rating: 5.0,
       stars: 5,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
   ]);
 
@@ -320,7 +321,7 @@ const Categories = ({ route, navigation }: Props) => {
           <View style={style.categoryContain}>
             {subCategories &&
               subCategories[activeSubTab].subCatItems &&
-              subCategories[activeSubTab].subCatItems.map((item: Food) => (
+              subCategories[activeSubTab].subCatItems.map((item: FoodType) => (
                 <View
                   key={item.id}
                   style={{ marginHorizontal: 1, marginBottom: 20 }}

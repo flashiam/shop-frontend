@@ -43,6 +43,8 @@ import foodImg from "../../img/indian_food_1.png";
 import { medColor, secondaryColor } from "../../styles/_variables";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+import { RootStackParamList, FoodType } from "../../App";
+
 // Slider width of the carousel
 const SliderWidth = Dimensions.get("window").width - 450;
 
@@ -73,15 +75,15 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     msg: string;
   }
 
-  interface Food {
-    id: number;
-    title: string;
-    price: number;
-    img: string;
-    rating: number;
-    stars: number;
-    reviews: number;
-  }
+  // interface Food {
+  //   id: number;
+  //   title: string;
+  //   price: number;
+  //   img: string;
+  //   rating: number;
+  //   stars: number;
+  //   reviews: number;
+  // }
 
   // State for the offer carousel
   const [offers, setOffers] = useState<Offer[]>([
@@ -130,7 +132,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   ]);
 
   // State for suggested foods
-  const [suggested, setSuggested] = useState<Food[]>([
+  const [suggested, setSuggested] = useState<FoodType[]>([
     {
       id: 1,
       title: "Mix Veg",
@@ -139,6 +141,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       price: 599,
       reviews: 150,
       img: suggestFood,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 2,
@@ -148,11 +151,12 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       price: 599,
       reviews: 150,
       img: suggestFood,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
   ]);
 
   // State for showcase food
-  const [foods, setFoods] = useState<Food[] | null>([
+  const [foods, setFoods] = useState<FoodType[] | null>([
     {
       id: 1,
       title: "Mix Veg",
@@ -161,6 +165,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       rating: 4.9,
       stars: 4,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 2,
@@ -170,6 +175,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       rating: 3.9,
       stars: 3,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 3,
@@ -179,6 +185,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       rating: 3.9,
       stars: 3,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 4,
@@ -188,6 +195,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       rating: 3.9,
       stars: 3,
       img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
   ]);
 

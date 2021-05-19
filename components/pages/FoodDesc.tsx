@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,13 @@ import {
   TextInput,
   Dimensions,
   Modal,
-  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
-import Carousel from "react-native-snap-carousel";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import utilStyle from "../../styles/utilStyle";
 import {
   darkColor,
@@ -30,8 +31,9 @@ import {
   MaterialCommunityIcons,
   FontAwesome,
   Entypo,
+  Octicons,
 } from "@expo/vector-icons";
-import { RootStackParamList } from "../../App";
+import { RootStackParamList, FoodType } from "../../App";
 
 import food from "../../img/indian_food_1.png";
 import chicken from "../../img/chicken.png";
@@ -43,17 +45,6 @@ const SliderWidth = Dimensions.get("window").width - 450;
 interface Photo {
   id: number;
   img: string;
-}
-
-interface FoodType {
-  id: number;
-  title: string;
-  subtitle?: string;
-  price: number;
-  img: string;
-  rating: number;
-  stars: number;
-  reviews: number;
 }
 
 interface CartItem {
@@ -79,6 +70,19 @@ type PhotoProps = {
 };
 
 const FoodDesc = ({ route, navigation }: Prop) => {
+  const [mainFood] = useState<FoodType>(route.params.food);
+  const {
+    id,
+    title,
+    subtitle,
+    price: foodPrice,
+    desc,
+    img,
+    rating,
+    stars,
+    reviews,
+  } = mainFood;
+
   // State for related
   const [related, setRelated] = useState<FoodType[]>([
     {
@@ -90,6 +94,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       stars: 4,
       reviews: 150,
       rating: 4.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 2,
@@ -100,6 +105,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       stars: 4,
       reviews: 150,
       rating: 4.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
   ]);
 
@@ -128,78 +134,13 @@ const FoodDesc = ({ route, navigation }: Prop) => {
   ]);
 
   let defaultWeight = 500;
-  let defaultPrice = 184;
+  let defaultPrice = foodPrice;
 
   // State for cart popup
   const [showCart, setCart] = useState<boolean>(false);
 
   // State for cart items
-  const [cartItems, setCartItems] = useState<CartItem[] | null>([
-    {
-      id: 1,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 3,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 4,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 5,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 6,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 7,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-    {
-      id: 8,
-      title: "Chicken drumstick",
-      subtitle: "(without skin)",
-      price: 184,
-      weight: 500,
-      quantity: 1,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // State for weight
   const [weight, setWeight] = useState<number>(defaultWeight);
@@ -209,6 +150,12 @@ const FoodDesc = ({ route, navigation }: Prop) => {
 
   // State for price
   const [price, setPrice] = useState<number>(defaultPrice);
+
+  // State for cart status
+  const [itemAdded, setCartStatus] = useState<boolean>(false);
+
+  // State for status loading
+  const [statusLoading, setStatusLoading] = useState<boolean>(true);
 
   const ref = useRef(null);
   const optionMenu = useRef(null);
@@ -247,6 +194,125 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     }
   };
 
+  // Function to fetch the cart items
+  const fetchCartItems = async () => {
+    try {
+      const storedItems = await AsyncStorage.getItem("cart-items");
+
+      // Set the items to the state
+      if (storedItems) setCartItems(JSON.parse(storedItems));
+      console.log("items fetched successfully");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to add the cart item
+  const addCartItem = (
+    id: number,
+    title: string,
+    subTitle?: string,
+    cweight: number,
+    cprice: number,
+    cquantity: number
+  ) => {
+    setCart(true);
+    // Create a cart item
+    const newCartItem = {
+      id,
+      title,
+      subTitle: subTitle ? subTitle : "",
+      price: cprice,
+      quantity: cquantity,
+      weight: cweight,
+    };
+
+    setCartStatus(true);
+
+    saveItem(newCartItem);
+  };
+
+  // Function to save the cart item
+  const saveItem = async (item: CartItem) => {
+    let items;
+    try {
+      // Add to the state
+      setCartItems([...cartItems, item]);
+      // Save to the storage too
+      const existingData = await AsyncStorage.getItem("cart-items");
+
+      if (existingData) {
+        items = JSON.parse(existingData);
+      } else {
+        items = [];
+      }
+
+      items.push(item);
+      await AsyncStorage.setItem("cart-items", JSON.stringify(items));
+      console.log("added to cart");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to delete item from the cart
+  const deleteItem = async (id: number) => {
+    try {
+      // Delete from the state
+      const updatedItems = cartItems.filter(item => item.id !== id);
+      setCartItems(updatedItems);
+
+      // Delete from storage too
+      const storedItems = await AsyncStorage.getItem("cart-items");
+
+      if (storedItems) {
+        const filteredItems = JSON.parse(storedItems).filter(
+          (item: { id: number }) => item.id !== id
+        );
+        await AsyncStorage.setItem("cart-items", JSON.stringify(filteredItems));
+      }
+      console.log("item removed");
+
+      // Enable the cart btn to add item
+      setCartStatus(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to auto close modal after checking condition
+  const autoCloseCart = () => {
+    if (cartItems.length > 0) {
+      setCart(true);
+    } else {
+      setCart(false);
+    }
+  };
+
+  // Function to check the cart item status and maniputate the cart according to that
+  const checkCartStatus = async (id: number) => {
+    try {
+      const storedItems = await AsyncStorage.getItem("cart-items");
+
+      if (storedItems) {
+        const itemExists = JSON.parse(storedItems).filter(
+          (item: CartItem) => item.id === id
+        );
+        if (itemExists.length > 0) {
+          // Item present in the storage
+          setCartStatus(true);
+        } else {
+          // Item is not present
+          setCartStatus(false);
+        }
+      }
+
+      setStatusLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // Photo component
   const PhotoItem = ({ photo }: PhotoProps) => {
     return (
@@ -255,6 +321,11 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       </Pressable>
     );
   };
+
+  useEffect(() => {
+    fetchCartItems();
+    checkCartStatus(id);
+  }, []);
 
   return (
     <ScrollView>
@@ -305,7 +376,12 @@ const FoodDesc = ({ route, navigation }: Prop) => {
                         </View>
                       </View>
                     </View>
-                    <Pressable>
+                    <Pressable
+                      onPress={() => {
+                        deleteItem(item.id);
+                        autoCloseCart();
+                      }}
+                    >
                       <MaterialIcons
                         name="delete-outline"
                         color={darkColor}
@@ -354,12 +430,12 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       <View style={utilStyle.container}>
         <View style={style.mainHeader}>
           <View style={style.imgContain}>
-            <Image source={food} style={style.foodImg} />
+            <Image source={img} style={style.foodImg} />
           </View>
           <View style={style.foodContent}>
             <View>
-              <Text style={style.title}>Chicken Drumstick</Text>
-              <Text style={style.subTitle}>(without skin)</Text>
+              <Text style={style.title}>{title}</Text>
+              {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
               <View style={style.ratings}>
                 <Text
                   style={{
@@ -368,22 +444,29 @@ const FoodDesc = ({ route, navigation }: Prop) => {
                     fontWeight: "bold",
                   }}
                 >
-                  4.3
+                  {rating}
                 </Text>
                 <View style={style.ratingsContain}>
-                  <MaterialIcons name="star" size={15} color={primaryColor} />
-                  <MaterialIcons name="star" size={15} color={primaryColor} />
-                  <MaterialIcons name="star" size={15} color={primaryColor} />
-                  <MaterialIcons name="star" size={15} color={primaryColor} />
-                  <MaterialIcons name="star" size={15} color={secondaryColor} />
+                  {[1, 2, 3, 4, 5].map(star =>
+                    star <= stars ? (
+                      <MaterialIcons
+                        key={star}
+                        name="star"
+                        size={15}
+                        color={primaryColor}
+                      />
+                    ) : (
+                      <MaterialIcons
+                        key={star}
+                        name="star"
+                        size={15}
+                        color={medColor}
+                      />
+                    )
+                  )}
                 </View>
               </View>
-              <Text style={style.description}>
-                Half a chicken with medium-sized pieces including one leg, a
-                wing, one breast with half backbone. A bone-in meat, ideal to
-                deliver a taste of soft and relatively tougher meat all packed
-                in one dish.
-              </Text>
+              <Text style={style.description}>{desc}</Text>
             </View>
 
             <View style={style.bottomContent}>
@@ -453,23 +536,47 @@ const FoodDesc = ({ route, navigation }: Prop) => {
                   </Text>
                   <Text style={{ color: medColor }}>{weight.toString()}g</Text>
                 </Text>
-                <Pressable style={style.cartBtn} onPress={() => setCart(true)}>
-                  <Text
-                    style={{
-                      fontSize: 17,
-                      fontWeight: "bold",
-                      marginRight: 10,
-                      color: quantity > 0 ? primaryColor : secondaryColor,
-                    }}
+                {!itemAdded ? (
+                  <Pressable
+                    style={style.cartBtn}
+                    onPress={() =>
+                      addCartItem(id, title, subtitle, weight, price, quantity)
+                    }
                   >
-                    Add to cart
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="cart-outline"
-                    color={quantity > 0 ? primaryColor : secondaryColor}
-                    size={17}
-                  />
-                </Pressable>
+                    <Text
+                      style={{
+                        fontSize: 17,
+                        fontWeight: "bold",
+                        marginRight: 10,
+                        color: primaryColor,
+                      }}
+                    >
+                      Add to cart
+                    </Text>
+                    <MaterialCommunityIcons
+                      name="cart-outline"
+                      color={primaryColor}
+                      size={17}
+                    />
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    style={style.cartBtn}
+                    onPress={() => setCart(true)}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 17,
+                        fontWeight: "bold",
+                        marginRight: 10,
+                        color: secondaryColor,
+                      }}
+                    >
+                      Added to cart
+                    </Text>
+                    <Octicons name="check" color={secondaryColor} size={17} />
+                  </Pressable>
+                )}
               </View>
 
               <View style={style.sideContent}>

@@ -21,9 +21,21 @@ import Promo from "./components/pages/Promo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
+export interface FoodType {
+  id: number;
+  title: string;
+  subtitle?: string;
+  price: number;
+  desc: string;
+  img: string;
+  rating: number;
+  stars: number;
+  reviews: number;
+}
+
 export type RootStackParamList = {
   Home: undefined;
-  Food: { foodid: number };
+  Food: { food: FoodType };
   Categories: { catid: number };
   Orders: undefined;
   Wishlist: undefined;

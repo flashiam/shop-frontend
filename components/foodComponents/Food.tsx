@@ -17,23 +17,26 @@ import {
   secondaryColor,
 } from "../../styles/_variables";
 
+import { FoodType } from "../../App";
+
 // import foodImg from "../../img/indian_food_1.png";
 
-interface Food {
-  id: number;
-  title: string;
-  price: number;
-  img: string;
-  rating: number;
-  stars: number;
-  reviews: number;
-}
+//   interface FoodType {
+//   id: number;
+//   title: string;
+//   price: number;
+//   desc: string;
+//   img: string;
+//   rating: number;
+//   stars: number;
+//   reviews: number;
+// }
 
 // Type checking
 
 type Props = {
   navigation: any;
-  food: Food;
+  food: FoodType;
   updatePage?: boolean;
   mr?: number;
 };
@@ -48,8 +51,8 @@ const Food = ({ navigation, food, updatePage, mr }: Props) => {
       style={[utilStyle.card, style.dealCard, { marginRight: mr ? mr : 0 }]}
       onPress={() =>
         updatePage
-          ? navigation.push("Food", { foodid: id })
-          : navigation.navigate("Food", { foodid: id })
+          ? navigation.push("Food", { food })
+          : navigation.navigate("Food", { food })
       }
     >
       <View style={style.imgContain}>
