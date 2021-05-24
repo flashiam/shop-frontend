@@ -5,7 +5,7 @@ import { primaryColor, lightColor } from "../../styles/_variables";
 const Footer = () => {
   return (
     <View style={style.footer}>
-      <Text style={{ color: lightColor, textAlign: "center" }}>
+      <Text style={{ color: lightColor, textAlign: "center", fontSize: 10 }}>
         Copyright &copy; 2020 B2C Foods Pvt. Ltd. All Rights Reserved
       </Text>
     </View>

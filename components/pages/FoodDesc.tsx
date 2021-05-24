@@ -10,11 +10,22 @@ import {
   Dimensions,
   Modal,
   ActivityIndicator,
+  Share,
+  Platform,
+  Animated,
+  Easing,
 } from "react-native";
+import PropTypes from "prop-types";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import { Picker } from "@react-native-picker/picker";
+import { Picker } from "native-base";
+import DrawerLayout from "react-native-drawer-layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+// import axios from "axios";
+import { connect } from "react-redux";
+
+import { fetchOrderId } from "../../actions/paymentActions";
 
 import utilStyle from "../../styles/utilStyle";
 import {
@@ -32,6 +43,7 @@ import {
   FontAwesome,
   Entypo,
   Octicons,
+  Feather,
 } from "@expo/vector-icons";
 import { RootStackParamList, FoodType } from "../../App";
 
@@ -39,6 +51,8 @@ import food from "../../img/indian_food_1.png";
 import chicken from "../../img/chicken.png";
 
 import Food from "../foodComponents/Food";
+import NavbarWeb from "../web/NavbarWeb";
+import Drawer from "../layout/Drawer";
 
 const SliderWidth = Dimensions.get("window").width - 450;
 
@@ -56,6 +70,16 @@ interface CartItem {
   weight: number;
 }
 
+interface PickerValue {
+  label: string;
+  value: string;
+}
+
+interface CartData {
+  quantity: number;
+  price: number;
+}
+
 // Type checking
 type FoodDescScreenNavProp = StackNavigationProp<RootStackParamList, "Food">;
 type FoodDescScreenRouteProp = RouteProp<RootStackParamList, "Food">;
@@ -63,13 +87,20 @@ type FoodDescScreenRouteProp = RouteProp<RootStackParamList, "Food">;
 type Prop = {
   route: FoodDescScreenRouteProp;
   navigation: FoodDescScreenNavProp;
+  fetchOrderId: Function;
+  payment: { orderId: number | null; orderLoading: boolean };
 };
 
 type PhotoProps = {
   photo: Photo;
 };
 
-const FoodDesc = ({ route, navigation }: Prop) => {
+const FoodDesc = ({
+  route,
+  navigation,
+  payment: { orderId, orderLoading },
+  fetchOrderId,
+}: Prop) => {
   const [mainFood] = useState<FoodType>(route.params.food);
   const {
     id,
@@ -82,6 +113,9 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     stars,
     reviews,
   } = mainFood;
+
+  // State for the orderId
+  // const [orderId, setOrderId] = useState<number | null>(null);
 
   // State for related
   const [related, setRelated] = useState<FoodType[]>([
@@ -98,13 +132,32 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     },
     {
       id: 2,
-      title: "Kadaknath chicken",
-      subtitle: "(without skin)",
+      title: "Murg mussalam",
       price: 184,
       img: food,
       stars: 4,
       reviews: 150,
       rating: 4.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
+    {
+      id: 3,
+      title: "Chicken wings",
+      price: 184,
+      img: food,
+      stars: 2,
+      reviews: 150,
+      rating: 2.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
+    {
+      id: 4,
+      title: "Chicken lolipop",
+      price: 184,
+      img: food,
+      stars: 3,
+      reviews: 150,
+      rating: 3.9,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
   ]);
@@ -135,6 +188,10 @@ const FoodDesc = ({ route, navigation }: Prop) => {
 
   let defaultWeight = 500;
   let defaultPrice = foodPrice;
+  const drawer = useRef<any>(null);
+  const cartAnim = useRef(new Animated.Value(1)).current;
+  const cartSlideAnim = useRef(new Animated.Value(100)).current;
+  const cartTranslateX = useRef(new Animated.Value(0)).current;
 
   // State for cart popup
   const [showCart, setCart] = useState<boolean>(false);
@@ -146,7 +203,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
   const [weight, setWeight] = useState<number>(defaultWeight);
 
   // State for quantity counter
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
 
   // State for price
   const [price, setPrice] = useState<number>(defaultPrice);
@@ -154,11 +211,63 @@ const FoodDesc = ({ route, navigation }: Prop) => {
   // State for cart status
   const [itemAdded, setCartStatus] = useState<boolean>(false);
 
+  // State for cart data
+  const [cartData, setCartData] = useState<CartData>({ quantity: 0, price: 0 });
+
   // State for status loading
   const [statusLoading, setStatusLoading] = useState<boolean>(true);
 
+  // State for cart item
+  const [totalCartItems, setTotalCart] = useState<number>(0);
+
+  // State for cart message
+  const [isCartMsgShowing, setCartMsg] = useState<boolean>(false);
+
+  // State for favourite
+  const [favorite, setFavorite] = useState<boolean>(false);
+
+  // State for the picker
+  // const [pickerOpened, setPicker] = useState<boolean>(false);
+  // const [pickerValue, setPickerValue] = useState<any>(null);
+  // const [pickerItems, setPickerItem] = useState<any>([
+  //   {
+  //     label: "500g",
+  //     value: "500g",
+  //   },
+  //   {
+  //     label: "1000g",
+  //     value: "1000g",
+  //   },
+  //   {
+  //     label: "1500g",
+  //     value: "1500g",
+  //   },
+  //   {
+  //     label: "2000g",
+  //     value: "2000g",
+  //   },
+  // ]);
+
   const ref = useRef(null);
   const optionMenu = useRef(null);
+
+  // Function to share the food
+  const shareFood = async () => {
+    try {
+      const res = await Share.share({
+        title: `Share Food`,
+        message: `Try this awesome and delicious ${title} from fresh fred https://www.fresh-fred.com/Food/${id}`,
+      });
+
+      if (res.action === Share.sharedAction) {
+        console.log("Food suggested");
+      } else {
+        console.log("Food not suggested");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   // Function to increment the weight
   const increaseWeight = () => {
@@ -175,7 +284,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
   // Function to control weight
   const ctrlWeight = (wt: string) => {
     let multiplePrice = 0;
-    const newWt = parseInt(wt.split("g")[0]);
+    const newWt = parseInt(wt);
     if (newWt === defaultWeight) {
       setPrice(defaultPrice);
     } else {
@@ -187,7 +296,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
 
   // Function to control quantity
   const ctrlQuantity = (qty: string) => {
-    if (quantity === 0) {
+    if (quantity === 1) {
       setPrice(defaultPrice);
     } else {
       setPrice(price * parseInt(qty));
@@ -207,6 +316,21 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     }
   };
 
+  // Function to check the cart
+  const checkCart = async () => {
+    try {
+      const storedItems = await AsyncStorage.getItem("cart-items");
+
+      if (!storedItems) {
+        setTotalCart(0);
+      } else {
+        setTotalCart(1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // Function to add the cart item
   const addCartItem = (
     id: number,
@@ -216,7 +340,6 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     cprice: number,
     cquantity: number
   ) => {
-    setCart(true);
     // Create a cart item
     const newCartItem = {
       id,
@@ -230,6 +353,7 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     setCartStatus(true);
 
     saveItem(newCartItem);
+    console.log(newCartItem);
   };
 
   // Function to save the cart item
@@ -271,6 +395,12 @@ const FoodDesc = ({ route, navigation }: Prop) => {
         );
         await AsyncStorage.setItem("cart-items", JSON.stringify(filteredItems));
       }
+
+      if (!storedItems) {
+        popDown();
+      } else {
+        fetchDataFromCart();
+      }
       console.log("item removed");
 
       // Enable the cart btn to add item
@@ -286,6 +416,35 @@ const FoodDesc = ({ route, navigation }: Prop) => {
       setCart(true);
     } else {
       setCart(false);
+    }
+  };
+
+  // Function to fetch the item quantity and price from the cart
+  const fetchDataFromCart = async () => {
+    try {
+      const savedItems = await AsyncStorage.getItem("cart-items");
+      let initQuantity = 0;
+      let initPrice = 0;
+
+      if (savedItems) {
+        JSON.parse(savedItems).forEach((item: any) => {
+          initQuantity = parseInt(item.quantity) + quantity;
+          initPrice = parseInt(item.price) + price;
+        });
+
+        // const isItemPresent = JSON.parse(savedItems).filter((item:CartItem) => item.id === id)
+
+        // if(!isItemPresent) {
+        //   setCartData({ quantity: quantity,price: foodPrice });
+        // }
+      } else {
+        initQuantity = quantity;
+        initPrice = foodPrice;
+      }
+      console.log(initQuantity, initPrice);
+      setCartData({ quantity: initQuantity, price: initPrice });
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -313,6 +472,54 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     }
   };
 
+  // Function to run when user proceeds for payment
+  const onProceedPayment = () => {
+    navigation.navigate("OrderLoading");
+    setCart(false);
+    // fetchOrderId();
+
+    // if (orderLoading) {
+    //   console.log("loading...");
+    // } else {
+    //   navigation.navigate("OrderLoading");
+    // }
+    // setCart(false);
+    // Redirect to payment page
+    // navigation.navigate("Payment", { orderid: orderId });
+  };
+
+  // Function to get total price from the cart
+  // const fetchTotalPrice = async () => {
+  //   try {
+  //     const savedItems = AsyncStorage.getItem('cart-items');
+  //     if(savedItems) {
+
+  //     }
+  //   } catch (err) {
+
+  //   }
+  // }
+
+  // Function to pop up the cart message
+  const popUp = () => {
+    setCartMsg(true);
+    Animated.timing(cartSlideAnim, {
+      toValue: 0,
+      duration: 500,
+      easing: Easing.elastic(1),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const popDown = () => {
+    setCartMsg(false);
+    Animated.timing(cartSlideAnim, {
+      toValue: 100,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
   // Photo component
   const PhotoItem = ({ photo }: PhotoProps) => {
     return (
@@ -322,316 +529,450 @@ const FoodDesc = ({ route, navigation }: Prop) => {
     );
   };
 
+  // Cart popup component
+  const CartPopUp = () => {
+    return (
+      // <Swipeable>
+      <Animated.View
+        style={[
+          style.popUpContain,
+          {
+            transform: [{ translateY: cartSlideAnim }],
+          },
+        ]}
+      >
+        <View style={[utilStyle.card, style.popUpStyle]}>
+          <View style={style.cartMsg}>
+            <Text
+              style={{
+                color: lightColor,
+                fontSize: 18,
+                letterSpacing: 2,
+                paddingBottom: 6,
+                textTransform: "uppercase",
+              }}
+            >
+              {cartData.quantity} Item
+            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={{
+                  color: lightColor,
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                ₹{cartData.price}{" "}
+              </Text>
+              <Text style={{ color: lightColor, fontSize: 12 }}>
+                plus taxes
+              </Text>
+            </View>
+          </View>
+          <Pressable
+            style={style.showCartBtn}
+            onPress={() => {
+              setCart(true);
+            }}
+          >
+            <Text style={{ color: lightColor, fontSize: 20, paddingRight: 5 }}>
+              View Cart
+            </Text>
+            <MaterialIcons name="arrow-right" color={lightColor} size={20} />
+          </Pressable>
+        </View>
+      </Animated.View>
+      // </Swipeable>
+    );
+  };
+
   useEffect(() => {
     fetchCartItems();
     checkCartStatus(id);
+    checkCart();
+    fetchDataFromCart();
   }, []);
 
   return (
-    <ScrollView>
-      {/* Backdrop for modal */}
-      {/* Cart modal */}
-      <Modal
-        animationType="slide"
-        visible={showCart}
-        transparent={true}
-        statusBarTranslucent
-      >
-        <View style={style.modalContain}>
-          <View style={style.cartContain}>
-            <ScrollView style={style.cartSection}>
-              {cartItems &&
-                cartItems.map(item => (
-                  <View key={item.id} style={[utilStyle.card, style.cartItem]}>
-                    <View>
-                      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                        {item.title} {item?.subtitle}
-                      </Text>
-                      <View style={{ display: "flex", flexDirection: "row" }}>
-                        <Text
-                          style={{ color: primaryColor, fontWeight: "bold" }}
-                        >
-                          ₹ {item.price.toString()}.00
-                        </Text>
-                        <Text
-                          style={{ color: primaryColor, fontWeight: "bold" }}
-                        >
-                          / {item.weight.toString()}gm
-                        </Text>
-                      </View>
-                      <View style={style.quantityContain}>
-                        <Text>Quantity</Text>
-                        <View style={[utilStyle.card, style.quantityBox]}>
-                          <Pressable style={style.btn}>
-                            <Text>-</Text>
-                          </Pressable>
-                          <TextInput
-                            style={style.quantityField}
-                            value={item.quantity.toString()}
-                            keyboardType="numeric"
-                          />
-                          <Pressable style={style.btn}>
-                            <Text>+</Text>
-                          </Pressable>
+    <DrawerLayout
+      ref={drawer}
+      renderNavigationView={() => (
+        <Drawer drawer={drawer} navigation={navigation} />
+      )}
+      drawerPosition="right"
+      drawerWidth={300}
+      drawerBackgroundColor={lightColor}
+      // style={{ alignItems: "center" }}
+    >
+      <ScrollView>
+        {/* Backdrop for modal */}
+        {/* Cart modal */}
+        {Platform.OS !== "web" && (
+          <Modal
+            animationType="slide"
+            visible={showCart}
+            transparent={true}
+            statusBarTranslucent
+          >
+            <View style={style.modalContain}>
+              <View style={style.cartContain}>
+                <ScrollView style={style.cartSection}>
+                  {cartItems &&
+                    cartItems.map(item => (
+                      <View
+                        key={item?.id}
+                        style={[utilStyle.card, style.cartItem]}
+                      >
+                        <View>
+                          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                            {item?.title} {item?.subtitle}
+                          </Text>
+                          <View
+                            style={{ display: "flex", flexDirection: "row" }}
+                          >
+                            <Text
+                              style={{
+                                color: primaryColor,
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ₹ {item?.price.toString()}.00
+                            </Text>
+                            <Text
+                              style={{
+                                color: primaryColor,
+                                fontWeight: "bold",
+                              }}
+                            >
+                              / {item?.weight.toString()}gm
+                            </Text>
+                          </View>
+                          <View style={style.quantityContain}>
+                            <Text>Quantity</Text>
+                            <View style={[utilStyle.card, style.quantityBox]}>
+                              <Pressable style={style.btn}>
+                                <Text>-</Text>
+                              </Pressable>
+                              <TextInput
+                                style={style.quantityField}
+                                value={item?.quantity.toString()}
+                                keyboardType="numeric"
+                              />
+                              <Pressable style={style.btn}>
+                                <Text>+</Text>
+                              </Pressable>
+                            </View>
+                          </View>
                         </View>
+                        <Pressable
+                          onPress={() => {
+                            deleteItem(item?.id);
+                            autoCloseCart();
+                          }}
+                        >
+                          <MaterialIcons
+                            name="delete-outline"
+                            color={darkColor}
+                            size={25}
+                          />
+                        </Pressable>
                       </View>
-                    </View>
-                    <Pressable
-                      onPress={() => {
-                        deleteItem(item.id);
-                        autoCloseCart();
+                    ))}
+                </ScrollView>
+                <View style={[utilStyle.card, style.cartFooter]}>
+                  <View>
+                    <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                      ₹ {cartData.price}
+                    </Text>
+                    <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                      Total
+                    </Text>
+                  </View>
+                  <Pressable
+                    style={style.paymentBtn}
+                    onPress={() => onProceedPayment()}
+                  >
+                    <Text style={{ color: lightColor }}>
+                      Proceed to payment
+                    </Text>
+                  </Pressable>
+                </View>
+
+                <View style={style.topContent}>
+                  <Pressable
+                    style={style.closeCartBtn}
+                    onPress={() => setCart(false)}
+                  >
+                    <AntDesign name="close" color={darkColor} size={25} />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setCart(false);
+                      navigation.navigate("Promo");
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        textDecorationLine: "underline",
+                        textDecorationStyle: "solid",
+                        paddingRight: 15,
                       }}
                     >
-                      <MaterialIcons
-                        name="delete-outline"
-                        color={darkColor}
-                        size={25}
+                      Add promocode
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+        <View style={utilStyle.container}>
+          {Platform.OS === "web" && <NavbarWeb drawer={drawer} />}
+          <View style={style.mainHeader}>
+            <View style={style.imgContain}>
+              <Image source={img} style={style.foodImg} />
+            </View>
+            <View style={style.foodContent}>
+              <View>
+                <Text style={style.title}>{title}</Text>
+                {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
+                <View style={style.ratings}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: secondaryColor,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {rating}
+                  </Text>
+                  <View style={style.ratingsContain}>
+                    {[1, 2, 3, 4, 5].map(star =>
+                      star <= stars ? (
+                        <MaterialIcons
+                          key={star}
+                          name="star"
+                          size={15}
+                          color={primaryColor}
+                        />
+                      ) : (
+                        <MaterialIcons
+                          key={star}
+                          name="star"
+                          size={15}
+                          color={medColor}
+                        />
+                      )
+                    )}
+                  </View>
+                </View>
+                <Text style={style.description}>{desc}</Text>
+              </View>
+
+              <View style={style.bottomContent}>
+                <View style={style.controls}>
+                  <View style={style.control}>
+                    <Text style={style.label}>Weight</Text>
+
+                    <View
+                      style={[utilStyle.card, { height: 50, borderRadius: 10 }]}
+                    >
+                      <Picker
+                        note
+                        mode="dropdown"
+                        style={{ width: 120 }}
+                        selectedValue={weight}
+                        onValueChange={value => ctrlWeight(value)}
+                        itemStyle={{ backgroundColor: lightColor }}
+                        placeholder="Select"
+                      >
+                        <Picker.Item label="500g" value="500" />
+                        <Picker.Item label="1000g" value="1000" />
+                        <Picker.Item label="1500g" value="1500" />
+                        <Picker.Item label="2000g" value="2000" />
+                      </Picker>
+                    </View>
+                  </View>
+                  <View style={style.control}>
+                    <Text style={style.label}>Quantity</Text>
+                    <View style={[utilStyle.card, style.quantityCtrl]}>
+                      <Pressable
+                        onPress={() => decreaseWeight()}
+                        style={{
+                          paddingHorizontal: 15,
+                          height: 30,
+                        }}
+                        android_ripple={{
+                          color: secondaryColor,
+                          borderless: true,
+                        }}
+                      >
+                        <Text style={style.quantityBtn}>-</Text>
+                      </Pressable>
+                      <TextInput
+                        keyboardType="numeric"
+                        value={quantity.toString()}
+                        style={style.quantityField}
+                        onChangeText={qty => ctrlQuantity(qty)}
+                      />
+                      <Pressable
+                        onPress={() => increaseWeight()}
+                        style={{
+                          paddingHorizontal: 15,
+                          height: 30,
+                        }}
+                        android_ripple={{
+                          color: secondaryColor,
+                          borderless: true,
+                        }}
+                      >
+                        <Text style={style.quantityBtn}>+</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={[utilStyle.card, style.cartBtnContain]}>
+                  <Text>
+                    <Text style={{ fontSize: 17, color: medColor }}>
+                      ₹{price.toString()}.00/
+                    </Text>
+                    <Text style={{ color: medColor }}>
+                      {weight.toString()}g
+                    </Text>
+                  </Text>
+                  {!itemAdded ? (
+                    <Pressable
+                      style={style.cartBtn}
+                      onPress={() => {
+                        fetchDataFromCart();
+                        addCartItem(
+                          id,
+                          title,
+                          subtitle,
+                          weight,
+                          price,
+                          quantity
+                        );
+                        popUp();
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "bold",
+                          marginRight: 10,
+                          color: primaryColor,
+                        }}
+                      >
+                        Add to cart
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="cart-outline"
+                        color={primaryColor}
+                        size={17}
                       />
                     </Pressable>
-                  </View>
-                ))}
-            </ScrollView>
-            <View style={[utilStyle.card, style.cartFooter]}>
-              <View>
-                <Text style={{ fontWeight: "bold", fontSize: 20 }}>₹ 423</Text>
-                <Text style={{ fontWeight: "bold", fontSize: 20 }}>Total</Text>
-              </View>
-              <Pressable
-                style={style.paymentBtn}
-                onPress={() => navigation.navigate("OrderLoading")}
-              >
-                <Text style={{ color: lightColor }}>Proceed to payment</Text>
-              </Pressable>
-            </View>
-
-            <View style={style.topContent}>
-              <Pressable
-                style={style.closeCartBtn}
-                onPress={() => setCart(false)}
-              >
-                <AntDesign name="close" color={darkColor} size={25} />
-              </Pressable>
-              <Pressable onPress={() => navigation.navigate("Promo")}>
-                <Text
-                  style={{
-                    color: primaryColor,
-                    textDecorationLine: "underline",
-                    textDecorationStyle: "solid",
-                    paddingRight: 15,
-                  }}
-                >
-                  Add promocode
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-      <View style={utilStyle.container}>
-        <View style={style.mainHeader}>
-          <View style={style.imgContain}>
-            <Image source={img} style={style.foodImg} />
-          </View>
-          <View style={style.foodContent}>
-            <View>
-              <Text style={style.title}>{title}</Text>
-              {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
-              <View style={style.ratings}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: secondaryColor,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {rating}
-                </Text>
-                <View style={style.ratingsContain}>
-                  {[1, 2, 3, 4, 5].map(star =>
-                    star <= stars ? (
-                      <MaterialIcons
-                        key={star}
-                        name="star"
-                        size={15}
-                        color={primaryColor}
-                      />
-                    ) : (
-                      <MaterialIcons
-                        key={star}
-                        name="star"
-                        size={15}
-                        color={medColor}
-                      />
-                    )
+                  ) : (
+                    <Pressable
+                      style={style.cartBtn}
+                      onPress={() => setCart(true)}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "bold",
+                          marginRight: 10,
+                          color: secondaryColor,
+                        }}
+                      >
+                        Added to cart
+                      </Text>
+                      <Octicons name="check" color={secondaryColor} size={17} />
+                    </Pressable>
                   )}
                 </View>
-              </View>
-              <Text style={style.description}>{desc}</Text>
-            </View>
 
-            <View style={style.bottomContent}>
-              <View style={style.controls}>
-                <View style={style.control}>
-                  <Text style={style.label}>Weight</Text>
-                  {/* <View style={[utilStyle.card, style.weightContain]}> */}
-                  <Picker
-                    // selectedValue={weight.toString()}
-                    onValueChange={value => ctrlWeight(value)}
-                    style={{ width: 150, height: 44 }}
-                    itemStyle={{ height: 44, borderRadius: 10 }}
-                    mode="dropdown"
-                    prompt="Enter weight"
-                    selectedValue={500}
-                  >
-                    <Picker.Item label="500g" value="500g" />
-                    <Picker.Item label="1000g" value="1000g" />
-                    <Picker.Item label="1500g" value="1500g" />
-                    <Picker.Item label="2000g" value="2000g" />
-                  </Picker>
-                  {/* </View> */}
-                </View>
-                <View style={style.control}>
-                  <Text style={style.label}>Quantity</Text>
-                  <View style={[utilStyle.card, style.quantityCtrl]}>
-                    <Pressable
-                      onPress={() => decreaseWeight()}
-                      style={{
-                        paddingHorizontal: 15,
-                        height: 30,
-                      }}
-                      android_ripple={{
-                        color: secondaryColor,
-                        borderless: true,
-                      }}
-                    >
-                      <Text style={style.quantityBtn}>-</Text>
-                    </Pressable>
-                    <TextInput
-                      keyboardType="numeric"
-                      value={quantity.toString()}
-                      style={style.quantityField}
-                      onChangeText={qty => ctrlQuantity(qty)}
-                    />
-                    <Pressable
-                      onPress={() => increaseWeight()}
-                      style={{
-                        paddingHorizontal: 15,
-                        height: 30,
-                      }}
-                      android_ripple={{
-                        color: secondaryColor,
-                        borderless: true,
-                      }}
-                    >
-                      <Text style={style.quantityBtn}>+</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              </View>
-
-              <View style={[utilStyle.card, style.cartBtnContain]}>
-                <Text>
-                  <Text style={{ fontSize: 17, color: medColor }}>
-                    ₹{price.toString()}.00/
-                  </Text>
-                  <Text style={{ color: medColor }}>{weight.toString()}g</Text>
-                </Text>
-                {!itemAdded ? (
+                <View style={style.sideContent}>
                   <Pressable
-                    style={style.cartBtn}
-                    onPress={() =>
-                      addCartItem(id, title, subtitle, weight, price, quantity)
-                    }
+                    style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
+                    onPress={() => setFavorite(() => !favorite)}
                   >
-                    <Text
-                      style={{
-                        fontSize: 17,
-                        fontWeight: "bold",
-                        marginRight: 10,
-                        color: primaryColor,
-                      }}
-                    >
-                      Add to cart
-                    </Text>
-                    <MaterialCommunityIcons
-                      name="cart-outline"
+                    <FontAwesome
+                      name={favorite ? `heart` : `heart-o`}
                       color={primaryColor}
-                      size={17}
+                      size={15}
                     />
                   </Pressable>
-                ) : (
                   <Pressable
-                    style={style.cartBtn}
-                    onPress={() => setCart(true)}
+                    style={[utilStyle.card, style.btn]}
+                    onPress={() => shareFood()}
                   >
-                    <Text
-                      style={{
-                        fontSize: 17,
-                        fontWeight: "bold",
-                        marginRight: 10,
-                        color: secondaryColor,
-                      }}
-                    >
-                      Added to cart
-                    </Text>
-                    <Octicons name="check" color={secondaryColor} size={17} />
+                    <Entypo name="share" color={primaryColor} size={15} />
                   </Pressable>
-                )}
-              </View>
-
-              <View style={style.sideContent}>
-                <View style={[utilStyle.card, style.btn, { marginBottom: 10 }]}>
-                  <FontAwesome name="heart-o" color={primaryColor} size={15} />
                 </View>
-                <View style={[utilStyle.card, style.btn]}>
-                  <Entypo name="share" color={primaryColor} size={15} />
-                </View>
-              </View>
+                <Pressable
+                  style={style.closeBtn}
+                  onPress={() => navigation.goBack()}
+                >
+                  <MaterialIcons
+                    name="arrow-back"
+                    color={darkColor}
+                    size={30}
+                  />
+                </Pressable>
 
-              <Pressable
-                style={[style.closeBtn]}
-                android_ripple={{ color: secondaryColor, borderless: true }}
-                onPress={() => navigation.goBack()}
-              >
-                <AntDesign name="close" color={darkColor} size={20} />
-              </Pressable>
+                {/* <Pressable
+                  style={[style.closeBtn]}
+                  android_ripple={{ color: secondaryColor, borderless: true }}
+                  onPress={() => navigation.goBack()}
+                >
+                  <AntDesign name="close" color={darkColor} size={20} />
+                </Pressable> */}
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Photos */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Photos</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {photos &&
-              photos.map(photo => <PhotoItem key={photo.id} photo={photo} />)}
-          </ScrollView>
-        </View>
+          {/* Photos */}
+          <View style={utilStyle.mt1}>
+            <Text style={utilStyle.head}>Photos</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {photos &&
+                photos.map(photo => <PhotoItem key={photo.id} photo={photo} />)}
+            </ScrollView>
+          </View>
 
-        {/* Related */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>More like this</Text>
-          <View style={style.relatedContain}>
-            {related &&
-              related.map(relFood => (
-                <Food
-                  key={relFood.id}
-                  navigation={navigation}
-                  food={relFood}
-                  updatePage
-                />
-              ))}
+          {/* Related */}
+          <View style={utilStyle.mt1}>
+            <Text style={utilStyle.head}>More like this</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {related &&
+                related.map(food => (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    mr={20}
+                  />
+                ))}
+            </ScrollView>
           </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      {/* Cart pop up */}
+      <CartPopUp />
+    </DrawerLayout>
   );
 };
 
 const style = StyleSheet.create({
   mainHeader: {
-    marginTop: 30,
+    marginTop: Platform.OS === "web" ? 50 : 30,
     position: "relative",
+    flexDirection: Platform.OS === "web" ? "row" : "column",
   },
   imgContain: {
     paddingTop: 25,
@@ -853,6 +1194,47 @@ const style = StyleSheet.create({
     width: "100%",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
+  popUpContain: {
+    position: "absolute",
+    left: 0,
+    width: "100%",
+    bottom: 10,
+    zIndex: 3,
+    alignItems: "center",
+  },
+  popUpStyle: {
+    width: "95%",
+    borderRadius: 15,
+    padding: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: primaryColor,
+    // borderWidth: 3,
+    // borderColor: lightColor,
+  },
+  cartMsg: {
+    // flexDirection: "row",
+    // alignItems: "center",
+  },
+  showCartBtn: {
+    // padding: 10,
+    borderRadius: 8,
+    backgroundColor: primaryColor,
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });
 
-export default FoodDesc;
+// Prop types
+FoodDesc.proptypes = {
+  payment: PropTypes.object.isRequired,
+  fetchOrderId: PropTypes.func.isRequired,
+};
+
+// Function to map states to props
+const mapStateToProps = (state: any) => ({
+  payment: state.payment,
+});
+
+export default connect(mapStateToProps, { fetchOrderId })(FoodDesc);

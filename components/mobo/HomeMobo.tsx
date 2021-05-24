@@ -13,6 +13,7 @@ import {
   Button,
   TouchableNativeFeedback,
 } from "react-native";
+import DrawerLayout from "react-native-drawer-layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import utilStyle from "../../styles/utilStyle";
 import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
@@ -75,16 +76,6 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     msg: string;
   }
 
-  // interface Food {
-  //   id: number;
-  //   title: string;
-  //   price: number;
-  //   img: string;
-  //   rating: number;
-  //   stars: number;
-  //   reviews: number;
-  // }
-
   // State for the offer carousel
   const [offers, setOffers] = useState<Offer[]>([
     {
@@ -135,9 +126,9 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   const [suggested, setSuggested] = useState<FoodType[]>([
     {
       id: 1,
-      title: "Mix Veg",
-      rating: 4.9,
-      stars: 4,
+      title: "Raw chicken",
+      rating: 2.9,
+      stars: 3,
       price: 599,
       reviews: 150,
       img: suggestFood,
@@ -145,7 +136,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     },
     {
       id: 2,
-      title: "Mix Veg",
+      title: "Kadaknath",
       rating: 4.9,
       stars: 4,
       price: 599,
@@ -159,8 +150,8 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   const [foods, setFoods] = useState<FoodType[] | null>([
     {
       id: 1,
-      title: "Mix Veg",
-      price: 599,
+      title: "Tuna fish",
+      price: 799,
       reviews: 150,
       rating: 4.9,
       stars: 4,
@@ -169,7 +160,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     },
     {
       id: 2,
-      title: "Mix Veg",
+      title: "Mutton",
       price: 599,
       reviews: 150,
       rating: 3.9,
@@ -179,7 +170,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     },
     {
       id: 3,
-      title: "Mix Veg",
+      title: "Chicken (Whole)",
       price: 599,
       reviews: 150,
       rating: 3.9,
@@ -189,7 +180,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     },
     {
       id: 4,
-      title: "Mix Veg",
+      title: "Sea Prawns",
       price: 599,
       reviews: 150,
       rating: 3.9,
@@ -258,22 +249,9 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   const ref = useRef(null);
   const drawer = useRef<any>(null);
 
-  // const [drawer, setDrawer] = useState<any>();
-
-  // const refDrawer = useCallback(el => {
-  //   setDrawer(el);
-  // }, []);
-
   type CatProps = {
     cat: Category;
   };
-
-  // Function to open drawer
-  // const openDrawer = () => {
-  //   if (drawer) {
-  //     drawer.current.openDrawer();
-  //   }
-  // };
 
   // Category item
   const CatItem = ({ cat }: CatProps) => {
@@ -298,7 +276,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   // Offer item
   const OfferItem = () => {
     return (
-      <View style={{ width: 300, marginRight: 10 }}>
+      <View style={{ width: 300, marginRight: 18 }}>
         <Pressable onPress={() => console.log("Show offers")}>
           <Image style={style.offerImg} source={offerImg1} />
         </Pressable>
@@ -307,11 +285,12 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <DrawerLayoutAndroid
+    <DrawerLayout
       ref={drawer}
       renderNavigationView={() => (
         <Drawer drawer={drawer} navigation={navigation} />
       )}
+      drawerBackgroundColor={lightColor}
       drawerPosition="right"
       drawerWidth={300}
     >
@@ -322,12 +301,14 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
             {/* Access location */}
             <Pressable onPress={() => console.log("location")}>
               <View style={style.leftContent}>
+                {/* <View style={[utilStyle.card, style.locationBtn]}> */}
                 <Ionicons
                   name="location-outline"
                   size={30}
-                  color={secondaryColor}
+                  color={primaryColor}
                   style={style.locateIcon}
                 />
+                {/* </View> */}
                 <View>
                   <Text
                     style={[
@@ -431,8 +412,15 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
           <View style={utilStyle.mt1}>
             <Text style={utilStyle.head}>Suggested</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {suggested &&
-                suggested.map(food => <FoodWide key={food.id} food={food} />)}
+              {foods &&
+                foods.map(food => (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    mr={20}
+                  />
+                ))}
             </ScrollView>
           </View>
 
@@ -516,7 +504,7 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
         </View>
         <Footer />
       </ScrollView>
-    </DrawerLayoutAndroid>
+    </DrawerLayout>
   );
 };
 
@@ -532,7 +520,7 @@ const style = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: StatusBar.currentHeight,
-    paddingTop: 10,
+    paddingTop: 20,
     paddingBottom: 5,
   },
   leftContent: {
@@ -544,32 +532,39 @@ const style = StyleSheet.create({
     color: secondaryColor,
     paddingLeft: 10,
   },
-  locateIcon: {
-    fontSize: 30,
+  locationBtn: {
+    padding: 10,
+    borderRadius: 8,
   },
   searchBar: {
-    marginTop: 20,
+    marginTop: 10,
     position: "relative",
     borderRadius: 8,
     display: "flex",
     flexDirection: "row",
+    padding: 10,
+    marginBottom: 15,
   },
   searchInput: {
     marginLeft: 20,
   },
   offersContain: {
+    // position: "absolute",
     marginTop: 15,
   },
   offerImg: {
-    height: 150,
+    // position: "absolute",
+    height: 160,
     width: 300,
+    left: 0,
+    zIndex: 2,
     borderRadius: 10,
-    marginRight: 10,
+    marginRight: 18,
   },
   catContain: {
-    marginRight: 5,
+    marginRight: 18,
     backgroundColor: "transparent",
-    width: 90,
+    width: 65,
   },
   category: {
     borderRadius: 8,
@@ -577,12 +572,12 @@ const style = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: lightColor,
-    marginRight: 10,
+    // marginRight: 10,
     position: "relative",
   },
   catImg: {
-    height: 40,
-    width: 40,
+    height: 30,
+    width: 30,
   },
   catTxt: {
     textAlign: "center",

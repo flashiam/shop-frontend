@@ -232,7 +232,7 @@ const style = StyleSheet.create({
   },
   orderNo: {
     fontSize: 28,
-    letterSpacing: 6,
+    letterSpacing: 5,
   },
   emojiMarker: {
     fontSize: 18,

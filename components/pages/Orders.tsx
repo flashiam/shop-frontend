@@ -38,7 +38,10 @@ const Orders = ({ navigation }: Props) => {
         </View>
         <View style={style.section}>
           <Text style={utilStyle.head}>My Orders</Text>
-          <View style={[utilStyle.card, style.orderItem]}>
+          <Pressable
+            style={[utilStyle.card, style.orderItem]}
+            onPress={() => navigation.navigate("Receipt")}
+          >
             <View style={style.orderDesc}>
               <Text style={style.orderHead}>Items</Text>
               <Text style={style.orderSubHead}>
@@ -59,8 +62,11 @@ const Orders = ({ navigation }: Props) => {
                 <Text style={style.link}>Help</Text>
               </Pressable>
             </View>
-          </View>
-          <View style={[utilStyle.card, style.orderItem]}>
+          </Pressable>
+          <Pressable
+            style={[utilStyle.card, style.orderItem]}
+            onPress={() => navigation.navigate("Receipt")}
+          >
             <View style={style.orderDesc}>
               <Text style={style.orderHead}>Items</Text>
               <Text style={style.orderSubHead}>
@@ -92,7 +98,7 @@ const Orders = ({ navigation }: Props) => {
                 <Text style={style.link}>Repeat order</Text>
               </Pressable>
             </View>
-          </View>
+          </Pressable>
         </View>
       </View>
     </ScrollView>

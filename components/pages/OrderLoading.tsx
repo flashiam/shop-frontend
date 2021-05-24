@@ -56,20 +56,18 @@ const OrderLoading = ({ navigation }: Props) => {
   const anim = useRef<any>(new Animated.Value(0)).current;
 
   // State for the delivery status
-  const [delivery, setDelivery] = useState<number>(1);
+  const [delivery, setDelivery] = useState<number>(2);
   const [status] = useState<DeliveryStat[]>([
     {
       id: 1,
       title: `“Your order has been accepted”`,
-      desc:
-        "We are preparing it for you! Sit back and relax you will get notified once it goes for delivery.",
+      desc: "We are preparing it for you! Sit back and relax you will get notified once it goes for delivery.",
       img: orderImg1,
     },
     {
       id: 2,
       title: `“Your order is out for delivery”`,
-      desc:
-        "Our delivery agent is on its way to deliver you order at your doors.",
+      desc: "Our delivery agent is on its way to deliver you order at your doors.",
       img: orderImg2,
     },
     {
@@ -94,95 +92,96 @@ const OrderLoading = ({ navigation }: Props) => {
 
   const scroll = useRef(null);
   return (
-    <ScrollView>
-      <View style={[style.scrollContainer, { height: windowHeight - 30 }]}>
-        <ScrollView
-          ref={scroll}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          scrollEventThrottle={1}
-        >
-          {status &&
-            status
-              .filter(stat => stat.id === delivery)
-              .map(stat => (
-                <View
-                  key={stat.id}
-                  style={[style.loadingScreen, { width: windowWidth }]}
-                >
-                  <View style={style.imgContain}>
-                    <Image source={stat.img} style={style.orderImg} />
-                  </View>
-                  <View style={style.orderContent}>
-                    <Text style={style.headMsg}>{stat.title}</Text>
-                    <Text style={style.orderMsg}>{stat.desc}</Text>
-                  </View>
-                  <View style={style.orderStateContain}>
-                    <View>
-                      <View style={style.timingContain}>
-                        <Feather name="clock" color={primaryColor} size={15} />
-                        <Text style={style.timeTaking}>09:30</Text>
-                      </View>
-                      <View style={[style.stateItem, style.activeState]}>
-                        <MaterialCommunityIcons
-                          name="package"
-                          color={lightColor}
-                          size={25}
-                        />
-                      </View>
+    // <ScrollView>
+    <View style={[style.scrollContainer, { height: windowHeight }]}>
+      <ScrollView
+        ref={scroll}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={1}
+      >
+        {status &&
+          status
+            .filter(stat => stat.id === delivery)
+            .map(stat => (
+              <View
+                key={stat.id}
+                style={[style.loadingScreen, { width: windowWidth }]}
+              >
+                <View style={style.imgContain}>
+                  <Image source={stat.img} style={style.orderImg} />
+                </View>
+                <View style={style.orderContent}>
+                  <Text style={style.headMsg}>{stat.title}</Text>
+                  <Text style={style.orderMsg}>{stat.desc}</Text>
+                </View>
+                <View style={style.orderStateContain}>
+                  <View>
+                    <View style={style.timingContain}>
+                      <Feather name="clock" color={primaryColor} size={15} />
+                      <Text style={style.timeTaking}>09:30</Text>
                     </View>
-                    <View style={style.progressBar}></View>
-                    <View>
-                      <View style={[style.timingContain, { opacity: 0 }]}>
-                        <Feather name="clock" color={primaryColor} size={15} />
-                        <Text style={style.timeTaking}>09:30</Text>
-                      </View>
-                      <View style={[style.stateItem]}>
-                        <MaterialIcons
-                          name="delivery-dining"
-                          color={secondaryColor}
-                          size={25}
-                        />
-                      </View>
+                    <View style={[style.stateItem, style.activeState]}>
+                      <MaterialCommunityIcons
+                        name="package"
+                        color={lightColor}
+                        size={25}
+                      />
                     </View>
-                    <View style={style.progressBar}></View>
-                    <View>
-                      <View style={[style.timingContain, { opacity: 0 }]}>
-                        <Feather name="clock" color={primaryColor} size={15} />
-                        <Text style={style.timeTaking}>09:30</Text>
-                      </View>
-                      <View style={style.stateItem}>
-                        <FontAwesome
-                          name="shopping-basket"
-                          color={secondaryColor}
-                          size={25}
-                        />
-                      </View>
+                  </View>
+                  <View style={style.progressBar}></View>
+                  <View>
+                    <View style={[style.timingContain, { opacity: 0 }]}>
+                      <Feather name="clock" color={primaryColor} size={15} />
+                      <Text style={style.timeTaking}>09:30</Text>
+                    </View>
+                    <View style={[style.stateItem]}>
+                      <MaterialIcons
+                        name="delivery-dining"
+                        color={secondaryColor}
+                        size={25}
+                      />
+                    </View>
+                  </View>
+                  <View style={style.progressBar}></View>
+                  <View>
+                    <View style={[style.timingContain, { opacity: 0 }]}>
+                      <Feather name="clock" color={primaryColor} size={15} />
+                      <Text style={style.timeTaking}>09:30</Text>
+                    </View>
+                    <View style={style.stateItem}>
+                      <FontAwesome
+                        name="shopping-basket"
+                        color={secondaryColor}
+                        size={25}
+                      />
                     </View>
                   </View>
                 </View>
-              ))}
-        </ScrollView>
-        <View style={[utilStyle.card, style.loadingFooter]}>
-          <Pressable onPress={() => navigation.navigate("Receipt")}>
-            <Text style={style.recieptTxt}>View receipt</Text>
-          </Pressable>
-          <Pressable
-            style={style.homeBtn}
-            onPress={() => navigation.navigate("Home")}
-          >
-            <Entypo name="home" color={lightColor} size={20} />
-            <Text style={style.btnLabel}>Go to home</Text>
-          </Pressable>
-        </View>
+              </View>
+            ))}
+      </ScrollView>
+      <View style={[utilStyle.card, style.loadingFooter]}>
+        <Pressable onPress={() => navigation.navigate("Receipt")}>
+          <Text style={style.recieptTxt}>View receipt</Text>
+        </Pressable>
+        <Pressable
+          style={style.homeBtn}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Entypo name="home" color={lightColor} size={20} />
+          <Text style={style.btnLabel}>Go to home</Text>
+        </Pressable>
       </View>
-    </ScrollView>
+    </View>
+    // </ScrollView>
   );
 };
 
 const style = StyleSheet.create({
   scrollContainer: {
+    flex: 1,
     marginTop: StatusBar.currentHeight,
     paddingVertical: 25,
     position: "relative",
@@ -212,16 +211,21 @@ const style = StyleSheet.create({
     paddingHorizontal: 25,
   },
   orderContent: {
-    marginTop: 50,
+    marginTop: 15,
   },
   imgContain: {
-    marginTop: 50,
+    marginTop: 30,
+    padding: 20,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   orderStateContain: {
+    position: "absolute",
+    alignSelf: "center",
+    bottom: 150,
     display: "flex",
+    width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -256,7 +260,7 @@ const style = StyleSheet.create({
     left: 0,
     bottom: 0,
     width: "100%",
-    display: "flex",
+    // display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider } from "react-redux";
 
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
@@ -20,6 +21,8 @@ import Promo from "./components/pages/Promo";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+
+import store from "./store";
 
 export interface FoodType {
   id: number;
@@ -56,27 +59,29 @@ export default function App() {
     return null;
   } else {
     return (
-      <SafeAreaProvider>
-        {/* <Navigation colorScheme={colorScheme} /> */}
-        <StatusBar backgroundColor="#E2E2E2" />
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Home"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Food" component={FoodDesc} />
-            <Stack.Screen name="Categories" component={Categories} />
-            <Stack.Screen name="Orders" component={Orders} />
-            <Stack.Screen name="Wishlist" component={Wishlist} />
-            <Stack.Screen name="Support" component={Support} />
-            <Stack.Screen name="Refer" component={Refer} />
-            <Stack.Screen name="OrderLoading" component={OrderLoading} />
-            <Stack.Screen name="Receipt" component={Receipt} />
-            <Stack.Screen name="Promo" component={Promo} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <Provider store={store}>
+        <SafeAreaProvider>
+          {/* <Navigation colorScheme={colorScheme} /> */}
+          <StatusBar backgroundColor="#E2E2E2" />
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName="Home"
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="Food" component={FoodDesc} />
+              <Stack.Screen name="Categories" component={Categories} />
+              <Stack.Screen name="Orders" component={Orders} />
+              <Stack.Screen name="Wishlist" component={Wishlist} />
+              <Stack.Screen name="Support" component={Support} />
+              <Stack.Screen name="Refer" component={Refer} />
+              <Stack.Screen name="OrderLoading" component={OrderLoading} />
+              <Stack.Screen name="Receipt" component={Receipt} />
+              <Stack.Screen name="Promo" component={Promo} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </Provider>
     );
   }
 }

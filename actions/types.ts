@@ -1,0 +1,4 @@
+export const GET_ORDER_ID = "GET_ORDER_ID";
+export const SET_LOADING = "SET_LOADING";
+export const SET_ORDER_LOADING = "SET_ORDER_LOADING";
+export const PAYMENT_ERROR = "PAYMENT_ERROR";

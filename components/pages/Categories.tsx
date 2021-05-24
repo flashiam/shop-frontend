@@ -18,6 +18,7 @@ import {
   medColor,
   secondaryColor,
   darkColor,
+  lightColor,
 } from "../../styles/_variables";
 
 import {
@@ -33,6 +34,7 @@ import Drawer from "../layout/Drawer";
 import foodImg from "../../img/indian_food_1.png";
 
 import { RootStackParamList, FoodType } from "../../App";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 // Type checking
 type CategoryScreenNavProp = StackNavigationProp<
@@ -52,16 +54,6 @@ const Categories = ({ route, navigation }: Props) => {
   const selectedCat = route.params.catid - 1;
 
   const srchInput = useRef<HTMLAllCollection>(null);
-
-  // interface Food {
-  //   id: number;
-  //   title: string;
-  //   price: number;
-  //   img: string;
-  //   rating: number;
-  //   stars: number;
-  //   reviews: number;
-  // }
 
   interface Category {
     id: number;
@@ -221,15 +213,15 @@ const Categories = ({ route, navigation }: Props) => {
     >
       <View style={[utilStyle.container, { paddingBottom: 0 }]}>
         {/* Navbar */}
-        <View style={style.nav}>
+        <Pressable style={style.nav} onPress={() => setSearch(false)}>
           {/* Back btn */}
-          <Pressable
+          <TouchableWithoutFeedback
             style={style.leftContent}
             onPress={() => navigation.goBack()}
-            android_ripple={{ color: secondaryColor, borderless: true }}
+            // android_ripple={{ color: secondaryColor, borderless: true }}
           >
             <MaterialIcons name="arrow-back" size={30} color={darkColor} />
-          </Pressable>
+          </TouchableWithoutFeedback>
           <View style={style.rightContent}>
             {/* Search bar */}
             <Pressable
@@ -255,6 +247,7 @@ const Categories = ({ route, navigation }: Props) => {
                 onBlur={() => setSearch(false)}
               />
             </Pressable>
+
             {/* Navbar btn */}
             <Pressable
               onPress={() => {
@@ -268,7 +261,7 @@ const Categories = ({ route, navigation }: Props) => {
               <EvilIcons name="navicon" size={35} color="red" />
             </Pressable>
           </View>
-        </View>
+        </Pressable>
       </View>
       <View style={utilStyle.container}>
         <ScrollView showsHorizontalScrollIndicator={false} horizontal>
@@ -324,7 +317,10 @@ const Categories = ({ route, navigation }: Props) => {
               subCategories[activeSubTab].subCatItems.map((item: FoodType) => (
                 <View
                   key={item.id}
-                  style={{ marginHorizontal: 1, marginBottom: 20 }}
+                  style={{
+                    // marginHorizontal: 1,
+                    marginBottom: 20,
+                  }}
                 >
                   <Food navigation={navigation} food={item} />
                 </View>
@@ -342,7 +338,8 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 50,
+    paddingTop: 50,
+    paddingBottom: 30,
   },
   leftContent: {
     display: "flex",
@@ -365,6 +362,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     marginRight: 15,
+    alignItems: "center",
     width: "auto",
     // width: 230,
   },
@@ -421,7 +419,7 @@ const style = StyleSheet.create({
     right: 30,
   },
   categoryContain: {
-    marginTop: 10,
+    marginTop: 5,
     display: "flex",
     // flex: 1,
     // height: 90,

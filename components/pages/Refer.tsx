@@ -8,6 +8,7 @@ import {
   Pressable,
   StatusBar,
   Share,
+  Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -51,19 +52,19 @@ const Refer = ({ navigation }: Props) => {
         console.log("Referal dismissed");
       }
     } catch (err) {
-      console.log("Referal failed");
+      console.log(err);
     }
   };
 
   return (
     <ScrollView>
-      <View style={utilStyle.container}>
+      <View style={[utilStyle.container]}>
         <View style={style.header}>
           <Pressable onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" color={darkColor} size={30} />
           </Pressable>
         </View>
-        <View style={style.section}>
+        <View style={[style.section]}>
           <View style={style.referHeader}>
             <Text style={[utilStyle.head, { paddingBottom: 0 }]}>
               Refer and earn
@@ -79,11 +80,31 @@ const Refer = ({ navigation }: Props) => {
             </Pressable>
           </View>
           <View style={style.referSection}>
-            <View style={style.outerCircle}>
-              <View style={style.innerCircle}>
-                <Image source={testAvatar} style={style.profilePic} />
-              </View>
-            </View>
+            {/* <View
+              style={[
+                style.topShadow,
+                {
+                  height: 150,
+                  width: 150,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  style.bottomShadow,
+                  {
+                    height: 150,
+                    width: 150,
+                  },
+                ]}
+              >
+                <View style={style.topShadow}>
+                  <View style={style.bottomShadow}> */}
+            <Image source={testAvatar} style={style.profilePic} />
+            {/* </View>
+                </View> */}
+            {/* </View> */}
+            {/* </View> */}
             <View style={style.referContent}>
               <Text style={style.username}>joypashina007</Text>
               <Text style={style.desc}>
@@ -104,7 +125,7 @@ const Refer = ({ navigation }: Props) => {
               <Pressable style={style.shareItem}>
                 <Image source={messaging} style={style.shareImg} />
               </Pressable>
-              <Pressable style={style.shareItem} onPress={sendReferal}>
+              <Pressable style={style.shareItem} onPress={() => sendReferal()}>
                 <Image source={linkImg} style={style.shareImg} />
               </Pressable>
             </View>
@@ -140,28 +161,29 @@ const style = StyleSheet.create({
     alignItems: "center",
   },
   referSection: {
-    marginTop: 40,
+    marginTop: 90,
     display: "flex",
     alignItems: "center",
     paddingBottom: 55,
     borderBottomColor: secondaryColor,
     borderBottomWidth: 1,
+    // marginHorizontal: Platform.OS === "web" ? 400 : "",
   },
   outerCircle: {
     height: 150,
     width: 150,
     borderRadius: 100 / 1,
-    // elevation: 10,
-    // shadowColor: primaryColor,
-    // shadowOpacity: 0.5,
-    // shadowOffset: {
-    //   height: 0,
-    //   width: 0,
-    // },
-    // shadowRadius: 90,
-    borderWidth: 1,
-    borderColor: secondaryColor,
-    // backgroundColor: lightColor,
+    elevation: 3,
+    shadowColor: primaryColor,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      height: 5,
+      width: 12,
+    },
+    shadowRadius: 15,
+    // borderWidth: 1,
+    // borderColor: secondaryColor,
+    backgroundColor: "transparent",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -169,27 +191,29 @@ const style = StyleSheet.create({
   innerCircle: {
     height: 100,
     width: 100,
-    elevation: 5,
-    shadowColor: primaryColor,
-    shadowOpacity: 0.8,
+    elevation: 3,
+    shadowColor: lightColor,
+    shadowOpacity: 0.2,
     shadowOffset: {
-      height: 0,
-      width: 0,
+      height: -6,
+      width: -6,
     },
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     shadowRadius: 5,
-    backgroundColor: lightColor,
+    backgroundColor: "transparent",
     borderRadius: 100 / 2,
   },
   profilePic: {
-    height: 80,
-    width: 80,
-    borderRadius: 100 / 2,
+    height: 120,
+    width: 120,
+    borderRadius: 100 / 1,
   },
   referContent: {
     marginTop: 20,
+
+    paddingBottom: 50,
   },
   username: {
     fontWeight: "bold",
@@ -201,11 +225,12 @@ const style = StyleSheet.create({
     fontSize: 15,
     textAlign: "center",
     color: medColor,
-    paddingHorizontal: 5,
+    paddingHorizontal: 30,
     lineHeight: 25,
   },
   referFooter: {
     marginTop: 15,
+    // paddingHorizontal: Platform.OS === "web" ? 400 : "",
   },
   shareOptions: {
     marginTop: 15,
@@ -222,6 +247,35 @@ const style = StyleSheet.create({
   shareImg: {
     height: 30,
     width: 30,
+  },
+  topShadow: {
+    elevation: 3,
+    backgroundColor: "transparent",
+    shadowOffset: {
+      width: -6,
+      height: -6,
+    },
+    shadowRadius: 5,
+    shadowColor: lightColor,
+    height: 100,
+    width: 100,
+    borderRadius: 100 / 1,
+  },
+  bottomShadow: {
+    elevation: 3,
+    backgroundColor: "transparent",
+    shadowOffset: {
+      width: 6,
+      height: 6,
+    },
+    alignItems: "center",
+    justifyContent: "center",
+    shadowRadius: 4,
+    shadowColor: primaryColor,
+    shadowOpacity: 0.1,
+    height: 100,
+    width: 100,
+    borderRadius: 100 / 1,
   },
 });
 

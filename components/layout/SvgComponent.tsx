@@ -11,7 +11,7 @@ function SvgComponent(props: any) {
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       {...props}
-      // style={{ transform: [{ translateX: 35 }] }}
+      style={{ marginLeft: 10 }}
     >
       <Rect width={413} height={216} rx={10} fill="url(#prefix__pattern0)" />
       <Defs>

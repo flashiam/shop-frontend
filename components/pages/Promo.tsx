@@ -73,6 +73,7 @@ const Promo = ({ navigation }: Props) => {
                     color: primaryColor,
                     fontWeight: "bold",
                     textTransform: "uppercase",
+                    // paddingRight: 10,
                   }}
                 >
                   Apply
@@ -123,6 +124,7 @@ const Promo = ({ navigation }: Props) => {
                       color: primaryColor,
                       fontWeight: "bold",
                       textTransform: "uppercase",
+                      paddingRight: 10,
                     }}
                   >
                     Apply
@@ -171,6 +173,7 @@ const Promo = ({ navigation }: Props) => {
                       color: primaryColor,
                       fontWeight: "bold",
                       textTransform: "uppercase",
+                      paddingRight: 10,
                     }}
                   >
                     Apply
