@@ -48,7 +48,10 @@ const Drawer = ({ drawer, navigation }: Props) => {
           <Text style={style.linkTxt}>My Orders</Text>
         </Pressable>
         <Pressable
-          onPress={() => navigation.navigate("Wishlist")}
+          onPress={() => {
+            drawer.current.closeDrawer();
+            navigation.navigate("Wishlist");
+          }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
         >
@@ -56,7 +59,10 @@ const Drawer = ({ drawer, navigation }: Props) => {
           <Text style={style.linkTxt}>Wishlist</Text>
         </Pressable>
         <Pressable
-          onPress={() => navigation.navigate("Support")}
+          onPress={() => {
+            drawer.current.closeDrawer();
+            navigation.navigate("Support");
+          }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
         >
@@ -64,7 +70,10 @@ const Drawer = ({ drawer, navigation }: Props) => {
           <Text style={style.linkTxt}>Support</Text>
         </Pressable>
         <Pressable
-          onPress={() => navigation.navigate("Refer")}
+          onPress={() => {
+            drawer.current.closeDrawer();
+            navigation.navigate("Refer");
+          }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
         >

@@ -27,10 +27,10 @@ type Props = {
   navigation: any;
   food: FoodType;
   updatePage?: boolean;
-  mr?: number;
+  marginStyle?: Object;
 };
 
-const Food = ({ navigation, food, updatePage, mr }: Props) => {
+const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
   const [favourite, setFavourite] = useState<boolean>(false);
   // const scaleAnim = useRef(new Animated.Value(0)).current;
 
@@ -77,9 +77,9 @@ const Food = ({ navigation, food, updatePage, mr }: Props) => {
           style.dealCard,
           {
             position: "relative",
-            marginRight: mr ? mr : 0,
             // transform: [{ scale: cardScale }],
             zIndex: 3,
+            ...marginStyle,
           },
         ]}
       >

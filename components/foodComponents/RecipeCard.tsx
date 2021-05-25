@@ -21,11 +21,12 @@ interface Recipe {
 
 type Props = {
   recipe: Recipe;
+  marginStyle?: any;
 };
 
-const RecipeCard = ({ recipe }: Props) => {
+const RecipeCard = ({ recipe, marginStyle }: Props) => {
   return (
-    <View style={[utilStyle.card, style.recipeCard]}>
+    <View style={[utilStyle.card, style.recipeCard, { ...marginStyle }]}>
       <View style={style.recipeHeader}>
         <View>
           <Image source={testAvatar} style={style.avatar} />

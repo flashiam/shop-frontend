@@ -6,7 +6,13 @@ const utilStyle = StyleSheet.create({
     width: Platform.OS === "web" ? "50%" : "90%",
     marginLeft: "auto",
     marginRight: "auto",
-    paddingBottom: 100,
+    // paddingBottom: 100,
+  },
+  containerBlock: {
+    position: "relative",
+    width: "100%",
+    // paddingBottom: 100,
+    // marginRight: 10,
   },
   card: {
     elevation: 2,

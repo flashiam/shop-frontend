@@ -310,7 +310,7 @@ const Categories = ({ route, navigation }: Props) => {
             ))}
         </ScrollView>
 
-        <ScrollView style={{ marginBottom: 120 }}>
+        <ScrollView style={{ marginBottom: 220 }}>
           <View style={style.categoryContain}>
             {subCategories &&
               subCategories[activeSubTab].subCatItems &&

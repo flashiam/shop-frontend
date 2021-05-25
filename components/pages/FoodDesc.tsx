@@ -93,6 +93,7 @@ type Prop = {
 
 type PhotoProps = {
   photo: Photo;
+  marginStyle?: any;
 };
 
 const FoodDesc = ({
@@ -226,30 +227,8 @@ const FoodDesc = ({
   // State for favourite
   const [favorite, setFavorite] = useState<boolean>(false);
 
-  // State for the picker
-  // const [pickerOpened, setPicker] = useState<boolean>(false);
-  // const [pickerValue, setPickerValue] = useState<any>(null);
-  // const [pickerItems, setPickerItem] = useState<any>([
-  //   {
-  //     label: "500g",
-  //     value: "500g",
-  //   },
-  //   {
-  //     label: "1000g",
-  //     value: "1000g",
-  //   },
-  //   {
-  //     label: "1500g",
-  //     value: "1500g",
-  //   },
-  //   {
-  //     label: "2000g",
-  //     value: "2000g",
-  //   },
-  // ]);
-
-  const ref = useRef(null);
-  const optionMenu = useRef(null);
+  // State for default margin
+  const [defaultMargin] = useState<number>(18);
 
   // Function to share the food
   const shareFood = async () => {
@@ -521,9 +500,9 @@ const FoodDesc = ({
   };
 
   // Photo component
-  const PhotoItem = ({ photo }: PhotoProps) => {
+  const PhotoItem = ({ photo, marginStyle }: PhotoProps) => {
     return (
-      <Pressable style={{ marginRight: 10 }}>
+      <Pressable style={{ ...marginStyle }}>
         <Image source={photo.img} />
       </Pressable>
     );
@@ -763,7 +742,7 @@ const FoodDesc = ({
                           key={star}
                           name="star"
                           size={15}
-                          color={medColor}
+                          color={secondaryColor}
                         />
                       )
                     )}
@@ -935,32 +914,60 @@ const FoodDesc = ({
               </View>
             </View>
           </View>
+        </View>
 
-          {/* Photos */}
-          <View style={utilStyle.mt1}>
+        {/* Photos */}
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
             <Text style={utilStyle.head}>Photos</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {photos &&
-                photos.map(photo => <PhotoItem key={photo.id} photo={photo} />)}
-            </ScrollView>
           </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {photos &&
+              photos.map((photo, i) =>
+                i === 0 ? (
+                  <PhotoItem
+                    key={photo.id}
+                    photo={photo}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <PhotoItem
+                    key={photo.id}
+                    photo={photo}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
+        </View>
 
-          {/* Related */}
-          <View style={utilStyle.mt1}>
+        {/* Related */}
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
             <Text style={utilStyle.head}>More like this</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {related &&
-                related.map(food => (
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {related &&
+              related.map((food, i) =>
+                i === 0 ? (
                   <Food
                     key={food.id}
                     navigation={navigation}
                     food={food}
-                    mr={20}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
                   />
-                ))}
-            </ScrollView>
-          </View>
+                ) : (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
         </View>
+        {/* </View> */}
       </ScrollView>
       {/* Cart pop up */}
       <CartPopUp />

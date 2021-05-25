@@ -4,7 +4,7 @@
     "slug": "project",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./img/app-logo-min 1.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
