@@ -1,11 +1,17 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Platform } from "react-native";
 import { primaryColor, lightColor } from "../../styles/_variables";
 
 const Footer = () => {
   return (
     <View style={style.footer}>
-      <Text style={{ color: lightColor, textAlign: "center", fontSize: 10 }}>
+      <Text
+        style={{
+          color: lightColor,
+          textAlign: "center",
+          fontSize: Platform.OS === "web" ? 12 : 10,
+        }}
+      >
         Copyright &copy; 2020 B2C Foods Pvt. Ltd. All Rights Reserved
       </Text>
     </View>
@@ -15,7 +21,7 @@ const Footer = () => {
 const style = StyleSheet.create({
   footer: {
     position: "absolute",
-    padding: 15,
+    padding: Platform.OS === "web" ? 20 : 15,
     bottom: 0,
     left: 0,
     right: 0,

@@ -10,6 +10,8 @@ import {
   // Animated,
   // Easing,
 } from "react-native";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 import { MaterialIcons, FontAwesome, Entypo } from "@expo/vector-icons";
 
 import utilStyle from "../../styles/utilStyle";
@@ -31,6 +33,7 @@ type Props = {
 };
 
 const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
+  const phoneOrTablets = useMediaQuery({ maxWidth: 768 });
   const [favourite, setFavourite] = useState<boolean>(false);
   // const scaleAnim = useRef(new Animated.Value(0)).current;
 
@@ -81,6 +84,7 @@ const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
             zIndex: 3,
             ...marginStyle,
           },
+          phoneOrTablets && { width: 155 },
         ]}
       >
         <View style={style.imgContain}>

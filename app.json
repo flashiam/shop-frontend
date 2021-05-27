@@ -29,7 +29,12 @@
       "versionCode": 1
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "build": {
+        "babel": {
+          "include": ["@codler/react-native-keyboard-aware-scroll-view"]
+        }
+      }
     }
   }
 }

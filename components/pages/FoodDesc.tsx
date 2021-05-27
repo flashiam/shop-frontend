@@ -18,7 +18,7 @@ import {
 import PropTypes from "prop-types";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import { Picker } from "native-base";
+// import { Picker } from "native-base";
 import DrawerLayout from "react-native-drawer-layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -759,7 +759,7 @@ const FoodDesc = ({
                     <View
                       style={[utilStyle.card, { height: 50, borderRadius: 10 }]}
                     >
-                      <Picker
+                      {/* <Picker
                         note
                         mode="dropdown"
                         style={{ width: 120 }}
@@ -772,7 +772,7 @@ const FoodDesc = ({
                         <Picker.Item label="1000g" value="1000" />
                         <Picker.Item label="1500g" value="1500" />
                         <Picker.Item label="2000g" value="2000" />
-                      </Picker>
+                      </Picker> */}
                     </View>
                   </View>
                   <View style={style.control}>
@@ -955,6 +955,7 @@ const FoodDesc = ({
                     navigation={navigation}
                     food={food}
                     marginStyle={{ marginHorizontal: defaultMargin }}
+                    updatePage
                   />
                 ) : (
                   <Food
@@ -962,6 +963,7 @@ const FoodDesc = ({
                     navigation={navigation}
                     food={food}
                     marginStyle={{ marginRight: defaultMargin }}
+                    updatePage
                   />
                 )
               )}

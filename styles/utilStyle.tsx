@@ -3,7 +3,7 @@ import { lightColor, primaryColor, darkColor } from "../styles/_variables";
 
 const utilStyle = StyleSheet.create({
   container: {
-    width: Platform.OS === "web" ? "50%" : "90%",
+    width: Platform.OS === "web" ? "80%" : "90%",
     marginLeft: "auto",
     marginRight: "auto",
     // paddingBottom: 100,

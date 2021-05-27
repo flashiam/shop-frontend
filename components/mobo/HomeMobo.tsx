@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,6 @@ import {
   TouchableNativeFeedback,
 } from "react-native";
 import DrawerLayout from "react-native-drawer-layout";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import utilStyle from "../../styles/utilStyle";
 import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
 import {

@@ -10,6 +10,9 @@ import {
   Pressable,
   DrawerLayoutAndroid,
 } from "react-native";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
+import DrawerLayout from "react-native-drawer-layout";
 import utilStyle from "../../styles/utilStyle";
 import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
 import {
@@ -19,76 +22,55 @@ import {
   FontAwesome5,
   MaterialIcons,
 } from "@expo/vector-icons";
-// import {
-//   IonContent,
-//   IonCard,
-//   IonCardContent,
-//   IonCardHeader,
-//   IonCardSubtitle,
-//   IonCardTitle,
-// } from "@ionic/react";
-import Carousel from "react-native-snap-carousel";
 
-import OfferItem from "../foodComponents/OfferItem";
+// import OfferItem from "../foodComponents/OfferItem";
 import Food from "../foodComponents/Food";
 import FoodWide from "../foodComponents/FoodWide";
 import RecipeCard from "../foodComponents/RecipeCard";
 import SvgComponent from "../layout/SvgComponent";
 import Footer from "../layout/Footer";
+import NavbarWeb from "./NavbarWeb";
+import NavbarMobo from "../mobo/NavbarMobo";
+import Drawer from "../layout/Drawer";
 
 import offerImg1 from "../../img/food_coupons.jpg";
 import offerImg2 from "../../img/food_coupons_2.jpg";
 import suggestFood from "../../img/suggest_food.jpg";
 import testAvatar from "../../img/test_avatar.jpg";
-import playStore from "../../img/play_store.png";
-import appStore from "../../img/app_store.png";
+import playStore from "../../img/google-play-badge.png";
+import appStore from "../../img/app-store-badge.png";
 import foodImg from "../../img/indian_food_1.png";
+import adMockup from "../../img/ad-mockup.png";
+
+import { FoodType } from "../../App";
 
 import { medColor, secondaryColor } from "../../styles/_variables";
 
 // Slider width of the carousel
-const SliderWidth = Dimensions.get("window").width - 450;
+const SliderWidth = Dimensions.get("window").width;
 
-// Category item
-const CatItem = ({ item, index }: { item: any; index: number }) => {
-  return (
-    <View style={style.catContain}>
-      <View style={{ borderRadius: 8, overflow: "hidden" }}>
-        <Pressable
-          android_ripple={{ color: secondaryColor }}
-          style={[utilStyle.card, style.category]}
-        >
-          <Image
-            style={[style.catImg, { borderRadius: 8 }]}
-            source={{ uri: item.img }}
-          />
-        </Pressable>
-      </View>
-      <Text style={style.catTxt}>{item.title}</Text>
-    </View>
-  );
+interface Category {
+  id: number;
+  title: string;
+  img: string;
+}
+
+type CatProp = {
+  cat: Category;
+  marginStyle?: any;
 };
 
-// Offer item
-const offerItem = ({ item, index }: { item: any; index: number }) => {
-  return (
-    <View>
-      <Pressable onPress={() => console.log("Show offers")}>
-        <Image style={style.offerImg} source={offerImg1} />
-      </Pressable>
-    </View>
-  );
+type OfferProp = {
+  imgStyle?: {
+    height: number;
+    width: number;
+  };
+  marginStyle: any;
 };
 
 const HomeWeb = ({ navigation }: { navigation: any }) => {
   interface Offer {
     id: number;
-    img: string;
-  }
-
-  interface Category {
-    id: number;
-    title: string;
     img: string;
   }
 
@@ -116,6 +98,58 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
     title: string;
     msg: string;
   }
+
+  // Media query
+  const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
+
+  // Category item
+  const CatItem = ({ cat, marginStyle }: CatProp) => {
+    return (
+      <View style={[style.catContain, { ...marginStyle }]}>
+        <View style={{ borderRadius: 8, overflow: "hidden" }}>
+          <Pressable
+            android_ripple={{ color: secondaryColor }}
+            style={[utilStyle.card, style.category]}
+          >
+            <Image
+              style={[
+                style.catImg,
+                { borderRadius: 8 },
+                phoneOrTablets
+                  ? { height: 30, width: 30 }
+                  : { height: 60, width: 60 },
+              ]}
+              source={{ uri: cat.img }}
+            />
+          </Pressable>
+        </View>
+        <Text style={style.catTxt}>{cat.title}</Text>
+      </View>
+    );
+  };
+
+  // Offer item
+  const OfferItem = ({ imgStyle, marginStyle }: OfferProp) => {
+    return (
+      <View style={{ ...marginStyle }}>
+        <Pressable onPress={() => console.log("Show offers")}>
+          <Image
+            style={[
+              style.offerImg,
+              imgStyle && { height: imgStyle.height, width: imgStyle.width },
+              phoneOrTablets
+                ? { height: 160, width: 300 }
+                : { height: 400, width: 1000 },
+            ]}
+            source={offerImg1}
+          />
+        </Pressable>
+      </View>
+    );
+  };
+
+  const [drawerClosed, setDrawer] = useState<boolean>(true);
+  const [defaultMargin] = useState<number>(10);
 
   // State for the offer carousel
   const [offers, setOffers] = useState<Offer[]>([
@@ -186,7 +220,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
   ]);
 
   // State for showcase food
-  const [foods, setFoods] = useState<Food[] | null>([
+  const [foods, setFoods] = useState<FoodType[] | null>([
     {
       id: 1,
       title: "Mix Veg",
@@ -194,6 +228,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
       reviews: 150,
       rating: 4.9,
       stars: 4,
+      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem placeat, reprehenderit aliquam vero soluta dolorem dolore, ipsa delectus a porro iusto, et perspiciatis unde similique veniam omnis quam reiciendis quibusdam?",
       img: foodImg,
     },
     {
@@ -203,6 +238,47 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
       reviews: 150,
       rating: 3.9,
       stars: 3,
+      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem placeat, reprehenderit aliquam vero soluta dolorem dolore, ipsa delectus a porro iusto, et perspiciatis unde similique veniam omnis quam reiciendis quibusdam?",
+      img: foodImg,
+    },
+    {
+      id: 3,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem placeat, reprehenderit aliquam vero soluta dolorem dolore, ipsa delectus a porro iusto, et perspiciatis unde similique veniam omnis quam reiciendis quibusdam?",
+      img: foodImg,
+    },
+    {
+      id: 4,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem placeat, reprehenderit aliquam vero soluta dolorem dolore, ipsa delectus a porro iusto, et perspiciatis unde similique veniam omnis quam reiciendis quibusdam?",
+      img: foodImg,
+    },
+    {
+      id: 5,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem placeat, reprehenderit aliquam vero soluta dolorem dolore, ipsa delectus a porro iusto, et perspiciatis unde similique veniam omnis quam reiciendis quibusdam?",
+      img: foodImg,
+    },
+    {
+      id: 6,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem placeat, reprehenderit aliquam vero soluta dolorem dolore, ipsa delectus a porro iusto, et perspiciatis unde similique veniam omnis quam reiciendis quibusdam?",
       img: foodImg,
     },
   ]);
@@ -219,6 +295,30 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
     },
     {
       id: 2,
+      name: "Fred",
+      date: "January 25,2021",
+      title: "How to follow a high protien diet plan with indian meals?",
+      desc: "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      avatar: testAvatar,
+    },
+    {
+      id: 3,
+      name: "Fred",
+      date: "January 25,2021",
+      title: "How to follow a high protien diet plan with indian meals?",
+      desc: "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      avatar: testAvatar,
+    },
+    {
+      id: 4,
+      name: "Fred",
+      date: "January 25,2021",
+      title: "How to follow a high protien diet plan with indian meals?",
+      desc: "This specialised diet plan lives up to the spoiler in its nomenclature by asking you to do just that: flood your system with friendly...",
+      avatar: testAvatar,
+    },
+    {
+      id: 5,
       name: "Fred",
       date: "January 25,2021",
       title: "How to follow a high protien diet plan with indian meals?",
@@ -247,240 +347,346 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
     },
   ]);
 
+  const [drawerDisabled, setDrawerState] = useState<boolean>(true);
+
   const ref = useRef(null);
   const drawer = useRef<any>(null);
 
-  // Navigation view
-  const navigationView = () => {
-    return (
-      <View style={style.navContain}>
-        <Pressable style={style.profileContain}>
-          <Image source={testAvatar} style={style.profileAvatar} />
-          <View style={style.profileDetails}>
-            <Text style={style.userName}>Joy Pashina</Text>
-            <Text style={style.userEmail}>joypashina32@gmail.com</Text>
-          </View>
-        </Pressable>
-
-        <View style={style.navLinks}>
-          <Pressable
-            style={style.navLink}
-            android_ripple={{ color: secondaryColor }}
-          >
-            <FontAwesome5 name="receipt" size={20} color={primaryColor} />
-            <Text style={style.linkTxt}>My Orders</Text>
-          </Pressable>
-          <Pressable
-            style={style.navLink}
-            android_ripple={{ color: secondaryColor }}
-          >
-            <FontAwesome5 name="shopping-bag" size={20} color={primaryColor} />
-            <Text style={style.linkTxt}>Wishlist</Text>
-          </Pressable>
-          <Pressable
-            style={style.navLink}
-            android_ripple={{ color: secondaryColor }}
-          >
-            <MaterialIcons
-              name="support-agent"
-              size={20}
-              color={primaryColor}
-            />
-            <Text style={style.linkTxt}>Support</Text>
-          </Pressable>
-          <Pressable
-            style={style.navLink}
-            android_ripple={{ color: secondaryColor }}
-          >
-            <FontAwesome5 name="ticket-alt" size={20} color={primaryColor} />
-            <Text style={style.linkTxt}>Refer and earn</Text>
-          </Pressable>
-        </View>
-
-        <Pressable
-          style={style.closeNavBtn}
-          android_ripple={{ color: secondaryColor, borderless: true }}
-          onPress={() => drawer.current.closeDrawer()}
-        >
-          <AntDesign name="close" size={25} color={darkColor} />
-        </Pressable>
-      </View>
-    );
-  };
-
   return (
-    <View>
+    <DrawerLayout
+      ref={drawer}
+      renderNavigationView={() => (
+        <Drawer navigation={navigation} drawer={drawer} />
+      )}
+      drawerPosition="right"
+      drawerWidth={300}
+      drawerBackgroundColor={lightColor}
+      style={{ overflow: "hidden" }}
+      onDrawerOpen={() => setDrawerState(false)}
+      onDrawerClose={() => setDrawerState(true)}
+    >
+      {/* <ScrollView> */}
       <View style={[utilStyle.container, style.container]}>
-        {/* <ProtonText>This is the proton</ProtonText> */}
-        {/* Navbar */}
-        <View style={style.nav}>
-          {/* Access location */}
-          <Pressable onPress={() => console.log("location")}>
-            <View style={style.leftContent}>
-              <Ionicons
-                name="location-outline"
-                size={30}
-                color={secondaryColor}
-                style={style.locateIcon}
-              />
-              <View>
-                <Text
-                  style={[
-                    style.locationTxt,
-                    { fontWeight: "bold", fontSize: 18 },
-                  ]}
-                >
-                  Bhopal
-                </Text>
-                <Text style={style.locationTxt}>
-                  10 no. market near arera colony...
-                </Text>
-              </View>
-            </View>
-          </Pressable>
-          {/* Navbar btn */}
-          <Pressable
-            onPress={() => {
-              drawer.current.openDrawer();
-            }}
-            android_ripple={{
-              color: secondaryColor,
-              borderless: true,
-            }}
+        {phoneOrTablets ? (
+          <NavbarMobo drawer={drawer} />
+        ) : (
+          <NavbarWeb drawer={drawer} />
+        )}
+      </View>
+
+      <View style={utilStyle.containerBlock}>
+        <View style={[utilStyle.mt1]}>
+          <ScrollView
+            style={style.scrollWidth}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToOffsets={[0, 300]}
           >
-            <EvilIcons name="navicon" size={35} color="red" />
-          </Pressable>
-        </View>
-        <View style={[utilStyle.card, style.searchBar]}>
-          <AntDesign name="search1" size={24} color={primaryColor} />
-          <TextInput
-            style={style.searchInput}
-            placeholder="Search for products"
-          />
-        </View>
-
-        <View style={utilStyle.mt1}>
-          {/* <Carousel
-              layout={"default"}
-              ref={ref}
-              data={offers}
-              renderItem={OfferItem}
-              sliderWidth={SliderWidth}
-              itemWidth={300}
-            /> */}
-        </View>
-
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Categories</Text>
-          {/* <Carousel
-              layout={"default"}
-              ref={ref}
-              data={categories}
-              renderItem={CatItem}
-              sliderWidth={SliderWidth}
-              itemWidth={90}
-              activeAnimationType={"spring"}
-              inactiveSlideOpacity={1}
-              inactiveSlideScale={1}
-            /> */}
-        </View>
-
-        {/* Todays deal */}
-        <View style={utilStyle.mt1}>
-          <Text style={[utilStyle.head]}>Today's deal</Text>
-
-          <View style={style.dealContain}>
-            {foods &&
-              foods.map(food => (
-                <Food key={food.id} navigation={navigation} food={food} />
-              ))}
-          </View>
-        </View>
-
-        {/* Most selling */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Most Selling</Text>
-
-          <View style={style.dealContain}>
-            {foods &&
-              foods.map(food => (
-                <Food key={food.id} navigation={navigation} food={food} />
-              ))}
-          </View>
-        </View>
-
-        {/* Suggested */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Suggested</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {suggested &&
-              suggested.map(food => <FoodWide key={food.id} food={food} />)}
+            {offers &&
+              offers.map((offer, i) =>
+                i === 0 ? (
+                  <OfferItem
+                    key={offer.id}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <OfferItem
+                    key={offer.id}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
           </ScrollView>
         </View>
-        {/* 
-        <IonCard>
-          <IonCardHeader>
-            <IonCardTitle>Hello !</IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent>We are awesome AF!!</IonCardContent>
-        </IonCard> */}
+      </View>
 
-        {/* Offers */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Offers</Text>
-          {/* <Carousel
-              ref={ref}
-              data={offers}
-              renderItem={offerItem}
-              sliderWidth={SliderWidth}
-              itemWidth={300}
-            /> */}
+      <View style={utilStyle.mt1}>
+        <View style={utilStyle.container}>
+          <Text style={utilStyle.head}>Categories</Text>
+        </View>
+        <ScrollView
+          style={style.scrollWidth}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {categories &&
+            categories.map((category, i) =>
+              i === 0 ? (
+                <CatItem
+                  key={category.id}
+                  cat={category}
+                  marginStyle={{ marginHorizontal: defaultMargin }}
+                />
+              ) : (
+                <CatItem
+                  key={category.id}
+                  cat={category}
+                  marginStyle={{ marginRight: defaultMargin }}
+                />
+              )
+            )}
+        </ScrollView>
+      </View>
+
+      {/* Todays deal */}
+      <View style={[utilStyle.mt1, { overflow: "hidden" }]}>
+        <View style={utilStyle.container}>
+          <Text style={[utilStyle.head]}>Today's deal</Text>
         </View>
 
-        {/* Special recipies */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Special Recipies</Text>
-          {/* <Carousel
-              ref={ref}
-              data={recipes}
-              renderItem={RecipeCard}
-              sliderWidth={SliderWidth}
-              itemWidth={320}
-              inactiveSlideOpacity={1}
-              inactiveSlideScale={1}
-            /> */}
+        <ScrollView
+          style={style.scrollWidth}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {foods &&
+            foods.map((food, i) =>
+              i === 0 ? (
+                <Food
+                  key={food.id}
+                  navigation={navigation}
+                  food={food}
+                  // mr={30}
+                  marginStyle={{ marginHorizontal: defaultMargin }}
+                />
+              ) : (
+                <Food
+                  key={food.id}
+                  navigation={navigation}
+                  food={food}
+                  // mr={30}
+                  marginStyle={{ marginRight: defaultMargin }}
+                />
+              )
+            )}
+        </ScrollView>
+      </View>
+
+      {/* Most selling */}
+      <View style={[utilStyle.mt1, { overflow: "hidden" }]}>
+        <View style={utilStyle.container}>
+          <Text style={utilStyle.head}>Most Selling</Text>
         </View>
 
-        {/* Advertisment */}
-        <View style={utilStyle.mt1}>
-          <Text style={utilStyle.head}>Also available on</Text>
-          <View style={style.advContain}>
-            <Pressable>
-              <View>
-                <Image style={style.advImg} source={playStore} />
-              </View>
-            </Pressable>
-            <Pressable>
-              <View>
-                <Image style={style.advImg} source={appStore} />
-              </View>
-            </Pressable>
+        <ScrollView
+          style={style.scrollWidth}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={style.dealContain}>
+            {foods &&
+              foods.map((food, i) =>
+                i === 0 ? (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
           </View>
-        </View>
+        </ScrollView>
+      </View>
 
-        {/* Illustration */}
-        <View style={utilStyle.mt1}>
-          <SvgComponent />
+      {/* Suggested */}
+      <View style={[utilStyle.mt1, { overflow: "hidden" }]}>
+        <View style={utilStyle.container}>
+          <Text style={utilStyle.head}>Suggested</Text>
         </View>
+        <ScrollView
+          style={style.scrollWidth}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={style.dealContain}>
+            {foods &&
+              foods.map((food, i) =>
+                i === 0 ? (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </View>
+        </ScrollView>
+      </View>
+
+      {/* Offers */}
+      <View style={utilStyle.mt1}>
+        <View style={utilStyle.container}>
+          <Text style={utilStyle.head}>Offers</Text>
+        </View>
+        <ScrollView
+          style={style.scrollWidth}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={style.dealContain}>
+            {offers &&
+              offers.map((offer, i) =>
+                i === 0 ? (
+                  <OfferItem
+                    key={offer.id}
+                    // imgStyle={{ height: 250, width: 600 }}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <OfferItem
+                    key={offer.id}
+                    // imgStyle={{ height: 250, width: 600 }}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </View>
+        </ScrollView>
+      </View>
+
+      {/* Special recipies */}
+      <View style={[utilStyle.mt1, { overflow: "hidden" }]}>
+        <View style={utilStyle.container}>
+          <Text style={utilStyle.head}>Special Recipies</Text>
+        </View>
+        <ScrollView
+          style={style.scrollWidth}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={style.dealContain}>
+            {recipes &&
+              recipes.map((recipe, i) =>
+                i === 0 ? (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </View>
+        </ScrollView>
+      </View>
+
+      <View style={[utilStyle.container, { paddingBottom: 100 }]}>
+        {/* Advertisment */}
+        {phoneOrTablets ? (
+          <View>
+            <View style={utilStyle.mt1}>
+              <Text style={utilStyle.head}>Also available on</Text>
+              <View
+                style={[
+                  style.advContain,
+                  {
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <Pressable>
+                  <View>
+                    <Image
+                      style={[style.advImg, { width: 155, height: 70 }]}
+                      source={playStore}
+                    />
+                  </View>
+                </Pressable>
+                <Pressable>
+                  <View>
+                    <Image
+                      style={[style.advImg, { width: 155, height: 70 }]}
+                      source={appStore}
+                    />
+                  </View>
+                </Pressable>
+              </View>
+            </View>
+            <View
+              style={
+                (utilStyle.mt1,
+                {
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingTop: 5,
+                  alignContent: "center",
+                })
+              }
+            >
+              <SvgComponent />
+            </View>
+          </View>
+        ) : (
+          <View style={utilStyle.mt1}>
+            <View style={style.advContain}>
+              <Image source={adMockup} style={style.mockupStyle} />
+              <View style={style.launchingContain}>
+                <Text style={{ fontSize: 30 }}>Launching Soon on...</Text>
+                <View style={style.launchingPlatforms}>
+                  <Pressable>
+                    <View>
+                      <Image
+                        style={[style.advImg, { height: 120, width: 270 }]}
+                        source={playStore}
+                      />
+                    </View>
+                  </Pressable>
+                  <Pressable>
+                    <View style={{ marginLeft: 30 }}>
+                      <Image style={style.advImg} source={appStore} />
+                    </View>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Why fresh fred */}
         <View style={utilStyle.mt1}>
-          <Text style={style.concludeTxt}>Why Fresh Fred?</Text>
+          <Text
+            style={[
+              style.concludeTxt,
+              phoneOrTablets ? { fontSize: 30 } : { fontSize: 40 },
+            ]}
+          >
+            Why Fresh Fred?
+          </Text>
           {conclusions &&
             conclusions.map(conclusion => (
               <View
                 key={conclusion.id}
-                style={[utilStyle.card, style.concludeCard]}
+                style={[
+                  utilStyle.card,
+                  style.concludeCard,
+                  phoneOrTablets
+                    ? { padding: 20 }
+                    : { paddingVertical: 50, paddingHorizontal: 50 },
+                ]}
               >
                 <Text style={style.concludeTitle}>{conclusion.title}</Text>
                 <Text style={style.concludeDesc}>{conclusion.msg}</Text>
@@ -490,16 +696,24 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
             ))}
         </View>
       </View>
+
       <Footer />
-    </View>
+    </DrawerLayout>
+    // </ScrollView>
   );
 };
 
 const style = StyleSheet.create({
+  scrollWidth: {
+    width: "90%",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
   container: {
     display: "flex",
     // flex: 1,
-    minHeight: "100%",
+    // minHeight: "100%",
+    overflow: "hidden",
   },
   nav: {
     display: "flex",
@@ -530,13 +744,16 @@ const style = StyleSheet.create({
     marginLeft: 20,
   },
   offerImg: {
-    height: 150,
-    width: 300,
+    height: 400,
+    // width: 500,
+    // width: SliderWidth - 50
+    // width: "90%",
+    width: 1000,
     borderRadius: 10,
     marginRight: 10,
   },
   catContain: {
-    marginRight: 5,
+    marginRight: 30,
     backgroundColor: "transparent",
   },
   category: {
@@ -545,12 +762,12 @@ const style = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: lightColor,
-    marginRight: 10,
+    // marginRight: 10,
     position: "relative",
   },
   catImg: {
-    height: 40,
-    width: 40,
+    height: 60,
+    width: 60,
   },
   catTxt: {
     textAlign: "center",
@@ -566,16 +783,20 @@ const style = StyleSheet.create({
   advContain: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    // justifyContent: "space-between",
   },
   advImg: {
-    width: 155,
+    width: 250,
+    height: 100,
     marginVertical: 10,
   },
   concludeCard: {
     position: "relative",
     borderRadius: 10,
     marginTop: 25,
+    // paddingVertical: 50,
+    // paddingHorizontal: 50,
     zIndex: 2,
   },
   concludeTxt: {
@@ -587,8 +808,8 @@ const style = StyleSheet.create({
   },
   concludeTitle: {
     fontWeight: "bold",
-    fontSize: 16,
-    paddingBottom: 5,
+    fontSize: 20,
+    paddingBottom: 10,
     color: darkColor,
   },
   concludeDesc: {
@@ -601,7 +822,7 @@ const style = StyleSheet.create({
     fontSize: 60,
     color: secondaryColor,
     position: "absolute",
-    top: -20,
+    top: -30,
     zIndex: 4,
   },
   leftApost: {
@@ -657,6 +878,22 @@ const style = StyleSheet.create({
     top: 50,
     right: 30,
   },
+  // Mockup
+  mockupStyle: {
+    height: 650,
+    width: 320,
+  },
+  launchingPlatforms: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  launchingContain: {
+    marginLeft: 150,
+  },
+  // advContain: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center'
+  // }
 });
 
 export default HomeWeb;
