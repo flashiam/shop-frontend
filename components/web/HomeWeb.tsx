@@ -373,7 +373,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
   const drawer = useRef<any>(null);
 
   return (
-    <View>
+    <View style={{ overflow: "hidden" }}>
       <DrawerLayout
         ref={drawer}
         renderNavigationView={() => (
@@ -391,7 +391,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
           {phoneOrTablets ? (
             <NavbarMobo drawer={drawer} />
           ) : (
-            <NavbarWeb drawer={drawer} />
+            <NavbarWeb drawer={drawer} navigation={navigation} />
           )}
         </View>
 

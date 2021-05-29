@@ -153,7 +153,7 @@ const CartWeb = ({ navigation, route, addCartItem }: Props) => {
   }, []);
 
   return (
-    <View style={[{ flex: 1 }]}>
+    <View style={[{ flex: 1, overflow: "hidden" }]}>
       <View style={[utilStyle.container, style.cartContain]}>
         <ScrollView style={style.cartSection}>
           {cartItems &&

@@ -19,6 +19,7 @@ import OrderLoading from "./components/pages/OrderLoading";
 import Receipt from "./components/pages/Receipt";
 import Promo from "./components/pages/Promo";
 import CartWeb from "./components/web/CartWeb";
+import NavbarWeb from "./components/web/NavbarWeb";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -40,6 +41,7 @@ export interface FoodType {
 export type RootStackParamList = {
   Home: undefined;
   Food: { food: FoodType };
+  NavbarWeb: undefined;
   Categories: { catid: number };
   Orders: undefined;
   Wishlist: undefined;
@@ -81,6 +83,7 @@ export default function App() {
               <Stack.Screen name="Receipt" component={Receipt} />
               <Stack.Screen name="Promo" component={Promo} />
               <Stack.Screen name="CartWeb" component={CartWeb} />
+              <Stack.Screen name="NavbarWeb" component={NavbarWeb} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaProvider>

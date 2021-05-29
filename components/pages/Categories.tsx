@@ -9,8 +9,11 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 import { RouteProp } from "@react-navigation/native";
 import utilStyle from "../../styles/utilStyle";
 import {
@@ -53,6 +56,7 @@ const Categories = ({ route, navigation }: Props) => {
   // Width for the tabs
   const layout = Dimensions.get("window").width;
   const selectedCat = route.params.catid - 1;
+  const phoneOrTablets = useMediaQuery({ maxWidth: 768 });
 
   const srchInput = useRef<HTMLAllCollection>(null);
 
@@ -122,6 +126,26 @@ const Categories = ({ route, navigation }: Props) => {
       img: foodImg,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
+    {
+      id: 6,
+      title: "Chicken Tangdi",
+      price: 1099,
+      reviews: 900,
+      rating: 5.0,
+      stars: 5,
+      img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
+    {
+      id: 7,
+      title: "Chicken Keema",
+      price: 1199,
+      reviews: 900,
+      rating: 5.0,
+      stars: 5,
+      img: foodImg,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
   ]);
 
   const [categories, setCategories] = useState<Category[]>([
@@ -138,6 +162,16 @@ const Categories = ({ route, navigation }: Props) => {
     {
       id: 2,
       catName: "Mutton",
+      catItems: foods,
+    },
+    {
+      id: 3,
+      catName: "Exotic",
+      catItems: foods,
+    },
+    {
+      id: 4,
+      catName: "Ready to cook",
       catItems: foods,
     },
   ]);
@@ -204,133 +238,287 @@ const Categories = ({ route, navigation }: Props) => {
   }, []);
 
   return (
-    <DrawerLayout
-      ref={drawer}
-      renderNavigationView={() => (
-        <Drawer drawer={drawer} navigation={navigation} />
-      )}
-      drawerPosition="right"
-      drawerWidth={300}
-      drawerBackgroundColor={lightColor}
-    >
-      <View style={[utilStyle.container, { paddingBottom: 0 }]}>
-        {/* Navbar */}
-        <Pressable style={style.nav} onPress={() => setSearch(false)}>
-          {/* Back btn */}
-          <TouchableWithoutFeedback
-            style={style.leftContent}
-            onPress={() => navigation.goBack()}
-            // android_ripple={{ color: secondaryColor, borderless: true }}
-          >
-            <MaterialIcons name="arrow-back" size={30} color={darkColor} />
-          </TouchableWithoutFeedback>
-          <View style={style.rightContent}>
-            {/* Search bar */}
-            <Pressable
-              style={[
-                utilStyle.card,
-                style.searchBar,
-                { width: searchOpened ? 230 : "auto" },
-              ]}
-              onPress={() => {
-                setSearch(true);
-                if (srchInput.current) {
-                  srchInput.current.focus();
-                }
-              }}
+    <View style={{ overflow: "hidden" }}>
+      <DrawerLayout
+        ref={drawer}
+        renderNavigationView={() => (
+          <Drawer drawer={drawer} navigation={navigation} />
+        )}
+        drawerPosition="right"
+        drawerWidth={300}
+        drawerBackgroundColor={lightColor}
+      >
+        <View style={[utilStyle.container, { paddingBottom: 0 }]}>
+          {/* Navbar */}
+          <Pressable style={style.nav} onPress={() => setSearch(false)}>
+            {/* Back btn */}
+            <TouchableWithoutFeedback
+              style={style.leftContent}
+              onPress={() => navigation.goBack()}
+              // android_ripple={{ color: secondaryColor, borderless: true }}
             >
-              <AntDesign name="search1" color={primaryColor} size={24} />
-              <TextInput
-                ref={srchInput}
+              <MaterialIcons name="arrow-back" size={30} color={darkColor} />
+            </TouchableWithoutFeedback>
+            <View style={style.rightContent}>
+              {/* Search bar */}
+              <Pressable
                 style={[
-                  style.searchInput,
-                  { display: searchOpened ? "flex" : "none" },
+                  utilStyle.card,
+                  style.searchBar,
+                  { width: searchOpened ? 230 : "auto" },
                 ]}
-                onBlur={() => setSearch(false)}
-              />
-            </Pressable>
-
-            {/* Navbar btn */}
-            <Pressable
-              onPress={() => {
-                drawer?.current.openDrawer();
-              }}
-              android_ripple={{
-                color: secondaryColor,
-                borderless: true,
-              }}
-            >
-              <EvilIcons name="navicon" size={35} color="red" />
-            </Pressable>
-          </View>
-        </Pressable>
-      </View>
-      <View style={utilStyle.container}>
-        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-          {categories &&
-            categories.map(cat => (
-              <TouchableOpacity
-                key={cat.id}
-                style={style.tab}
-                onPress={() => setActiveTab(cat.id)}
-                activeOpacity={0.8}
+                onPress={() => {
+                  setSearch(true);
+                  if (srchInput.current) {
+                    srchInput.current.focus();
+                  }
+                }}
               >
-                <Text
+                <AntDesign name="search1" color={primaryColor} size={24} />
+                <TextInput
+                  ref={srchInput}
                   style={[
-                    style.tabLabel,
-                    activeTab === cat.id && style.activeLabel,
+                    style.searchInput,
+                    { display: searchOpened ? "flex" : "none" },
                   ]}
-                >
-                  {cat.catName}
-                </Text>
-              </TouchableOpacity>
-            ))}
-        </ScrollView>
+                  onBlur={() => setSearch(false)}
+                />
+              </Pressable>
 
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          style={style.subCategory}
-        >
-          {subCategories &&
-            subCategories.map(subCat => (
-              <TouchableOpacity
-                key={subCat.id}
-                style={style.subTab}
-                onPress={() => setActiveSubTab(subCat.id)}
-                activeOpacity={0.8}
+              {/* Navbar btn */}
+              <Pressable
+                onPress={() => {
+                  drawer?.current.openDrawer();
+                }}
+                android_ripple={{
+                  color: secondaryColor,
+                  borderless: true,
+                }}
               >
-                <Text
-                  style={[
-                    style.subTabLabel,
-                    activeSubTab === subCat.id && style.activeSubLabel,
-                  ]}
-                >
-                  {subCat.subCatName}
-                </Text>
-              </TouchableOpacity>
-            ))}
-        </ScrollView>
-
-        <ScrollView style={{ marginBottom: 220 }}>
-          <View style={style.categoryContain}>
-            {subCategories &&
-              subCategories[activeSubTab].subCatItems &&
-              subCategories[activeSubTab].subCatItems.map((item: FoodType) => (
+                <EvilIcons name="navicon" size={35} color="red" />
+              </Pressable>
+            </View>
+          </Pressable>
+        </View>
+        <View style={utilStyle.container}>
+          {Platform.OS === "web" ? (
+            phoneOrTablets ? (
+              <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+                {categories &&
+                  categories.map(cat => (
+                    <TouchableOpacity
+                      key={cat.id}
+                      style={style.tab}
+                      onPress={() => setActiveTab(cat.id)}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        style={[
+                          style.tabLabel,
+                          activeTab === cat.id && style.activeLabel,
+                        ]}
+                      >
+                        {cat.catName}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  marginBottom: 30,
+                }}
+              >
                 <View
-                  key={item.id}
                   style={{
-                    // marginHorizontal: 1,
-                    marginBottom: 20,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  <Food navigation={navigation} food={item} />
+                  {categories &&
+                    categories.map(cat => (
+                      <TouchableOpacity
+                        key={cat.id}
+                        style={style.tab}
+                        onPress={() => setActiveTab(cat.id)}
+                        activeOpacity={0.8}
+                      >
+                        <Text
+                          style={[
+                            style.tabLabel,
+                            activeTab === cat.id && style.activeLabel,
+                          ]}
+                        >
+                          {cat.catName}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                 </View>
-              ))}
-          </View>
-        </ScrollView>
-      </View>
-    </DrawerLayout>
+              </View>
+            )
+          ) : (
+            <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+              {categories &&
+                categories.map(cat => (
+                  <TouchableOpacity
+                    key={cat.id}
+                    style={style.tab}
+                    onPress={() => setActiveTab(cat.id)}
+                    activeOpacity={0.8}
+                  >
+                    <Text
+                      style={[
+                        style.tabLabel,
+                        activeTab === cat.id && style.activeLabel,
+                      ]}
+                    >
+                      {cat.catName}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+            </ScrollView>
+          )}
+
+          {Platform.OS === "web" ? (
+            phoneOrTablets ? (
+              <ScrollView
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                style={style.subCategory}
+              >
+                {subCategories &&
+                  subCategories.map(subCat => (
+                    <TouchableOpacity
+                      key={subCat.id}
+                      style={style.subTab}
+                      onPress={() => setActiveSubTab(subCat.id)}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        style={[
+                          style.subTabLabel,
+                          Platform.OS === "web" && {
+                            paddingVertical: 5,
+                            paddingHorizontal: 15,
+                            borderWidth: 2,
+                            borderColor: "transparent",
+                            borderRadius: 8,
+                          },
+                          activeSubTab === subCat.id && style.activeSubLabel,
+                        ]}
+                      >
+                        {subCat.subCatName}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "90%",
+                  marginBottom: 50,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  {subCategories &&
+                    subCategories.map(subCat => (
+                      <TouchableOpacity
+                        key={subCat.id}
+                        style={style.subTab}
+                        onPress={() => setActiveSubTab(subCat.id)}
+                        activeOpacity={0.8}
+                      >
+                        <Text
+                          style={[
+                            style.subTabLabel,
+                            Platform.OS === "web" && {
+                              paddingVertical: 5,
+                              paddingHorizontal: 15,
+                              borderWidth: 2,
+                              borderColor: "transparent",
+                              borderRadius: 8,
+                            },
+                            activeSubTab === subCat.id && style.activeSubLabel,
+                            { fontWeight: "normal" },
+                          ]}
+                        >
+                          {subCat.subCatName}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                </View>
+              </View>
+            )
+          ) : (
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              style={style.subCategory}
+            >
+              {subCategories &&
+                subCategories.map(subCat => (
+                  <TouchableOpacity
+                    key={subCat.id}
+                    style={style.subTab}
+                    onPress={() => setActiveSubTab(subCat.id)}
+                    activeOpacity={0.8}
+                  >
+                    <Text
+                      style={[
+                        style.subTabLabel,
+
+                        activeSubTab === subCat.id && style.activeSubLabel,
+                      ]}
+                    >
+                      {subCat.subCatName}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+            </ScrollView>
+          )}
+
+          <ScrollView style={{ marginBottom: 220 }}>
+            <View
+              style={[
+                style.categoryContain,
+                // Platform.OS === "web" &&
+                //   !phoneOrTablets && { marginHorizontal: 200 },
+              ]}
+            >
+              {subCategories &&
+                subCategories[activeSubTab].subCatItems &&
+                subCategories[activeSubTab].subCatItems.map(
+                  (item: FoodType) => (
+                    <View
+                      key={item.id}
+                      style={{
+                        // marginHorizontal: 1,
+                        marginBottom: 20,
+                      }}
+                    >
+                      <Food navigation={navigation} food={item} />
+                    </View>
+                  )
+                )}
+            </View>
+          </ScrollView>
+        </View>
+      </DrawerLayout>
+    </View>
   );
 };
 
@@ -460,9 +648,19 @@ const style = StyleSheet.create({
   activeLabel: {
     color: darkColor,
   },
-  activeSubLabel: {
-    color: primaryColor,
-  },
+  activeSubLabel:
+    Platform.OS === "web"
+      ? {
+          color: primaryColor,
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          borderWidth: 2,
+          borderColor: primaryColor,
+          borderRadius: 8,
+        }
+      : {
+          color: primaryColor,
+        },
 });
 
 export default Categories;

@@ -183,7 +183,14 @@ const Support = ({ navigation }: Props) => {
     return <Spinner />;
   } else {
     return (
-      <View style={{ position: "relative", display: "flex", flex: 1 }}>
+      <View
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          display: "flex",
+          flex: 1,
+        }}
+      >
         <View style={utilStyle.container}>
           <View style={style.header}>
             <Pressable onPress={() => navigation.goBack()}>
@@ -194,11 +201,13 @@ const Support = ({ navigation }: Props) => {
             <Text style={utilStyle.head}>Support</Text>
             <ScrollView
               ref={messageRef}
-              style={{
-                minHeight: Dimensions.get("window").height + 100,
-              }}
+              style={
+                {
+                  // minHeight: Dimensions.get("window").height + 100,
+                }
+              }
             >
-              <View style={{ marginBottom: 500 }}>
+              <View style={{ marginBottom: 0 }}>
                 <View style={[utilStyle.card, style.msg, style.left]}>
                   <Text style={style.time}>12:34</Text>
                   <View>

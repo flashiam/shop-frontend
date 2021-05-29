@@ -30,9 +30,16 @@ type Props = {
   food: FoodType;
   updatePage?: boolean;
   marginStyle?: Object;
+  markedFavorite?: boolean;
 };
 
-const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
+const Food = ({
+  navigation,
+  food,
+  updatePage,
+  marginStyle,
+  markedFavorite,
+}: Props) => {
   const phoneOrTablets = useMediaQuery({ maxWidth: 768 });
   const [favourite, setFavourite] = useState<boolean>(false);
   // const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -148,7 +155,7 @@ const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
             onPress={() => setFavourite(() => !favourite)}
           >
             <FontAwesome
-              name={favourite ? "heart" : "heart-o"}
+              name={markedFavorite ? "heart" : favourite ? "heart" : "heart-o"}
               size={15}
               color={primaryColor}
             />

@@ -6,8 +6,11 @@ import {
   StyleSheet,
   Pressable,
   StatusBar,
+  Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 
 import { RootStackParamList } from "../../App";
 
@@ -28,6 +31,9 @@ type Props = {
 };
 
 const Orders = ({ navigation }: Props) => {
+  // Media query
+  const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
+
   return (
     <ScrollView>
       <View style={utilStyle.container}>
@@ -39,20 +45,71 @@ const Orders = ({ navigation }: Props) => {
         <View style={style.section}>
           <Text style={utilStyle.head}>My Orders</Text>
           <Pressable
-            style={[utilStyle.card, style.orderItem]}
+            style={[
+              utilStyle.card,
+              style.orderItem,
+              Platform.OS === "web"
+                ? phoneOrTablets
+                  ? { marginHorizontal: 0 }
+                  : {
+                      marginHorizontal: 100,
+                      paddingHorizontal: 80,
+                      paddingVertical: 35,
+                    }
+                : { marginHorizontal: 0 },
+            ]}
             onPress={() => navigation.navigate("Receipt")}
           >
-            <View style={style.orderDesc}>
+            <View
+              style={[
+                style.orderDesc,
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? { flexDirection: "column" }
+                    : {
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }
+                  : { flexDirection: "column" },
+              ]}
+            >
               <Text style={style.orderHead}>Items</Text>
               <Text style={style.orderSubHead}>
                 Chicken kadaknath (whole) 500 gm x 1
               </Text>
             </View>
-            <View style={style.orderDesc}>
+            <View
+              style={[
+                style.orderDesc,
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? { flexDirection: "column" }
+                    : {
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }
+                  : { flexDirection: "column" },
+              ]}
+            >
               <Text style={style.orderHead}>Ordered on</Text>
               <Text style={style.orderSubHead}>21 Aug 2020 | 2024</Text>
             </View>
-            <View style={style.orderDesc}>
+            <View
+              style={[
+                style.orderDesc,
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? { flexDirection: "column" }
+                    : {
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }
+                  : { flexDirection: "column" },
+              ]}
+            >
               <Text style={style.orderHead}>Total amount</Text>
               <Text style={style.orderSubHead}>₹ 169.00</Text>
             </View>
@@ -64,20 +121,71 @@ const Orders = ({ navigation }: Props) => {
             </View>
           </Pressable>
           <Pressable
-            style={[utilStyle.card, style.orderItem]}
+            style={[
+              utilStyle.card,
+              style.orderItem,
+              Platform.OS === "web"
+                ? phoneOrTablets
+                  ? { marginHorizontal: 0 }
+                  : {
+                      marginHorizontal: 100,
+                      paddingHorizontal: 80,
+                      paddingVertical: 35,
+                    }
+                : { marginHorizontal: 0 },
+            ]}
             onPress={() => navigation.navigate("Receipt")}
           >
-            <View style={style.orderDesc}>
+            <View
+              style={[
+                style.orderDesc,
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? { flexDirection: "column" }
+                    : {
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }
+                  : { flexDirection: "column" },
+              ]}
+            >
               <Text style={style.orderHead}>Items</Text>
               <Text style={style.orderSubHead}>
                 Chicken Drumstick (without skin) 500 gm x 1
               </Text>
             </View>
-            <View style={style.orderDesc}>
+            <View
+              style={[
+                style.orderDesc,
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? { flexDirection: "column" }
+                    : {
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }
+                  : { flexDirection: "column" },
+              ]}
+            >
               <Text style={style.orderHead}>Ordered on</Text>
               <Text style={style.orderSubHead}>10 Aug 2020 | 05:24</Text>
             </View>
-            <View style={style.orderDesc}>
+            <View
+              style={[
+                style.orderDesc,
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? { flexDirection: "column" }
+                    : {
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }
+                  : { flexDirection: "column" },
+              ]}
+            >
               <Text style={style.orderHead}>Total amount</Text>
               <Text style={style.orderSubHead}>₹ 230.34</Text>
             </View>

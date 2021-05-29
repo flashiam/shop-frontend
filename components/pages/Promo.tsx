@@ -7,8 +7,11 @@ import {
   Pressable,
   StatusBar,
   Image,
+  Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 
 import { RootStackParamList } from "../../App";
 
@@ -31,6 +34,9 @@ type Props = {
 };
 
 const Promo = ({ navigation }: Props) => {
+  // Media query
+  const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
+
   return (
     <ScrollView>
       <View style={utilStyle.container}>
@@ -39,52 +45,275 @@ const Promo = ({ navigation }: Props) => {
             <MaterialIcons name="arrow-back" color={darkColor} size={30} />
           </Pressable>
         </View>
-        <View style={style.section}>
-          <View style={[utilStyle.card, style.promoItem]}>
+        <View
+          style={[
+            style.section,
+            // Platform.OS === "web"
+            //   ? phoneOrTablets
+            //     ? { marginHorizontal: 0 }
+            //     : { marginHorizontal: 100 }
+            //   : { marginHorizontal: 0 },
+          ]}
+        >
+          {/* <View
+            style={[
+              utilStyle.card,
+              style.promoItem,
+              Platform.OS === "web"
+                ? phoneOrTablets
+                  ? { marginHorizontal: 0 }
+                  : { marginHorizontal: 100 }
+                : { marginHorizontal: 0 },
+            ]}
+          >
             <View
               style={{
-                display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                justifyContent: "space-around",
+                width: "100%",
               }}
             >
-              <View style={style.promoImgContain}>
-                <Image source={couponImg} style={style.promoImg} />
-              </View>
-              <View style={style.promoDesc}>
-                <Text>
-                  <Text style={{ fontWeight: "700", paddingRight: 5 }}>
-                    Fresh Point:
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <View style={style.promoImgContain}>
+                  <Image source={couponImg} style={style.promoImg} />
+                </View>
+                <View style={style.promoDesc}>
+                  <Text>
+                    <Text style={{ fontWeight: "700", paddingRight: 5 }}>
+                      Fresh Point:
+                    </Text>
+                    <Text style={{ color: medColor }}> joypashina007</Text>
                   </Text>
-                  <Text style={{ color: medColor }}> joypashina007</Text>
-                </Text>
-                <View style={style.points}>
-                  <FontAwesome5 name="coins" size={14} color={medColor} />
-                  <Text style={{ color: medColor, paddingLeft: 5 }}>200</Text>
+                  <View style={style.points}>
+                    <FontAwesome5 name="coins" size={14} color={medColor} />
+                    <Text style={{ color: medColor, paddingLeft: 5 }}>200</Text>
+                  </View>
                 </View>
               </View>
+              {Platform.OS === "web" && !phoneOrTablets && (
+                <View>
+                  <Pressable
+                    android_ripple={{
+                      color: secondaryColor,
+                      borderless: true,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        paddingRight: 10,
+                        fontSize: 18,
+                      }}
+                    >
+                      Apply
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
             </View>
-            <View style={style.applySection}>
-              <Pressable
-                android_ripple={{ color: secondaryColor, borderless: true }}
-              >
-                <Text
-                  style={{
-                    color: primaryColor,
-                    fontWeight: "bold",
-                    textTransform: "uppercase",
-                    // paddingRight: 10,
-                  }}
+            {phoneOrTablets && (
+              <View style={style.applySection}>
+                <Pressable
+                  android_ripple={{ color: secondaryColor, borderless: true }}
                 >
-                  Apply
-                </Text>
-              </Pressable>
+                  <Text
+                    style={{
+                      color: primaryColor,
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      // paddingRight: 10,
+                    }}
+                  >
+                    Apply
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+          </View> */}
+          <View
+            style={[
+              utilStyle.card,
+              style.promoItem,
+              Platform.OS === "web"
+                ? phoneOrTablets
+                  ? { marginHorizontal: 0 }
+                  : { marginHorizontal: 100 }
+                : { marginHorizontal: 0 },
+            ]}
+          >
+            <View
+              style={[
+                {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                },
+                Platform.OS === "web" &&
+                  !phoneOrTablets && {
+                    alignItems: "center",
+                    justifyContent: "space-around",
+                    width: "100%",
+                  },
+              ]}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={style.promoImgContain}>
+                  <Image source={couponImg} style={style.promoImg} />
+                </View>
+                <View
+                  style={[
+                    style.promoDesc,
+                    Platform.OS === "web" &&
+                      !phoneOrTablets && {
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                        width: "70%",
+                        marginLeft: 55,
+                        alignItems: "center",
+                      },
+                  ]}
+                >
+                  <Text>
+                    <Text style={{ fontWeight: "700", paddingRight: 5 }}>
+                      Fresh Point:
+                    </Text>
+                    <Text style={{ color: medColor }}> joypashina007</Text>
+                  </Text>
+                  <View
+                    style={[
+                      style.points,
+                      Platform.OS === "web" &&
+                        !phoneOrTablets && { marginTop: 0, marginLeft: 55 },
+                    ]}
+                  >
+                    <FontAwesome5 name="coins" size={14} color={medColor} />
+                    <Text
+                      style={[
+                        { color: medColor, paddingLeft: 5 },
+                        Platform.OS === "web" && { fontSize: 18 },
+                      ]}
+                    >
+                      200
+                    </Text>
+                  </View>
+                  {/* <Text
+                    style={[
+                      { fontWeight: "700", paddingRight: 5, width: 180 },
+                      Platform.OS === "web" &&
+                        !phoneOrTablets && { width: 400 },
+                    ]}
+                  >
+                    Get 25% OFF up to ₹100 on your first buy
+                  </Text>
+                  <View
+                    style={[
+                      style.promocode,
+                      Platform.OS === "web" &&
+                        !phoneOrTablets && {
+                          marginTop: 0,
+                          marginLeft: 24,
+                          padding: 10,
+                        },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        {
+                          fontSize: 12,
+                          color: medColor,
+                          letterSpacing: 2,
+                          textTransform: "uppercase",
+                        },
+                      ]}
+                    >
+                      FIRSTTIME
+                    </Text>
+                  </View> */}
+                </View>
+              </View>
+              {Platform.OS === "web" && !phoneOrTablets && (
+                <View>
+                  <Pressable
+                    android_ripple={{
+                      color: secondaryColor,
+                      borderless: true,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        paddingRight: 10,
+                        fontSize: 18,
+                      }}
+                    >
+                      Apply
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
             </View>
+            {phoneOrTablets && (
+              <View style={[style.applySection]}>
+                <Pressable
+                  android_ripple={{ color: secondaryColor, borderless: true }}
+                >
+                  <Text
+                    style={{
+                      color: primaryColor,
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      paddingRight: 10,
+                    }}
+                  >
+                    Apply
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+            {Platform.OS !== "web" && (
+              <View style={[style.applySection]}>
+                <Pressable
+                  android_ripple={{ color: secondaryColor, borderless: true }}
+                >
+                  <Text
+                    style={{
+                      color: primaryColor,
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      paddingRight: 10,
+                    }}
+                  >
+                    Apply
+                  </Text>
+                </Pressable>
+              </View>
+            )}
           </View>
 
-          <View style={style.availContain}>
+          <View
+            style={[
+              style.availContain,
+              Platform.OS === "web"
+                ? phoneOrTablets
+                  ? { marginHorizontal: 0 }
+                  : { marginHorizontal: 100 }
+                : { marginHorizontal: 0 },
+            ]}
+          >
             <Text style={utilStyle.head}>Available Offers</Text>
-
+            {/* 
             <View style={[utilStyle.card, style.promoItem]}>
               <View
                 style={{
@@ -131,55 +360,264 @@ const Promo = ({ navigation }: Props) => {
                   </Text>
                 </Pressable>
               </View>
+            </View> */}
+
+            <View style={[utilStyle.card, style.promoItem]}>
+              <View
+                style={[
+                  {
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  },
+                  Platform.OS === "web" &&
+                    !phoneOrTablets && {
+                      alignItems: "center",
+                      justifyContent: "space-around",
+                      width: "100%",
+                    },
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={style.promoImgContain}>
+                    <Image source={couponImg} style={style.promoImg} />
+                  </View>
+                  <View
+                    style={[
+                      style.promoDesc,
+                      Platform.OS === "web" &&
+                        !phoneOrTablets && {
+                          flexDirection: "row",
+                          justifyContent: "space-around",
+                          width: "70%",
+                          marginLeft: 55,
+                          alignItems: "center",
+                        },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        { fontWeight: "700", paddingRight: 5, width: 180 },
+                        Platform.OS === "web" &&
+                          !phoneOrTablets && { width: 400 },
+                      ]}
+                    >
+                      Get 25% OFF up to ₹100 on your first buy
+                    </Text>
+                    <View
+                      style={[
+                        style.promocode,
+                        Platform.OS === "web" &&
+                          !phoneOrTablets && {
+                            marginTop: 0,
+                            marginLeft: 24,
+                            padding: 10,
+                          },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          {
+                            fontSize: 12,
+                            color: medColor,
+                            letterSpacing: 2,
+                            textTransform: "uppercase",
+                          },
+                        ]}
+                      >
+                        FIRSTTIME
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                {Platform.OS === "web" && !phoneOrTablets && (
+                  <View>
+                    <Pressable
+                      android_ripple={{
+                        color: secondaryColor,
+                        borderless: true,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: primaryColor,
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          paddingRight: 10,
+                          fontSize: 18,
+                        }}
+                      >
+                        Apply
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
+              </View>
+              {phoneOrTablets && (
+                <View style={[style.applySection]}>
+                  <Pressable
+                    android_ripple={{ color: secondaryColor, borderless: true }}
+                  >
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        paddingRight: 10,
+                      }}
+                    >
+                      Apply
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+              {Platform.OS !== "web" && (
+                <View style={[style.applySection]}>
+                  <Pressable
+                    android_ripple={{ color: secondaryColor, borderless: true }}
+                  >
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        paddingRight: 10,
+                      }}
+                    >
+                      Apply
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
             </View>
 
             <View style={[utilStyle.card, style.promoItem]}>
               <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
+                style={[
+                  {
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  },
+                  Platform.OS === "web" &&
+                    !phoneOrTablets && {
+                      alignItems: "center",
+                      justifyContent: "space-around",
+                      width: "100%",
+                    },
+                ]}
               >
-                <View style={style.promoImgContain}>
-                  <Image source={couponImg} style={style.promoImg} />
-                </View>
-                <View style={style.promoDesc}>
-                  <Text
-                    style={{ fontWeight: "700", paddingRight: 5, width: 180 }}
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={style.promoImgContain}>
+                    <Image source={couponImg} style={style.promoImg} />
+                  </View>
+                  <View
+                    style={[
+                      style.promoDesc,
+                      Platform.OS === "web" &&
+                        !phoneOrTablets && {
+                          flexDirection: "row",
+                          justifyContent: "space-around",
+                          width: "70%",
+                          marginLeft: 55,
+                          alignItems: "center",
+                        },
+                    ]}
                   >
-                    Get 50% OFF up to ₹200 on exotic meet
-                  </Text>
-                  <View style={style.promocode}>
                     <Text
-                      style={{
-                        fontSize: 12,
-                        color: medColor,
-                        letterSpacing: 2,
-                        textTransform: "uppercase",
-                      }}
+                      style={[
+                        { fontWeight: "700", paddingRight: 5, width: 180 },
+                        Platform.OS === "web" &&
+                          !phoneOrTablets && { width: 400 },
+                      ]}
                     >
-                      EXOTIC
+                      Get 50% OFF up to ₹200 on exotic meat
                     </Text>
+                    <View
+                      style={[
+                        style.promocode,
+                        Platform.OS === "web" &&
+                          !phoneOrTablets && {
+                            marginTop: 0,
+                            marginLeft: 24,
+                            padding: 10,
+                          },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          {
+                            fontSize: 12,
+                            color: medColor,
+                            letterSpacing: 2,
+                            textTransform: "uppercase",
+                          },
+                        ]}
+                      >
+                        EXOTIC
+                      </Text>
+                    </View>
                   </View>
                 </View>
+                {Platform.OS === "web" && !phoneOrTablets && (
+                  <View>
+                    <Pressable
+                      android_ripple={{
+                        color: secondaryColor,
+                        borderless: true,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: primaryColor,
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          paddingRight: 10,
+                          fontSize: 18,
+                        }}
+                      >
+                        Apply
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
               </View>
-              <View style={style.applySection}>
-                <Pressable
-                  android_ripple={{ color: secondaryColor, borderless: true }}
-                >
-                  <Text
-                    style={{
-                      color: primaryColor,
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
-                      paddingRight: 10,
-                    }}
+              {phoneOrTablets && (
+                <View style={[style.applySection]}>
+                  <Pressable
+                    android_ripple={{ color: secondaryColor, borderless: true }}
                   >
-                    Apply
-                  </Text>
-                </Pressable>
-              </View>
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        paddingRight: 10,
+                      }}
+                    >
+                      Apply
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+              {Platform.OS !== "web" && (
+                <View style={[style.applySection]}>
+                  <Pressable
+                    android_ripple={{ color: secondaryColor, borderless: true }}
+                  >
+                    <Text
+                      style={{
+                        color: primaryColor,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        paddingRight: 10,
+                      }}
+                    >
+                      Apply
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
             </View>
           </View>
         </View>

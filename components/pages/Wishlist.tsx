@@ -76,6 +76,24 @@ const Wishlist = ({ navigation }: Props) => {
       stars: 3,
       img: foodImg,
     },
+    {
+      id: 5,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      img: foodImg,
+    },
+    {
+      id: 6,
+      title: "Mix Veg",
+      price: 599,
+      reviews: 150,
+      rating: 3.9,
+      stars: 3,
+      img: foodImg,
+    },
   ]);
   return (
     <ScrollView>
@@ -91,7 +109,7 @@ const Wishlist = ({ navigation }: Props) => {
             {foods &&
               foods.map(food => (
                 <View key={food.id} style={{ marginBottom: 15 }}>
-                  <Food food={food} navigation={navigation} />
+                  <Food food={food} navigation={navigation} markedFavorite />
                 </View>
               ))}
           </View>

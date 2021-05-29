@@ -26,12 +26,14 @@ type Props = {
   drawer: any;
   food?: { cartItems: any; cartNum: any };
   getCartNo: Function;
+  navigation?: any;
 };
 
 const NavbarWeb = ({
   drawer,
   food: { cartItems, cartNum },
   getCartNo,
+  navigation,
 }: Props) => {
   const [cartItemNum, setItemNum] = useState<number>(0);
 
@@ -42,7 +44,12 @@ const NavbarWeb = ({
 
   return (
     <View style={style.navbar}>
-      <Pressable style={style.logoContain}>
+      <Pressable
+        style={style.logoContain}
+        onPress={() => {
+          navigation.navigate("Home");
+        }}
+      >
         <Image source={appLogo} style={style.logo} />
       </Pressable>
 

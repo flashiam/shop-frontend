@@ -181,6 +181,26 @@ const FoodDesc = ({
       rating: 3.9,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
+    {
+      id: 6,
+      title: "Chicken with skin",
+      price: 999,
+      img: food,
+      stars: 3,
+      reviews: 50,
+      rating: 3.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
+    {
+      id: 7,
+      title: "Fish (whole)",
+      price: 999,
+      img: food,
+      stars: 3,
+      reviews: 50,
+      rating: 3.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
   ]);
 
   // State for photo
@@ -596,486 +616,503 @@ const FoodDesc = ({
   }, []);
 
   return (
-    <DrawerLayout
-      ref={drawer}
-      renderNavigationView={() => (
-        <Drawer drawer={drawer} navigation={navigation} />
-      )}
-      drawerPosition="right"
-      drawerWidth={300}
-      drawerBackgroundColor={lightColor}
-      // style={{ alignItems: "center" }}
-    >
-      <ScrollView>
-        {/* Backdrop for modal */}
-        {/* Cart modal */}
-        {Platform.OS !== "web" && (
-          <Modal
-            animationType="slide"
-            visible={showCart}
-            transparent={true}
-            statusBarTranslucent
-          >
-            <View style={style.modalContain}>
-              <View style={style.cartContain}>
-                <ScrollView style={style.cartSection}>
-                  {cartItems &&
-                    cartItems.map(item => (
-                      <View
-                        key={item?.id}
-                        style={[utilStyle.card, style.cartItem]}
-                      >
-                        <View>
-                          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                            {item?.title} {item?.subtitle}
-                          </Text>
-                          <View
-                            style={{ display: "flex", flexDirection: "row" }}
-                          >
-                            <Text
-                              style={{
-                                color: primaryColor,
-                                fontWeight: "bold",
-                              }}
-                            >
-                              ₹ {item?.price.toString()}.00
+    <View style={{ overflow: "hidden" }}>
+      <DrawerLayout
+        ref={drawer}
+        renderNavigationView={() => (
+          <Drawer drawer={drawer} navigation={navigation} />
+        )}
+        drawerPosition="right"
+        drawerWidth={300}
+        drawerBackgroundColor={lightColor}
+        // style={{ alignItems: "center" }}
+      >
+        <ScrollView>
+          {/* Backdrop for modal */}
+          {/* Cart modal */}
+          {Platform.OS !== "web" && (
+            <Modal
+              animationType="slide"
+              visible={showCart}
+              transparent={true}
+              statusBarTranslucent
+            >
+              <View style={style.modalContain}>
+                <View style={style.cartContain}>
+                  <ScrollView style={style.cartSection}>
+                    {cartItems &&
+                      cartItems.map(item => (
+                        <View
+                          key={item?.id}
+                          style={[utilStyle.card, style.cartItem]}
+                        >
+                          <View>
+                            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                              {item?.title} {item?.subtitle}
                             </Text>
-                            <Text
-                              style={{
-                                color: primaryColor,
-                                fontWeight: "bold",
-                              }}
+                            <View
+                              style={{ display: "flex", flexDirection: "row" }}
                             >
-                              / {item?.weight.toString()}gm
-                            </Text>
-                          </View>
-                          <View style={style.quantityContain}>
-                            <Text>Quantity</Text>
-                            <View style={[utilStyle.card, style.quantityBox]}>
-                              <Pressable style={style.btn}>
-                                <Text>-</Text>
-                              </Pressable>
-                              <TextInput
-                                style={style.quantityField}
-                                value={item?.quantity.toString()}
-                                keyboardType="numeric"
-                              />
-                              <Pressable style={style.btn}>
-                                <Text>+</Text>
-                              </Pressable>
+                              <Text
+                                style={{
+                                  color: primaryColor,
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                ₹ {item?.price.toString()}.00
+                              </Text>
+                              <Text
+                                style={{
+                                  color: primaryColor,
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                / {item?.weight.toString()}gm
+                              </Text>
+                            </View>
+                            <View style={style.quantityContain}>
+                              <Text>Quantity</Text>
+                              <View style={[utilStyle.card, style.quantityBox]}>
+                                <Pressable style={style.btn}>
+                                  <Text>-</Text>
+                                </Pressable>
+                                <TextInput
+                                  style={style.quantityField}
+                                  value={item?.quantity.toString()}
+                                  keyboardType="numeric"
+                                />
+                                <Pressable style={style.btn}>
+                                  <Text>+</Text>
+                                </Pressable>
+                              </View>
                             </View>
                           </View>
+                          <Pressable
+                            onPress={() => {
+                              deleteItem(item?.id);
+                              autoCloseCart();
+                            }}
+                          >
+                            <MaterialIcons
+                              name="delete-outline"
+                              color={darkColor}
+                              size={25}
+                            />
+                          </Pressable>
                         </View>
-                        <Pressable
-                          onPress={() => {
-                            deleteItem(item?.id);
-                            autoCloseCart();
-                          }}
-                        >
-                          <MaterialIcons
-                            name="delete-outline"
-                            color={darkColor}
-                            size={25}
-                          />
-                        </Pressable>
-                      </View>
-                    ))}
-                </ScrollView>
-                <View style={[utilStyle.card, style.cartFooter]}>
-                  <View>
-                    <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                      ₹ {cartData.price}
-                    </Text>
-                    <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                      Total
-                    </Text>
+                      ))}
+                  </ScrollView>
+                  <View style={[utilStyle.card, style.cartFooter]}>
+                    <View>
+                      <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                        ₹ {cartData.price}
+                      </Text>
+                      <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                        Total
+                      </Text>
+                    </View>
+                    <Pressable
+                      style={style.paymentBtn}
+                      onPress={() => onProceedPayment()}
+                    >
+                      <Text style={{ color: lightColor }}>
+                        Proceed to payment
+                      </Text>
+                    </Pressable>
                   </View>
-                  <Pressable
-                    style={style.paymentBtn}
-                    onPress={() => onProceedPayment()}
-                  >
-                    <Text style={{ color: lightColor }}>
-                      Proceed to payment
-                    </Text>
-                  </Pressable>
-                </View>
 
-                <View style={style.topContent}>
-                  <Pressable onPress={() => setCart(false)}>
-                    <AntDesign name="close" color={darkColor} size={25} />
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      setCart(false);
-                      navigation.navigate("Promo");
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: primaryColor,
-                        textDecorationLine: "underline",
-                        textDecorationStyle: "solid",
-                        paddingRight: 15,
+                  <View style={style.topContent}>
+                    <Pressable onPress={() => setCart(false)}>
+                      <AntDesign name="close" color={darkColor} size={25} />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setCart(false);
+                        navigation.navigate("Promo");
                       }}
                     >
-                      Add promocode
-                    </Text>
-                  </Pressable>
+                      <Text
+                        style={{
+                          color: primaryColor,
+                          textDecorationLine: "underline",
+                          textDecorationStyle: "solid",
+                          paddingRight: 15,
+                        }}
+                      >
+                        Add promocode
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Modal>
-        )}
-        <View style={[utilStyle.container]}>
-          {Platform.OS === "web" &&
-            (phoneOrTablets ? (
-              <NavbarMobo drawer={drawer} />
-            ) : (
-              <NavbarWeb drawer={drawer} />
-            ))}
-          <View
-            style={[
-              style.mainHeader,
-              {
-                flexDirection:
-                  Platform.OS === "web"
-                    ? phoneOrTablets
-                      ? "column"
-                      : "row"
-                    : "column",
-              },
-            ]}
-          >
+            </Modal>
+          )}
+          <View style={[utilStyle.container]}>
+            {Platform.OS === "web" &&
+              (phoneOrTablets ? (
+                <NavbarMobo drawer={drawer} />
+              ) : (
+                <NavbarWeb drawer={drawer} navigation={navigation} />
+              ))}
             <View
               style={[
-                style.imgContain,
+                style.mainHeader,
                 {
-                  width:
+                  flexDirection:
                     Platform.OS === "web"
                       ? phoneOrTablets
-                        ? "100%"
-                        : "50%"
-                      : "100%",
+                        ? "column"
+                        : "row"
+                      : "column",
                 },
               ]}
             >
-              <Image
-                source={img}
-                style={[
-                  style.foodImg,
-                  Platform.OS === "web"
-                    ? phoneOrTablets
-                      ? { height: 200, width: 200 }
-                      : { height: 300, width: 300 }
-                    : { height: 200, width: 200 },
-                ]}
-              />
-            </View>
-            <View style={style.foodContent}>
               <View
-                style={{
-                  width:
+                style={[
+                  style.imgContain,
+                  {
+                    width:
+                      Platform.OS === "web"
+                        ? phoneOrTablets
+                          ? "100%"
+                          : "50%"
+                        : "100%",
+                  },
+                ]}
+              >
+                <Image
+                  source={img}
+                  style={[
+                    style.foodImg,
                     Platform.OS === "web"
                       ? phoneOrTablets
-                        ? "100%"
-                        : "25%"
-                      : "100%",
-                }}
-              >
-                <Text style={style.title}>{title}</Text>
-                {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
-                <View style={style.ratings}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: secondaryColor,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {rating}
-                  </Text>
-                  <View style={style.ratingsContain}>
-                    {[1, 2, 3, 4, 5].map(star =>
-                      star <= stars ? (
-                        <MaterialIcons
-                          key={star}
-                          name="star"
-                          size={15}
-                          color={primaryColor}
-                        />
-                      ) : (
-                        <MaterialIcons
-                          key={star}
-                          name="star"
-                          size={15}
-                          color={secondaryColor}
-                        />
-                      )
-                    )}
-                  </View>
-                </View>
-                <Text style={style.description}>{desc}</Text>
+                        ? { height: 200, width: 200 }
+                        : { height: 450, width: 450 }
+                      : { height: 200, width: 200 },
+                  ]}
+                />
               </View>
-
-              <View style={style.bottomContent}>
+              <View style={style.foodContent}>
                 <View
-                  style={[
-                    style.controls,
-                    {
-                      width:
-                        Platform.OS === "web"
-                          ? phoneOrTablets
-                            ? "100%"
-                            : "25%"
-                          : "100%",
-                    },
-                  ]}
+                  style={{
+                    width:
+                      Platform.OS === "web"
+                        ? phoneOrTablets
+                          ? "100%"
+                          : "25%"
+                        : "100%",
+                  }}
                 >
-                  <View style={style.control}>
-                    <Text style={style.label}>Weight</Text>
-
-                    <View
-                      style={[utilStyle.card, { height: 50, borderRadius: 10 }]}
-                    >
-                      <Picker
-                        note
-                        mode="dropdown"
-                        style={{ width: 120, borderWidth: 0 }}
-                        selectedValue={weight}
-                        onValueChange={value => ctrlWeight(value)}
-                        itemStyle={{ backgroundColor: lightColor }}
-                        placeholder="Select"
-                      >
-                        <Picker.Item label="500g" value="500" />
-                        <Picker.Item label="1000g" value="1000" />
-                        <Picker.Item label="1500g" value="1500" />
-                        <Picker.Item label="2000g" value="2000" />
-                      </Picker>
-                    </View>
-                  </View>
-                  <View style={style.control}>
-                    <Text style={style.label}>Quantity</Text>
-                    <View style={[utilStyle.card, style.quantityCtrl]}>
-                      <Pressable
-                        onPress={() => decreaseWeight()}
-                        style={{
-                          paddingHorizontal: 15,
-                          height: 30,
-                        }}
-                        android_ripple={{
-                          color: secondaryColor,
-                          borderless: true,
-                        }}
-                      >
-                        <Text style={style.quantityBtn}>-</Text>
-                      </Pressable>
-                      <TextInput
-                        keyboardType="numeric"
-                        value={quantity.toString()}
-                        style={style.quantityField}
-                        onChangeText={qty => ctrlQuantity(qty)}
-                      />
-                      <Pressable
-                        onPress={() => increaseWeight()}
-                        style={{
-                          paddingHorizontal: 15,
-                          height: 30,
-                        }}
-                        android_ripple={{
-                          color: secondaryColor,
-                          borderless: true,
-                        }}
-                      >
-                        <Text style={style.quantityBtn}>+</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </View>
-
-                <View
-                  style={[
-                    utilStyle.card,
-                    style.cartBtnContain,
-                    {
-                      width:
-                        Platform.OS === "web"
-                          ? phoneOrTablets
-                            ? "100%"
-                            : "25%"
-                          : "100%",
-                    },
-                  ]}
-                >
-                  <Text>
-                    <Text style={{ fontSize: 17, color: medColor }}>
-                      ₹{price.toString()}.00/
-                    </Text>
-                    <Text style={{ color: medColor }}>
-                      {weight.toString()}g
-                    </Text>
-                  </Text>
-                  {!itemAdded ? (
-                    <Pressable
-                      style={style.cartBtn}
-                      onPress={() => {
-                        fetchDataFromCart();
-                        makeCartItem(
-                          id,
-                          title,
-                          subtitle,
-                          weight,
-                          price,
-                          quantity
-                        );
-                        popUp();
+                  <Text style={style.title}>{title}</Text>
+                  {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
+                  <View style={style.ratings}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: secondaryColor,
+                        fontWeight: "bold",
                       }}
                     >
-                      <Text
-                        style={{
-                          fontSize: 17,
-                          fontWeight: "bold",
-                          marginRight: 10,
-                          color: primaryColor,
-                        }}
-                      >
-                        Add to cart
-                      </Text>
-                      <MaterialCommunityIcons
-                        name="cart-outline"
-                        color={primaryColor}
-                        size={17}
-                      />
-                    </Pressable>
-                  ) : (
-                    <Pressable
-                      style={style.cartBtn}
-                      onPress={() => setCart(true)}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 17,
-                          fontWeight: "bold",
-                          marginRight: 10,
-                          color: secondaryColor,
-                        }}
-                      >
-                        Added to cart
-                      </Text>
-                      <Octicons name="check" color={secondaryColor} size={17} />
-                    </Pressable>
-                  )}
+                      {rating}
+                    </Text>
+                    <View style={style.ratingsContain}>
+                      {[1, 2, 3, 4, 5].map(star =>
+                        star <= stars ? (
+                          <MaterialIcons
+                            key={star}
+                            name="star"
+                            size={15}
+                            color={primaryColor}
+                          />
+                        ) : (
+                          <MaterialIcons
+                            key={star}
+                            name="star"
+                            size={15}
+                            color={secondaryColor}
+                          />
+                        )
+                      )}
+                    </View>
+                  </View>
+                  <Text style={style.description}>{desc}</Text>
                 </View>
 
-                {/* <Pressable
+                <View style={style.bottomContent}>
+                  <View
+                    style={[
+                      style.controls,
+                      {
+                        width:
+                          Platform.OS === "web"
+                            ? phoneOrTablets
+                              ? "100%"
+                              : "25%"
+                            : "100%",
+                      },
+                    ]}
+                  >
+                    <View style={style.control}>
+                      <Text style={style.label}>Weight</Text>
+
+                      <View
+                        style={[
+                          utilStyle.card,
+                          { height: 50, borderRadius: 10 },
+                        ]}
+                      >
+                        <Picker
+                          note
+                          mode="dropdown"
+                          style={{ width: 120, borderWidth: 0 }}
+                          selectedValue={weight}
+                          onValueChange={value => ctrlWeight(value)}
+                          itemStyle={{ backgroundColor: lightColor }}
+                          placeholder="Select"
+                        >
+                          <Picker.Item label="500g" value="500" />
+                          <Picker.Item label="1000g" value="1000" />
+                          <Picker.Item label="1500g" value="1500" />
+                          <Picker.Item label="2000g" value="2000" />
+                        </Picker>
+                      </View>
+                    </View>
+                    <View style={style.control}>
+                      <Text style={style.label}>Quantity</Text>
+                      <View style={[utilStyle.card, style.quantityCtrl]}>
+                        <Pressable
+                          onPress={() => decreaseWeight()}
+                          style={{
+                            paddingHorizontal: 15,
+                            height: 30,
+                          }}
+                          android_ripple={{
+                            color: secondaryColor,
+                            borderless: true,
+                          }}
+                        >
+                          <Text style={style.quantityBtn}>-</Text>
+                        </Pressable>
+                        <TextInput
+                          keyboardType="numeric"
+                          value={quantity.toString()}
+                          style={style.quantityField}
+                          onChangeText={qty => ctrlQuantity(qty)}
+                        />
+                        <Pressable
+                          onPress={() => increaseWeight()}
+                          style={{
+                            paddingHorizontal: 15,
+                            height: 30,
+                          }}
+                          android_ripple={{
+                            color: secondaryColor,
+                            borderless: true,
+                          }}
+                        >
+                          <Text style={style.quantityBtn}>+</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View
+                    style={[
+                      utilStyle.card,
+                      style.cartBtnContain,
+                      {
+                        width:
+                          Platform.OS === "web"
+                            ? phoneOrTablets
+                              ? "100%"
+                              : "25%"
+                            : "100%",
+                      },
+                    ]}
+                  >
+                    <Text>
+                      <Text style={{ fontSize: 17, color: medColor }}>
+                        ₹{price.toString()}.00/
+                      </Text>
+                      <Text style={{ color: medColor }}>
+                        {weight.toString()}g
+                      </Text>
+                    </Text>
+                    {!itemAdded ? (
+                      <Pressable
+                        style={style.cartBtn}
+                        onPress={() => {
+                          fetchDataFromCart();
+                          makeCartItem(
+                            id,
+                            title,
+                            subtitle,
+                            weight,
+                            price,
+                            quantity
+                          );
+                          popUp();
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 17,
+                            fontWeight: "bold",
+                            marginRight: 10,
+                            color: primaryColor,
+                          }}
+                        >
+                          Add to cart
+                        </Text>
+                        <MaterialCommunityIcons
+                          name="cart-outline"
+                          color={primaryColor}
+                          size={17}
+                        />
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        style={style.cartBtn}
+                        onPress={() => setCart(true)}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 17,
+                            fontWeight: "bold",
+                            marginRight: 10,
+                            color: secondaryColor,
+                          }}
+                        >
+                          Added to cart
+                        </Text>
+                        <Octicons
+                          name="check"
+                          color={secondaryColor}
+                          size={17}
+                        />
+                      </Pressable>
+                    )}
+                  </View>
+
+                  {/* <Pressable
                   style={[style.closeBtn]}
                   android_ripple={{ color: secondaryColor, borderless: true }}
                   onPress={() => navigation.goBack()}
                   >
                   <AntDesign name="close" color={darkColor} size={20} />
                 </Pressable> */}
+                </View>
               </View>
-            </View>
-            <View style={style.sideContent}>
+              <View style={style.sideContent}>
+                <Pressable
+                  style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
+                  onPress={() => setFavorite(() => !favorite)}
+                >
+                  <FontAwesome
+                    name={favorite ? "heart" : "heart-o"}
+                    color={primaryColor}
+                    size={15}
+                  />
+                </Pressable>
+                <Pressable
+                  style={[utilStyle.card, style.btn]}
+                  onPress={() => shareFood()}
+                >
+                  <Entypo name="share" color={primaryColor} size={15} />
+                </Pressable>
+              </View>
               <Pressable
-                style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
-                onPress={() => setFavorite(() => !favorite)}
+                style={style.closeBtn}
+                onPress={() => navigation.goBack()}
               >
-                <FontAwesome
-                  name={favorite ? "heart" : "heart-o"}
-                  color={primaryColor}
-                  size={15}
-                />
-              </Pressable>
-              <Pressable
-                style={[utilStyle.card, style.btn]}
-                onPress={() => shareFood()}
-              >
-                <Entypo name="share" color={primaryColor} size={15} />
+                <MaterialIcons name="arrow-back" color={darkColor} size={30} />
               </Pressable>
             </View>
-            <Pressable
-              style={style.closeBtn}
-              onPress={() => navigation.goBack()}
-            >
-              <MaterialIcons name="arrow-back" color={darkColor} size={30} />
-            </Pressable>
           </View>
-        </View>
 
-        {/* Photos */}
-        {Platform.OS !== "web" && (
-          <View style={utilStyle.mt1}>
-            <View style={utilStyle.container}>
-              <Text style={utilStyle.head}>Photos</Text>
+          {/* Photos */}
+          {Platform.OS !== "web" && (
+            <View style={utilStyle.mt1}>
+              <View style={utilStyle.container}>
+                <Text style={utilStyle.head}>Photos</Text>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {photos &&
+                  photos.map((photo, i) =>
+                    i === 0 ? (
+                      <PhotoItem
+                        key={photo.id}
+                        photo={photo}
+                        marginStyle={{ marginHorizontal: defaultMargin }}
+                      />
+                    ) : (
+                      <PhotoItem
+                        key={photo.id}
+                        photo={photo}
+                        marginStyle={{ marginRight: defaultMargin }}
+                      />
+                    )
+                  )}
+              </ScrollView>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {photos &&
-                photos.map((photo, i) =>
-                  i === 0 ? (
-                    <PhotoItem
-                      key={photo.id}
-                      photo={photo}
-                      marginStyle={{ marginHorizontal: defaultMargin }}
-                    />
-                  ) : (
-                    <PhotoItem
-                      key={photo.id}
-                      photo={photo}
-                      marginStyle={{ marginRight: defaultMargin }}
-                    />
-                  )
-                )}
-            </ScrollView>
-          </View>
-        )}
+          )}
 
-        {/* Related */}
-        <View style={utilStyle.mt1}>
-          <View style={utilStyle.container}>
-            <Text style={utilStyle.head}>More like this</Text>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
+          {/* Related */}
+          <View
             style={[
-              style.scrollWidth,
-              {
-                width:
-                  Platform.OS === "web"
-                    ? phoneOrTablets
-                      ? "90%"
-                      : "83%"
-                    : "90%",
-              },
+              utilStyle.mt1,
+              Platform.OS === "web" && !phoneOrTablets && { marginTop: 55 },
             ]}
           >
-            {related &&
-              related.map((food, i) =>
-                i === 0 ? (
-                  <Food
-                    key={food.id}
-                    navigation={navigation}
-                    food={food}
-                    marginStyle={{ marginHorizontal: defaultMargin }}
-                    updatePage
-                  />
-                ) : (
-                  <Food
-                    key={food.id}
-                    navigation={navigation}
-                    food={food}
-                    marginStyle={{ marginRight: defaultMargin }}
-                    updatePage
-                  />
-                )
-              )}
-          </ScrollView>
-        </View>
-        {/* </View> */}
-      </ScrollView>
-      {/* Cart pop up */}
-      {Platform.OS !== "web" && <CartPopUp />}
-    </DrawerLayout>
+            <View style={utilStyle.container}>
+              <Text style={utilStyle.head}>More like this</Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={
+                  [
+                    // style.scrollWidth,
+                    // {`5
+                    //   width:
+                    //     Platform.OS === "web"
+                    //       ? phoneOrTablets
+                    //         ? "90%"
+                    //         : "83%"
+                    //       : "90%",
+                    // },
+                  ]
+                }
+              >
+                {related &&
+                  related.map((food, i) =>
+                    i === 0 ? (
+                      <Food
+                        key={food.id}
+                        navigation={navigation}
+                        food={food}
+                        marginStyle={{ marginRight: defaultMargin }}
+                        updatePage
+                      />
+                    ) : (
+                      <Food
+                        key={food.id}
+                        navigation={navigation}
+                        food={food}
+                        marginStyle={{ marginRight: defaultMargin }}
+                        updatePage
+                      />
+                    )
+                  )}
+              </ScrollView>
+            </View>
+          </View>
+          {/* </View> */}
+        </ScrollView>
+        {/* Cart pop up */}
+        {Platform.OS !== "web" && <CartPopUp />}
+      </DrawerLayout>
+    </View>
   );
 };
 

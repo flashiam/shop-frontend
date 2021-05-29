@@ -33,7 +33,7 @@ const RecipeCard = ({ recipe, marginStyle }: Props) => {
       style={[
         utilStyle.card,
         style.recipeCard,
-        { ...marginStyle, width: phoneOrTablets ? 290 : 320 },
+        { ...marginStyle, width: phoneOrTablets ? 290 : 330 },
       ]}
     >
       <View style={style.recipeHeader}>
