@@ -11,6 +11,8 @@ import {
   Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 
 import { RootStackParamList } from "../../App";
 
@@ -37,6 +39,9 @@ type Props = {
 };
 
 const Refer = ({ navigation }: Props) => {
+  // Media query
+  const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
+
   // Function to send referal manually
   const sendReferal = async () => {
     try {
@@ -79,7 +84,15 @@ const Refer = ({ navigation }: Props) => {
               <Text style={style.pointsTxt}>200</Text>
             </Pressable>
           </View>
-          <View style={style.referSection}>
+          <View
+            style={[
+              style.referSection,
+              {
+                marginHorizontal:
+                  Platform.OS === "web" ? (phoneOrTablets ? 0 : 400) : 0,
+              },
+            ]}
+          >
             {/* <View
               style={[
                 style.topShadow,
@@ -113,19 +126,67 @@ const Refer = ({ navigation }: Props) => {
               </Text>
             </View>
           </View>
-          <View style={style.referFooter}>
+          <View
+            style={[
+              style.referFooter,
+              {
+                paddingHorizontal:
+                  Platform.OS === "web" ? (phoneOrTablets ? 0 : 400) : 0,
+                flexDirection:
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? "column"
+                      : "row"
+                    : "column",
+              },
+              Platform.OS === "web"
+                ? phoneOrTablets
+                  ? { flexDirection: "column" }
+                  : {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }
+                : { flexDirection: "column" },
+            ]}
+          >
             <Text style={{ fontWeight: "bold", fontSize: 18 }}>Share</Text>
             <View style={style.shareOptions}>
-              <Pressable style={style.shareItem}>
+              <Pressable
+                style={[
+                  style.shareItem,
+                  Platform.OS === "web" &&
+                    !phoneOrTablets && { marginLeft: 20 },
+                ]}
+              >
                 <Image source={google} style={style.shareImg} />
               </Pressable>
-              <Pressable style={style.shareItem}>
+              <Pressable
+                style={[
+                  style.shareItem,
+                  Platform.OS === "web" &&
+                    !phoneOrTablets && { marginLeft: 20 },
+                ]}
+              >
                 <Image source={facebook} style={style.shareImg} />
               </Pressable>
-              <Pressable style={style.shareItem}>
+              <Pressable
+                style={[
+                  style.shareItem,
+                  Platform.OS === "web" &&
+                    !phoneOrTablets && { marginLeft: 20 },
+                ]}
+              >
                 <Image source={messaging} style={style.shareImg} />
               </Pressable>
-              <Pressable style={style.shareItem} onPress={() => sendReferal()}>
+              <Pressable
+                style={[
+                  style.shareItem,
+                  Platform.OS === "web" &&
+                    !phoneOrTablets && { marginLeft: 20 },
+                ]}
+                onPress={() => sendReferal()}
+              >
                 <Image source={linkImg} style={style.shareImg} />
               </Pressable>
             </View>
@@ -167,7 +228,7 @@ const style = StyleSheet.create({
     paddingBottom: 55,
     borderBottomColor: secondaryColor,
     borderBottomWidth: 1,
-    // marginHorizontal: Platform.OS === "web" ? 400 : "",
+    marginHorizontal: Platform.OS === "web" ? 400 : 0,
   },
   outerCircle: {
     height: 150,
@@ -230,7 +291,7 @@ const style = StyleSheet.create({
   },
   referFooter: {
     marginTop: 15,
-    // paddingHorizontal: Platform.OS === "web" ? 400 : "",
+    paddingHorizontal: Platform.OS === "web" ? 400 : 0,
   },
   shareOptions: {
     marginTop: 15,

@@ -16,9 +16,11 @@ import {
   Easing,
 } from "react-native";
 import PropTypes from "prop-types";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-// import { Picker } from "native-base";
+import { Picker } from "native-base";
 import DrawerLayout from "react-native-drawer-layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -26,6 +28,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { connect } from "react-redux";
 
 import { fetchOrderId } from "../../actions/paymentActions";
+import { addCartItem, getCartNo } from "../../actions/foodActions";
 
 import utilStyle from "../../styles/utilStyle";
 import {
@@ -53,6 +56,7 @@ import chicken from "../../img/chicken.png";
 import Food from "../foodComponents/Food";
 import NavbarWeb from "../web/NavbarWeb";
 import Drawer from "../layout/Drawer";
+import NavbarMobo from "../mobo/NavbarMobo";
 
 const SliderWidth = Dimensions.get("window").width - 450;
 
@@ -88,6 +92,8 @@ type Prop = {
   route: FoodDescScreenRouteProp;
   navigation: FoodDescScreenNavProp;
   fetchOrderId: Function;
+  addCartItem: Function;
+  getCartNo: Function;
   payment: { orderId: number | null; orderLoading: boolean };
 };
 
@@ -101,7 +107,11 @@ const FoodDesc = ({
   navigation,
   payment: { orderId, orderLoading },
   fetchOrderId,
+  addCartItem,
+  getCartNo,
 }: Prop) => {
+  // Media query
+  const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
   const [mainFood] = useState<FoodType>(route.params.food);
   const {
     id,
@@ -124,40 +134,50 @@ const FoodDesc = ({
       id: 1,
       title: "Kadaknath chicken",
       subtitle: "(without skin)",
-      price: 184,
+      price: 344,
       img: food,
       stars: 4,
-      reviews: 150,
+      reviews: 350,
       rating: 4.9,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 2,
       title: "Murg mussalam",
-      price: 184,
+      price: 900,
       img: food,
       stars: 4,
-      reviews: 150,
+      reviews: 100,
       rating: 4.9,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 3,
       title: "Chicken wings",
-      price: 184,
+      price: 154,
       img: food,
       stars: 2,
-      reviews: 150,
+      reviews: 250,
       rating: 2.9,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
     {
       id: 4,
       title: "Chicken lolipop",
-      price: 184,
+      price: 499,
       img: food,
       stars: 3,
-      reviews: 150,
+      reviews: 50,
+      rating: 3.9,
+      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
+    },
+    {
+      id: 5,
+      title: "Chicken breasts",
+      price: 999,
+      img: food,
+      stars: 3,
+      reviews: 50,
       rating: 3.9,
       desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Suscipit, earum sint dicta soluta odio aperiam assumenda obcaecati laudantium culpa? Laborum, tempore quae provident illum cumque similique nam magni voluptas sapiente?",
     },
@@ -311,7 +331,7 @@ const FoodDesc = ({
   };
 
   // Function to add the cart item
-  const addCartItem = (
+  const makeCartItem = (
     id: number,
     title: string,
     subTitle?: string,
@@ -331,7 +351,8 @@ const FoodDesc = ({
 
     setCartStatus(true);
 
-    saveItem(newCartItem);
+    addCartItem(newCartItem);
+    // getCartNo();
     console.log(newCartItem);
   };
 
@@ -680,10 +701,7 @@ const FoodDesc = ({
                 </View>
 
                 <View style={style.topContent}>
-                  <Pressable
-                    style={style.closeCartBtn}
-                    onPress={() => setCart(false)}
-                  >
+                  <Pressable onPress={() => setCart(false)}>
                     <AntDesign name="close" color={darkColor} size={25} />
                   </Pressable>
                   <Pressable
@@ -708,14 +726,62 @@ const FoodDesc = ({
             </View>
           </Modal>
         )}
-        <View style={utilStyle.container}>
-          {Platform.OS === "web" && <NavbarWeb drawer={drawer} />}
-          <View style={style.mainHeader}>
-            <View style={style.imgContain}>
-              <Image source={img} style={style.foodImg} />
+        <View style={[utilStyle.container]}>
+          {Platform.OS === "web" &&
+            (phoneOrTablets ? (
+              <NavbarMobo drawer={drawer} />
+            ) : (
+              <NavbarWeb drawer={drawer} />
+            ))}
+          <View
+            style={[
+              style.mainHeader,
+              {
+                flexDirection:
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? "column"
+                      : "row"
+                    : "column",
+              },
+            ]}
+          >
+            <View
+              style={[
+                style.imgContain,
+                {
+                  width:
+                    Platform.OS === "web"
+                      ? phoneOrTablets
+                        ? "100%"
+                        : "50%"
+                      : "100%",
+                },
+              ]}
+            >
+              <Image
+                source={img}
+                style={[
+                  style.foodImg,
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? { height: 200, width: 200 }
+                      : { height: 300, width: 300 }
+                    : { height: 200, width: 200 },
+                ]}
+              />
             </View>
             <View style={style.foodContent}>
-              <View>
+              <View
+                style={{
+                  width:
+                    Platform.OS === "web"
+                      ? phoneOrTablets
+                        ? "100%"
+                        : "25%"
+                      : "100%",
+                }}
+              >
                 <Text style={style.title}>{title}</Text>
                 {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
                 <View style={style.ratings}>
@@ -752,17 +818,29 @@ const FoodDesc = ({
               </View>
 
               <View style={style.bottomContent}>
-                <View style={style.controls}>
+                <View
+                  style={[
+                    style.controls,
+                    {
+                      width:
+                        Platform.OS === "web"
+                          ? phoneOrTablets
+                            ? "100%"
+                            : "25%"
+                          : "100%",
+                    },
+                  ]}
+                >
                   <View style={style.control}>
                     <Text style={style.label}>Weight</Text>
 
                     <View
                       style={[utilStyle.card, { height: 50, borderRadius: 10 }]}
                     >
-                      {/* <Picker
+                      <Picker
                         note
                         mode="dropdown"
-                        style={{ width: 120 }}
+                        style={{ width: 120, borderWidth: 0 }}
                         selectedValue={weight}
                         onValueChange={value => ctrlWeight(value)}
                         itemStyle={{ backgroundColor: lightColor }}
@@ -772,7 +850,7 @@ const FoodDesc = ({
                         <Picker.Item label="1000g" value="1000" />
                         <Picker.Item label="1500g" value="1500" />
                         <Picker.Item label="2000g" value="2000" />
-                      </Picker> */}
+                      </Picker>
                     </View>
                   </View>
                   <View style={style.control}>
@@ -814,7 +892,20 @@ const FoodDesc = ({
                   </View>
                 </View>
 
-                <View style={[utilStyle.card, style.cartBtnContain]}>
+                <View
+                  style={[
+                    utilStyle.card,
+                    style.cartBtnContain,
+                    {
+                      width:
+                        Platform.OS === "web"
+                          ? phoneOrTablets
+                            ? "100%"
+                            : "25%"
+                          : "100%",
+                    },
+                  ]}
+                >
                   <Text>
                     <Text style={{ fontSize: 17, color: medColor }}>
                       ₹{price.toString()}.00/
@@ -828,7 +919,7 @@ const FoodDesc = ({
                       style={style.cartBtn}
                       onPress={() => {
                         fetchDataFromCart();
-                        addCartItem(
+                        makeCartItem(
                           id,
                           title,
                           subtitle,
@@ -875,78 +966,89 @@ const FoodDesc = ({
                   )}
                 </View>
 
-                <View style={style.sideContent}>
-                  <Pressable
-                    style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
-                    onPress={() => setFavorite(() => !favorite)}
-                  >
-                    <FontAwesome
-                      name={favorite ? `heart` : `heart-o`}
-                      color={primaryColor}
-                      size={15}
-                    />
-                  </Pressable>
-                  <Pressable
-                    style={[utilStyle.card, style.btn]}
-                    onPress={() => shareFood()}
-                  >
-                    <Entypo name="share" color={primaryColor} size={15} />
-                  </Pressable>
-                </View>
-                <Pressable
-                  style={style.closeBtn}
-                  onPress={() => navigation.goBack()}
-                >
-                  <MaterialIcons
-                    name="arrow-back"
-                    color={darkColor}
-                    size={30}
-                  />
-                </Pressable>
-
                 {/* <Pressable
                   style={[style.closeBtn]}
                   android_ripple={{ color: secondaryColor, borderless: true }}
                   onPress={() => navigation.goBack()}
-                >
+                  >
                   <AntDesign name="close" color={darkColor} size={20} />
                 </Pressable> */}
               </View>
             </View>
+            <View style={style.sideContent}>
+              <Pressable
+                style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
+                onPress={() => setFavorite(() => !favorite)}
+              >
+                <FontAwesome
+                  name={favorite ? "heart" : "heart-o"}
+                  color={primaryColor}
+                  size={15}
+                />
+              </Pressable>
+              <Pressable
+                style={[utilStyle.card, style.btn]}
+                onPress={() => shareFood()}
+              >
+                <Entypo name="share" color={primaryColor} size={15} />
+              </Pressable>
+            </View>
+            <Pressable
+              style={style.closeBtn}
+              onPress={() => navigation.goBack()}
+            >
+              <MaterialIcons name="arrow-back" color={darkColor} size={30} />
+            </Pressable>
           </View>
         </View>
 
         {/* Photos */}
-        <View style={utilStyle.mt1}>
-          <View style={utilStyle.container}>
-            <Text style={utilStyle.head}>Photos</Text>
+        {Platform.OS !== "web" && (
+          <View style={utilStyle.mt1}>
+            <View style={utilStyle.container}>
+              <Text style={utilStyle.head}>Photos</Text>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {photos &&
+                photos.map((photo, i) =>
+                  i === 0 ? (
+                    <PhotoItem
+                      key={photo.id}
+                      photo={photo}
+                      marginStyle={{ marginHorizontal: defaultMargin }}
+                    />
+                  ) : (
+                    <PhotoItem
+                      key={photo.id}
+                      photo={photo}
+                      marginStyle={{ marginRight: defaultMargin }}
+                    />
+                  )
+                )}
+            </ScrollView>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {photos &&
-              photos.map((photo, i) =>
-                i === 0 ? (
-                  <PhotoItem
-                    key={photo.id}
-                    photo={photo}
-                    marginStyle={{ marginHorizontal: defaultMargin }}
-                  />
-                ) : (
-                  <PhotoItem
-                    key={photo.id}
-                    photo={photo}
-                    marginStyle={{ marginRight: defaultMargin }}
-                  />
-                )
-              )}
-          </ScrollView>
-        </View>
+        )}
 
         {/* Related */}
         <View style={utilStyle.mt1}>
           <View style={utilStyle.container}>
             <Text style={utilStyle.head}>More like this</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={[
+              style.scrollWidth,
+              {
+                width:
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? "90%"
+                      : "83%"
+                    : "90%",
+              },
+            ]}
+          >
             {related &&
               related.map((food, i) =>
                 i === 0 ? (
@@ -972,7 +1074,7 @@ const FoodDesc = ({
         {/* </View> */}
       </ScrollView>
       {/* Cart pop up */}
-      <CartPopUp />
+      {Platform.OS !== "web" && <CartPopUp />}
     </DrawerLayout>
   );
 };
@@ -1021,7 +1123,7 @@ const style = StyleSheet.create({
   },
   closeBtn: {
     position: "absolute",
-    top: "-280%",
+    // top: "-280%",
     // left: 15,
   },
   bottomContent: {
@@ -1102,7 +1204,7 @@ const style = StyleSheet.create({
   },
   sideContent: {
     position: "absolute",
-    bottom: "310%",
+    // bottom: "310%",
     right: 0,
   },
   btn: {
@@ -1188,11 +1290,6 @@ const style = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 15,
   },
-  closeCartBtn: {
-    // position: "absolute",
-    // top: 10,
-    // left: 10,
-  },
   backdrop: {
     display: "none",
     zIndex: 10,
@@ -1233,6 +1330,11 @@ const style = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  scrollWidth: {
+    // width: "83%",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
 });
 
 // Prop types
@@ -1246,4 +1348,8 @@ const mapStateToProps = (state: any) => ({
   payment: state.payment,
 });
 
-export default connect(mapStateToProps, { fetchOrderId })(FoodDesc);
+export default connect(mapStateToProps, {
+  fetchOrderId,
+  addCartItem,
+  getCartNo,
+})(FoodDesc);

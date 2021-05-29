@@ -10,7 +10,10 @@ import {
   Image,
   StatusBar,
   Pressable,
+  Platform,
 } from "react-native";
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../App";
 
@@ -54,9 +57,11 @@ const OrderLoading = ({ navigation }: Props) => {
   const { width: windowWidth } = useWindowDimensions();
   const { height: windowHeight } = useWindowDimensions();
   const anim = useRef<any>(new Animated.Value(0)).current;
+  // Media query
+  const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
 
   // State for the delivery status
-  const [delivery, setDelivery] = useState<number>(2);
+  const [delivery, setDelivery] = useState<number>(1);
   const [status] = useState<DeliveryStat[]>([
     {
       id: 1,
@@ -107,73 +112,179 @@ const OrderLoading = ({ navigation }: Props) => {
             .map(stat => (
               <View
                 key={stat.id}
-                style={[style.loadingScreen, { width: windowWidth }]}
+                style={[
+                  style.loadingScreen,
+                  { width: windowWidth, height: "100%" },
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? { flexDirection: "column" }
+                      : {
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }
+                    : { flexDirection: "column" },
+                ]}
               >
                 <View style={style.imgContain}>
-                  <Image source={stat.img} style={style.orderImg} />
+                  <Image
+                    source={stat.img}
+                    style={[
+                      style.orderImg,
+                      Platform.OS === "web"
+                        ? phoneOrTablets
+                          ? { height: 188, width: "70%" }
+                          : { height: 500, width: 650 }
+                        : { height: 188, width: "70%" },
+                    ]}
+                  />
                 </View>
-                <View style={style.orderContent}>
-                  <Text style={style.headMsg}>{stat.title}</Text>
-                  <Text style={style.orderMsg}>{stat.desc}</Text>
-                </View>
-                <View style={style.orderStateContain}>
-                  <View>
-                    <View style={style.timingContain}>
-                      <Feather name="clock" color={primaryColor} size={15} />
-                      <Text style={style.timeTaking}>09:30</Text>
+                <View>
+                  <View style={style.orderContent}>
+                    <Text style={style.headMsg}>{stat.title}</Text>
+                    <Text style={style.orderMsg}>{stat.desc}</Text>
+                  </View>
+                  <View
+                    style={[
+                      style.orderStateContain,
+                      Platform.OS === "web"
+                        ? phoneOrTablets
+                          ? {
+                              position: "absolute",
+                              bottom: -150,
+                              justifyContent: "space-between",
+                            }
+                          : {
+                              position: "relative",
+                              width: "100%",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              bottom: 0,
+                            }
+                        : {
+                            position: "absolute",
+                            bottom: -150,
+                            justifyContent: "space-between",
+                          },
+                    ]}
+                  >
+                    <View
+                      style={
+                        Platform.OS === "web" &&
+                        !phoneOrTablets && { marginHorizontal: 20 }
+                      }
+                    >
+                      <View style={style.timingContain}>
+                        <Feather name="clock" color={primaryColor} size={15} />
+                        <Text style={style.timeTaking}>09:30</Text>
+                      </View>
+                      <View style={[style.stateItem, style.activeState]}>
+                        <MaterialCommunityIcons
+                          name="package"
+                          color={lightColor}
+                          size={25}
+                        />
+                      </View>
                     </View>
-                    <View style={[style.stateItem, style.activeState]}>
-                      <MaterialCommunityIcons
-                        name="package"
-                        color={lightColor}
-                        size={25}
-                      />
+                    <View style={style.progressBar}></View>
+                    <View
+                      style={
+                        Platform.OS === "web" &&
+                        !phoneOrTablets && { marginHorizontal: 20 }
+                      }
+                    >
+                      <View style={[style.timingContain, { opacity: 0 }]}>
+                        <Feather name="clock" color={primaryColor} size={15} />
+                        <Text style={style.timeTaking}>09:30</Text>
+                      </View>
+                      <View style={[style.stateItem]}>
+                        <MaterialIcons
+                          name="delivery-dining"
+                          color={secondaryColor}
+                          size={25}
+                        />
+                      </View>
+                    </View>
+                    <View style={style.progressBar}></View>
+                    <View
+                      style={
+                        Platform.OS === "web" &&
+                        !phoneOrTablets && { marginHorizontal: 20 }
+                      }
+                    >
+                      <View style={[style.timingContain, { opacity: 0 }]}>
+                        <Feather name="clock" color={primaryColor} size={15} />
+                        <Text style={style.timeTaking}>09:30</Text>
+                      </View>
+                      <View style={style.stateItem}>
+                        <FontAwesome
+                          name="shopping-basket"
+                          color={secondaryColor}
+                          size={25}
+                        />
+                      </View>
                     </View>
                   </View>
-                  <View style={style.progressBar}></View>
-                  <View>
-                    <View style={[style.timingContain, { opacity: 0 }]}>
-                      <Feather name="clock" color={primaryColor} size={15} />
-                      <Text style={style.timeTaking}>09:30</Text>
+                  {Platform.OS === "web" && !phoneOrTablets && (
+                    <View
+                      style={{
+                        marginTop: 150,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Pressable onPress={() => navigation.navigate("Receipt")}>
+                        <Text
+                          style={[
+                            style.recieptTxt,
+                            { fontSize: 18, marginBottom: 15 },
+                          ]}
+                        >
+                          View receipt
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        style={[style.homeBtn]}
+                        onPress={() => navigation.navigate("Home")}
+                      >
+                        <Entypo name="home" color={lightColor} size={20} />
+                        <Text style={style.btnLabel}>Go to home</Text>
+                      </Pressable>
                     </View>
-                    <View style={[style.stateItem]}>
-                      <MaterialIcons
-                        name="delivery-dining"
-                        color={secondaryColor}
-                        size={25}
-                      />
-                    </View>
-                  </View>
-                  <View style={style.progressBar}></View>
-                  <View>
-                    <View style={[style.timingContain, { opacity: 0 }]}>
-                      <Feather name="clock" color={primaryColor} size={15} />
-                      <Text style={style.timeTaking}>09:30</Text>
-                    </View>
-                    <View style={style.stateItem}>
-                      <FontAwesome
-                        name="shopping-basket"
-                        color={secondaryColor}
-                        size={25}
-                      />
-                    </View>
-                  </View>
+                  )}
                 </View>
               </View>
             ))}
       </ScrollView>
-      <View style={[utilStyle.card, style.loadingFooter]}>
-        <Pressable onPress={() => navigation.navigate("Receipt")}>
-          <Text style={style.recieptTxt}>View receipt</Text>
-        </Pressable>
-        <Pressable
-          style={style.homeBtn}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Entypo name="home" color={lightColor} size={20} />
-          <Text style={style.btnLabel}>Go to home</Text>
-        </Pressable>
-      </View>
+      {Platform.OS === "web" ? (
+        phoneOrTablets ? (
+          <View style={[utilStyle.card, style.loadingFooter]}>
+            <Pressable onPress={() => navigation.navigate("Receipt")}>
+              <Text style={style.recieptTxt}>View receipt</Text>
+            </Pressable>
+            <Pressable
+              style={style.homeBtn}
+              onPress={() => navigation.navigate("Home")}
+            >
+              <Entypo name="home" color={lightColor} size={20} />
+              <Text style={style.btnLabel}>Go to home</Text>
+            </Pressable>
+          </View>
+        ) : null
+      ) : (
+        <View style={[utilStyle.card, style.loadingFooter]}>
+          <Pressable onPress={() => navigation.navigate("Receipt")}>
+            <Text style={style.recieptTxt}>View receipt</Text>
+          </Pressable>
+          <Pressable
+            style={style.homeBtn}
+            onPress={() => navigation.navigate("Home")}
+          >
+            <Entypo name="home" color={lightColor} size={20} />
+            <Text style={style.btnLabel}>Go to home</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
     // </ScrollView>
   );
@@ -227,7 +338,7 @@ const style = StyleSheet.create({
     display: "flex",
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
     marginTop: 20,

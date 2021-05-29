@@ -35,6 +35,7 @@ import foodImg from "../../img/indian_food_1.png";
 
 import { RootStackParamList, FoodType } from "../../App";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import DrawerLayout from "react-native-drawer-layout";
 
 // Type checking
 type CategoryScreenNavProp = StackNavigationProp<
@@ -203,13 +204,14 @@ const Categories = ({ route, navigation }: Props) => {
   }, []);
 
   return (
-    <DrawerLayoutAndroid
+    <DrawerLayout
       ref={drawer}
       renderNavigationView={() => (
         <Drawer drawer={drawer} navigation={navigation} />
       )}
       drawerPosition="right"
       drawerWidth={300}
+      drawerBackgroundColor={lightColor}
     >
       <View style={[utilStyle.container, { paddingBottom: 0 }]}>
         {/* Navbar */}
@@ -251,7 +253,7 @@ const Categories = ({ route, navigation }: Props) => {
             {/* Navbar btn */}
             <Pressable
               onPress={() => {
-                drawer.current.openDrawer();
+                drawer?.current.openDrawer();
               }}
               android_ripple={{
                 color: secondaryColor,
@@ -328,7 +330,7 @@ const Categories = ({ route, navigation }: Props) => {
           </View>
         </ScrollView>
       </View>
-    </DrawerLayoutAndroid>
+    </DrawerLayout>
   );
 };
 

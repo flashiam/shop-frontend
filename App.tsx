@@ -18,6 +18,7 @@ import Refer from "./components/pages/Refer";
 import OrderLoading from "./components/pages/OrderLoading";
 import Receipt from "./components/pages/Receipt";
 import Promo from "./components/pages/Promo";
+import CartWeb from "./components/web/CartWeb";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -47,6 +48,7 @@ export type RootStackParamList = {
   OrderLoading: undefined;
   Receipt: undefined;
   Promo: undefined;
+  CartWeb?: { cartid: number };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -78,6 +80,7 @@ export default function App() {
               <Stack.Screen name="OrderLoading" component={OrderLoading} />
               <Stack.Screen name="Receipt" component={Receipt} />
               <Stack.Screen name="Promo" component={Promo} />
+              <Stack.Screen name="CartWeb" component={CartWeb} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaProvider>

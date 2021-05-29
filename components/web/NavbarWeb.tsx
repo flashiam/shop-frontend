@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
+import { connect } from "react-redux";
 
 import {
   AntDesign,
@@ -17,9 +18,28 @@ import {
 
 import appLogo from "../../img/app-logo-min 1.png";
 import utilStyle from "../../styles/utilStyle";
-import { primaryColor, secondaryColor } from "../../styles/_variables";
+import { lightColor, primaryColor, bgColor } from "../../styles/_variables";
 
-const NavbarWeb = ({ drawer }: any) => {
+import { getCartNo } from "../../actions/foodActions";
+
+type Props = {
+  drawer: any;
+  food?: { cartItems: any; cartNum: any };
+  getCartNo: Function;
+};
+
+const NavbarWeb = ({
+  drawer,
+  food: { cartItems, cartNum },
+  getCartNo,
+}: Props) => {
+  const [cartItemNum, setItemNum] = useState<number>(0);
+
+  useEffect(() => {
+    // getCartNo();
+    console.log(cartItems, cartNum);
+  }, [cartItems]);
+
   return (
     <View style={style.navbar}>
       <Pressable style={style.logoContain}>
@@ -50,8 +70,16 @@ const NavbarWeb = ({ drawer }: any) => {
         />
       </View>
 
-      <Pressable onPress={() => drawer.current.openDrawer()}>
+      <Pressable
+        onPress={() => drawer.current.openDrawer()}
+        style={{ position: "relative" }}
+      >
         <EvilIcons name="navicon" size={35} color={primaryColor} />
+        {cartNum > 0 && (
+          <View style={style.cartNotification}>
+            <Text style={{ color: lightColor, fontSize: 10 }}>{cartNum}</Text>
+          </View>
+        )}
       </Pressable>
     </View>
   );
@@ -88,6 +116,24 @@ const style = StyleSheet.create({
   locationCity: {
     marginLeft: 10,
   },
+  cartNotification: {
+    position: "absolute",
+    padding: 8,
+    height: 13,
+    width: 13,
+    borderWidth: 3,
+    borderColor: bgColor,
+    borderRadius: 100 / 2,
+    backgroundColor: primaryColor,
+    justifyContent: "center",
+    alignItems: "center",
+    top: -2,
+  },
 });
 
-export default NavbarWeb;
+// Function to map states to props
+const mapStateToProps = (state: any) => ({
+  food: state.food,
+});
+
+export default connect(mapStateToProps, { getCartNo })(NavbarWeb);

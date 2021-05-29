@@ -6,7 +6,8 @@ import {
   secondaryColor,
 } from "../../styles/_variables";
 import utilStyle from "../../styles/utilStyle";
-
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import testAvatar from "../../img/test_avatar.jpg";
 
@@ -25,8 +26,16 @@ type Props = {
 };
 
 const RecipeCard = ({ recipe, marginStyle }: Props) => {
+  const phoneOrTablets = useMediaQuery({ maxWidth: 768 });
+
   return (
-    <View style={[utilStyle.card, style.recipeCard, { ...marginStyle }]}>
+    <View
+      style={[
+        utilStyle.card,
+        style.recipeCard,
+        { ...marginStyle, width: phoneOrTablets ? 290 : 320 },
+      ]}
+    >
       <View style={style.recipeHeader}>
         <View>
           <Image source={testAvatar} style={style.avatar} />

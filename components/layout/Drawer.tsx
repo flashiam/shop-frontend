@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Image,
@@ -9,13 +9,21 @@ import {
   StatusBar,
   Platform,
 } from "react-native";
-import { FontAwesome5, MaterialIcons, AntDesign } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  MaterialIcons,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { connect } from "react-redux";
 
 import {
   primaryColor,
   secondaryColor,
   darkColor,
   medColor,
+  lightColor,
 } from "../../styles/_variables";
 
 import testAvatar from "../../img/test_avatar.jpg";
@@ -23,9 +31,43 @@ import testAvatar from "../../img/test_avatar.jpg";
 type Props = {
   navigation: any;
   drawer: any;
+  food: { cartItems: Object; cartNum: number };
 };
 
-const Drawer = ({ drawer, navigation }: Props) => {
+const Drawer = ({
+  drawer,
+  navigation,
+  food: { cartItems, cartNum },
+}: Props) => {
+  const initialMount = useRef<boolean>(true);
+
+  // State for cart item num
+  const [cartItemNum, setCartItemNum] = useState<number>(0);
+
+  // Function to get the total no. of cart items
+  const getCartNo = async () => {
+    try {
+      const savedItems = await AsyncStorage.getItem("cart-items");
+      if (savedItems) setCartItemNum(JSON.parse(savedItems).length);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const updateCartNo = () => {
+    setCartItemNum(cartNum);
+  };
+
+  useEffect(() => {
+    if (initialMount.current) {
+      getCartNo();
+      initialMount.current = false;
+    } else {
+      updateCartNo();
+    }
+    console.log(cartItems);
+  }, []);
+
   return (
     <View style={style.navContain}>
       <Pressable style={style.profileContain}>
@@ -37,6 +79,45 @@ const Drawer = ({ drawer, navigation }: Props) => {
       </Pressable>
 
       <View style={style.navLinks}>
+        {Platform.OS === "web" && (
+          <Pressable
+            onPress={() => {
+              drawer.current.closeDrawer();
+              navigation.navigate("CartWeb");
+            }}
+            style={style.navLink}
+            android_ripple={{ color: secondaryColor }}
+          >
+            <MaterialCommunityIcons
+              name="cart"
+              size={20}
+              color={primaryColor}
+            />
+            <View
+              style={{
+                width: "70%",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={style.linkTxt}>Cart</Text>
+              {cartNum > 0 && (
+                <View style={style.cartNotification}>
+                  <Text
+                    style={{
+                      color: lightColor,
+                      fontSize: 10,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {cartNum}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </Pressable>
+        )}
         <Pressable
           onPress={() => {
             drawer.current.closeDrawer();
@@ -142,6 +223,21 @@ const style = StyleSheet.create({
     right: 30,
     paddingTop: 10,
   },
+  cartNotification: {
+    backgroundColor: primaryColor,
+    height: 20,
+    width: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100 / 2,
+    marginLeft: 10,
+  },
 });
 
-export default Drawer;
+// Function to map states to props
+const mapStateToProps = (state: any) => ({
+  food: state.food,
+});
+
+export default connect(mapStateToProps, null)(Drawer);

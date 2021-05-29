@@ -84,7 +84,7 @@ const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
             zIndex: 3,
             ...marginStyle,
           },
-          phoneOrTablets && { width: 155 },
+          phoneOrTablets && { width: 175 },
         ]}
       >
         <View style={style.imgContain}>
@@ -93,7 +93,14 @@ const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
 
         <View style={style.dealContent}>
           <View>
-            <Text style={{ fontSize: 20, color: medColor, fontWeight: "bold" }}>
+            <Text
+              style={{
+                fontSize: 20,
+                color: medColor,
+                fontWeight: "bold",
+                width: "95%",
+              }}
+            >
               {title}
             </Text>
             <View style={style.ratings}>
@@ -155,9 +162,10 @@ const Food = ({ navigation, food, updatePage, marginStyle }: Props) => {
 const style = StyleSheet.create({
   dealCard: {
     borderRadius: 10,
-    height: 245,
+    // height: 245,
     // width: 160,
-    width: Platform.OS === "web" ? 270 : 155,
+    width: Platform.OS === "web" ? 200 : 155,
+    // width: Platform.OS === "web" ? 200 : 155,
   },
   imgContain: {
     display: "flex",
@@ -170,16 +178,17 @@ const style = StyleSheet.create({
     width: 120,
   },
   dealContent: {
-    position: "absolute",
+    position: "relative",
     bottom: 0,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
+    marginTop: 30,
     // marginTop: 50,
-    paddingBottom: 13,
-    paddingVertical: 15,
+    // paddingBottom: 13,
+    // paddingVertical: 15,
   },
   ratings: {
     display: "flex",
