@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,17 +12,28 @@ import {
   StatusBar,
   Button,
   TouchableNativeFeedback,
+  ActivityIndicator,
+  // Modal,
 } from "react-native";
 import DrawerLayout from "react-native-drawer-layout";
+import Modal from "react-native-modal";
 import utilStyle from "../../styles/utilStyle";
-import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
+import {
+  primaryColor,
+  lightColor,
+  darkColor,
+  bgColor,
+} from "../../styles/_variables";
 import {
   AntDesign,
   Ionicons,
   EvilIcons,
   FontAwesome5,
   MaterialIcons,
+  Entypo,
 } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import OfferItem from "../foodComponents/OfferItem";
 import Food from "../foodComponents/Food";
@@ -245,6 +256,15 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     },
   ]);
 
+  // State for location modal
+  const [openLocation, setLocationModal] = useState<boolean>(false);
+
+  // State for the location
+  const [address, setAddress] = useState<any>(null);
+
+  // State for the loader in location
+  const [locationLoading, setLocationLoading] = useState<boolean>(false);
+
   const [defaultMargin] = useState<number>(18);
 
   const ref = useRef(null);
@@ -286,6 +306,148 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
     );
   };
 
+  // Function to save the location to localstorage
+  const saveAddress = async (address: any) => {
+    try {
+      await AsyncStorage.setItem("user-address", JSON.stringify(address));
+      console.log("address saved");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to get the location from the storage if it is saved
+  const fetchAddress = async () => {
+    try {
+      const savedAddress = await AsyncStorage.getItem("user-address");
+      if (savedAddress) return setAddress(JSON.parse(savedAddress));
+
+      setAddress(null);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to fetch the current location
+  const getCurrentLocation = async () => {
+    try {
+      setLocationLoading(true);
+      // Close the modal after location is fetched
+      setLocationModal(false);
+
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      // Checking permission status
+      if (status !== "granted") {
+        console.log("Permission denied");
+      } else {
+        const isServicesEnabled = await Location.hasServicesEnabledAsync();
+        if (!isServicesEnabled)
+          return console.log("Please enable the location");
+
+        // If permission granted then fetch the location
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+
+        // Fetching current address through coordinates
+        const currentAddress = await Location.reverseGeocodeAsync({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        });
+
+        // Set the current address
+        setAddress(currentAddress);
+
+        // Save the address also
+        saveAddress(currentAddress);
+
+        // Disable loading
+        setLocationLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to delete the address
+  const deleteAddress = async () => {
+    try {
+      await AsyncStorage.removeItem("user-address");
+      setAddress(null);
+      console.log("address deleted");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddress();
+  }, []);
+
+  // Location modal currently for apps only
+  const LocateModal = () => {
+    return (
+      <Modal
+        onBackdropPress={() => setLocationModal(false)}
+        onSwipeComplete={() => setLocationModal(false)}
+        style={{
+          position: "relative",
+          padding: 0,
+          margin: 0,
+        }}
+        isVisible={openLocation}
+        swipeDirection="down"
+      >
+        <View style={style.locationContain}>
+          <View style={style.locationHeader}>
+            <Text style={{ fontSize: 18 }}>Select Location</Text>
+            <Pressable>
+              <AntDesign name="close" color={medColor} size={18} />
+            </Pressable>
+          </View>
+          <View style={style.locationSection}>
+            <Pressable
+              style={style.currentLocationBtn}
+              onPress={() => getCurrentLocation()}
+            >
+              <MaterialIcons
+                name="my-location"
+                color={primaryColor}
+                size={18}
+              />
+              <Text
+                style={{ color: primaryColor, marginLeft: 15, fontSize: 15 }}
+              >
+                Use current location
+              </Text>
+            </Pressable>
+            <View style={style.savedAddressContain}>
+              <Text style={{ fontSize: 16, paddingBottom: 10 }}>
+                Saved Address
+              </Text>
+              {address && address[0] && (
+                <View style={style.addressItem}>
+                  <View style={style.addressLeftContent}>
+                    <Entypo name="home" color={darkColor} size={18} />
+                    <Text style={{ marginLeft: 15 }}>{address[0].city}</Text>
+                  </View>
+                  <Pressable onPress={() => deleteAddress()}>
+                    <MaterialIcons
+                      name="delete-outline"
+                      color={primaryColor}
+                      size={20}
+                    />
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   return (
     <DrawerLayout
       ref={drawer}
@@ -296,44 +458,54 @@ const HomeMobo = ({ navigation }: { navigation: any }) => {
       drawerPosition="right"
       drawerWidth={300}
     >
+      <LocateModal />
       <ScrollView>
         <View style={[utilStyle.container]}>
           {/* Navbar */}
           <View style={style.nav}>
             {/* Access location */}
-            <Pressable onPress={() => console.log("location")}>
+            <Pressable onPress={() => setLocationModal(true)}>
               <View style={style.leftContent}>
                 {/* <View style={[utilStyle.card, style.locationBtn]}> */}
                 <Ionicons
                   name="location-outline"
                   size={30}
                   color={primaryColor}
-                  style={style.locateIcon}
                 />
                 {/* </View> */}
-                <View>
-                  <Text
-                    style={[
-                      style.locationTxt,
-                      { fontWeight: "bold", fontSize: 18 },
-                    ]}
+                {locationLoading && locationLoading ? (
+                  <View
+                    style={{
+                      marginLeft: 10,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
                   >
-                    Bhopal
-                  </Text>
-                  <Text style={style.locationTxt}>
-                    10 no. market near arera colony...
-                  </Text>
-                </View>
+                    <ActivityIndicator color={primaryColor} />
+                  </View>
+                ) : (
+                  address &&
+                  address[0] && (
+                    <View>
+                      <Text
+                        style={[
+                          style.locationTxt,
+                          { fontWeight: "bold", fontSize: 18 },
+                        ]}
+                      >
+                        {address[0].city}
+                      </Text>
+                      <Text style={style.locationTxt}>
+                        {address[0].name}, {address[0].district} -{" "}
+                        {address[0].postalCode}
+                      </Text>
+                    </View>
+                  )
+                )}
               </View>
             </Pressable>
             {/* Navbar btn */}
-            <Pressable
-              onPress={() => drawer?.current.openDrawer()}
-              // android_ripple={{
-              //   color: secondaryColor,
-              //   borderless: true,
-              // }}
-            >
+            <Pressable onPress={() => drawer?.current.openDrawer()}>
               <EvilIcons name="navicon" size={35} color="red" />
             </Pressable>
           </View>
@@ -799,6 +971,46 @@ const style = StyleSheet.create({
     position: "absolute",
     top: 50,
     right: 30,
+  },
+  locationContain: {
+    backgroundColor: lightColor,
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: "50%",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  locationHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  locationSection: {
+    marginTop: 50,
+  },
+  currentLocationBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  savedAddressContain: {
+    marginTop: 25,
+  },
+  addressLeftContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addressItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: bgColor,
   },
 });
 

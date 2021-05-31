@@ -91,7 +91,8 @@ const Food = ({
             zIndex: 3,
             ...marginStyle,
           },
-          phoneOrTablets && { width: 175 },
+          // phoneOrTablets && { width: 175 },
+          phoneOrTablets && { width: 155 },
         ]}
       >
         <View style={style.imgContain}>

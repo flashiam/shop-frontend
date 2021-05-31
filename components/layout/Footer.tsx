@@ -21,7 +21,7 @@ const Footer = () => {
 const style = StyleSheet.create({
   footer: {
     position: "absolute",
-    padding: Platform.OS === "web" ? 20 : 15,
+    padding: Platform.OS === "web" ? 14 : 15,
     bottom: 0,
     left: 0,
     right: 0,
