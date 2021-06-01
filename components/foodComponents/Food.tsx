@@ -170,7 +170,7 @@ const Food = ({
 const style = StyleSheet.create({
   dealCard: {
     borderRadius: 10,
-    // height: 245,
+    height: 245,
     // width: 160,
     width: Platform.OS === "web" ? 200 : 155,
     // width: Platform.OS === "web" ? 200 : 155,
@@ -186,16 +186,18 @@ const style = StyleSheet.create({
     width: 120,
   },
   dealContent: {
-    position: "relative",
+    position: "absolute",
+    // position: "relative",
     bottom: 0,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
-    marginTop: 30,
-    // marginTop: 50,
-    // paddingBottom: 13,
+    // marginTop: 20,
+    // marginTop: 30,
+    marginTop: 50,
+    paddingBottom: 13,
     // paddingVertical: 15,
   },
   ratings: {

@@ -12,6 +12,7 @@ import { fetchCartItem } from "../utils/fetchCartItem";
 // Setting the initial state to be manipulated
 const initialState = {
   foods: [],
+  searchedFoods: [],
   loading: true,
   cartItems: [],
   cartNum: 0,

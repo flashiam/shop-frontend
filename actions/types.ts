@@ -6,6 +6,13 @@ export const GET_ORDER_ID = "GET_ORDER_ID";
 export const SET_LOADING = "SET_LOADING";
 export const SET_ORDER_LOADING = "SET_ORDER_LOADING";
 
+// User
+export const FETCH_USER = "FETCH_USER";
+export const FETCH_TOKEN = "FETCH_TOKEN";
+export const REGISTER_ERROR = "REGISTER_ERROR";
+export const USER_AUTHORIZED = "USER_AUTHORIZED";
+export const USER_UNAUTHORIZED = "USER_UNAUTHORIZED";
+
 // Errors
 export const FOOD_ERROR = "FOOD_ERROR";
 export const PAYMENT_ERROR = "PAYMENT_ERROR";

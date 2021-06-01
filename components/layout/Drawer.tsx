@@ -18,26 +18,34 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { connect } from "react-redux";
 
+import { signOutUser, fetchUserCredentials } from "../../actions/userActions";
+
 import {
   primaryColor,
   secondaryColor,
   darkColor,
   medColor,
   lightColor,
+  bgColor,
 } from "../../styles/_variables";
 
 import testAvatar from "../../img/test_avatar.jpg";
+import { DrawerRouter } from "@react-navigation/routers";
 
 type Props = {
   navigation: any;
   drawer: any;
   food: { cartItems: Object; cartNum: number };
+  user: { userRegistered: boolean; userProfile: any };
+  signOutUser: Function;
 };
 
 const Drawer = ({
   drawer,
   navigation,
   food: { cartItems, cartNum },
+  user: { userRegistered, userProfile },
+  signOutUser,
 }: Props) => {
   const initialMount = useRef<boolean>(true);
 
@@ -65,18 +73,60 @@ const Drawer = ({
     } else {
       updateCartNo();
     }
-    console.log(cartItems);
   }, []);
 
   return (
     <View style={style.navContain}>
-      <Pressable style={style.profileContain}>
-        <Image source={testAvatar} style={style.profileAvatar} />
-        <View style={style.profileDetails}>
-          <Text style={style.userName}>Joy Pashina</Text>
-          <Text style={style.userEmail}>joypashina32@gmail.com</Text>
+      {userProfile && userRegistered ? (
+        <View style={{ marginLeft: 25 }}>
+          <Pressable style={style.profileContain}>
+            <Image
+              source={{ uri: userProfile.photoUrl }}
+              style={style.profileAvatar}
+            />
+
+            <View style={style.profileDetails}>
+              <Text style={style.userName}>{userProfile.name}</Text>
+              <Text style={style.userEmail}>{userProfile.email}</Text>
+            </View>
+          </Pressable>
+          <Pressable
+            style={{
+              marginTop: 5,
+              borderWidth: 1,
+              borderColor: bgColor,
+              paddingVertical: 5,
+              paddingHorizontal: 10,
+              alignSelf: "flex-start",
+              borderRadius: 5,
+            }}
+            onPress={() => {
+              signOutUser();
+            }}
+          >
+            <Text style={{ color: secondaryColor }}>Sign out</Text>
+          </Pressable>
         </View>
-      </Pressable>
+      ) : (
+        <View style={style.unauthContain}>
+          <Text style={{ color: darkColor, fontWeight: "bold", fontSize: 18 }}>
+            Hey, Buddy login to explore more !
+          </Text>
+          <Pressable
+            style={style.loginBtn}
+            onPress={() => {
+              navigation.navigate("Login");
+              drawer.current.closeDrawer();
+            }}
+          >
+            <Text
+              style={{ color: lightColor, fontSize: 16, textAlign: "center" }}
+            >
+              Sign in
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       <View style={style.navLinks}>
         {Platform.OS === "web" && (
@@ -120,8 +170,12 @@ const Drawer = ({
         )}
         <Pressable
           onPress={() => {
+            if (!userRegistered) {
+              navigation.navigate("Login");
+            } else {
+              navigation.navigate("Orders");
+            }
             drawer.current.closeDrawer();
-            navigation.navigate("Orders");
           }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
@@ -131,8 +185,12 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
+            if (!userRegistered) {
+              navigation.navigate("Login");
+            } else {
+              navigation.navigate("Wishlist");
+            }
             drawer.current.closeDrawer();
-            navigation.navigate("Wishlist");
           }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
@@ -142,8 +200,12 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
+            if (!userRegistered) {
+              navigation.navigate("Login");
+            } else {
+              navigation.navigate("Support");
+            }
             drawer.current.closeDrawer();
-            navigation.navigate("Support");
           }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
@@ -153,8 +215,12 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
+            if (!userRegistered) {
+              navigation.navigate("Login");
+            } else {
+              navigation.navigate("Refer");
+            }
             drawer.current.closeDrawer();
-            navigation.navigate("Refer");
           }}
           style={style.navLink}
           android_ripple={{ color: secondaryColor }}
@@ -184,7 +250,19 @@ const style = StyleSheet.create({
     position: "relative",
     display: "flex",
     flexDirection: "row",
-    marginLeft: 25,
+    // marginLeft: 25,
+  },
+  unauthContain: {
+    // marginLeft: 25,
+    alignItems: "center",
+  },
+  loginBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: primaryColor,
+    borderRadius: 8,
+    marginTop: 15,
+    width: "80%",
   },
   profileAvatar: {
     height: 50,
@@ -238,6 +316,7 @@ const style = StyleSheet.create({
 // Function to map states to props
 const mapStateToProps = (state: any) => ({
   food: state.food,
+  user: state.user,
 });
 
-export default connect(mapStateToProps, null)(Drawer);
+export default connect(mapStateToProps, { signOutUser })(Drawer);

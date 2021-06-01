@@ -1,7 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
@@ -20,6 +21,8 @@ import Receipt from "./components/pages/Receipt";
 import Promo from "./components/pages/Promo";
 import CartWeb from "./components/web/CartWeb";
 import NavbarWeb from "./components/web/NavbarWeb";
+import ProductSearch from "./components/pages/ProductSearch";
+import Login from "./components/pages/Login";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -36,6 +39,7 @@ export interface FoodType {
   rating: number;
   stars: number;
   reviews: number;
+  tags?: string[];
 }
 
 export type RootStackParamList = {
@@ -51,13 +55,33 @@ export type RootStackParamList = {
   Receipt: undefined;
   Promo: undefined;
   CartWeb?: { cartid: number };
+  ProductSearch: { keyword: string };
+  Login: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-export default function App() {
+const App = () => {
+  useEffect(() => {
+    console.log("Hello user");
+    checkAuthStatus();
+  });
+
+  const [isRegistered, setStatus] = useState<boolean>(false);
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
+
+  // Function to check the auth status of user
+  const checkAuthStatus = async () => {
+    try {
+      const status = await AsyncStorage.getItem("tokens");
+      if (!status) return setStatus(false);
+
+      setStatus(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   if (!isLoadingComplete) {
     return null;
@@ -76,6 +100,7 @@ export default function App() {
               <Stack.Screen name="Food" component={FoodDesc} />
               <Stack.Screen name="Categories" component={Categories} />
               <Stack.Screen name="Orders" component={Orders} />
+              <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Wishlist" component={Wishlist} />
               <Stack.Screen name="Support" component={Support} />
               <Stack.Screen name="Refer" component={Refer} />
@@ -84,10 +109,13 @@ export default function App() {
               <Stack.Screen name="Promo" component={Promo} />
               <Stack.Screen name="CartWeb" component={CartWeb} />
               <Stack.Screen name="NavbarWeb" component={NavbarWeb} />
+              <Stack.Screen name="ProductSearch" component={ProductSearch} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaProvider>
       </Provider>
     );
   }
-}
+};
+
+export default App;

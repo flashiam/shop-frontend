@@ -13,6 +13,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
+import { connect } from "react-redux";
 
 import { RootStackParamList } from "../../App";
 
@@ -36,9 +37,16 @@ type ReferScreenNavProp = StackNavigationProp<RootStackParamList, "Refer">;
 
 type Props = {
   navigation: ReferScreenNavProp;
+  user: {
+    userRegistered: boolean;
+    userProfile: any;
+  };
 };
 
-const Refer = ({ navigation }: Props) => {
+const Refer = ({
+  navigation,
+  user: { userRegistered, userProfile },
+}: Props) => {
   // Media query
   const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
 
@@ -113,13 +121,16 @@ const Refer = ({ navigation }: Props) => {
               >
                 <View style={style.topShadow}>
                   <View style={style.bottomShadow}> */}
-            <Image source={testAvatar} style={style.profilePic} />
+            <Image
+              source={{ uri: userProfile.photoUrl }}
+              style={style.profilePic}
+            />
             {/* </View>
                 </View> */}
             {/* </View> */}
             {/* </View> */}
             <View style={style.referContent}>
-              <Text style={style.username}>joypashina007</Text>
+              <Text style={style.username}>{userProfile.email}</Text>
               <Text style={style.desc}>
                 Share this referal code with your friends to earn exciting
                 fredpoints
@@ -340,4 +351,8 @@ const style = StyleSheet.create({
   },
 });
 
-export default Refer;
+const mapStateToProps = (state: any) => ({
+  user: state.user,
+});
+
+export default connect(mapStateToProps, null)(Refer);

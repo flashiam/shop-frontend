@@ -574,73 +574,32 @@ const OrderLoading = ({ navigation }: Props) => {
                     style={[
                       style.loadingScreen,
                       { width: windowWidth, height: "100%" },
-                      Platform.OS === "web"
-                        ? phoneOrTablets
-                          ? { flexDirection: "column" }
-                          : {
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                            }
-                        : { flexDirection: "column" },
+
+                      { flexDirection: "column" },
                     ]}
                   >
                     <View style={style.imgContain}>
                       <Image
                         source={stat.img}
-                        style={[
-                          style.orderImg,
-                          Platform.OS === "web"
-                            ? phoneOrTablets
-                              ? { height: 188, width: "70%" }
-                              : { height: 500, width: 650 }
-                            : { height: 188, width: "70%" },
-                        ]}
+                        style={[style.orderImg, { height: 188, width: "70%" }]}
                       />
                     </View>
                     <View>
                       <View style={[style.orderContent]}>
                         <Text style={style.headMsg}>{stat.title}</Text>
-                        <Text
-                          style={[
-                            style.orderMsg,
-                            Platform.OS === "web" &&
-                              !phoneOrTablets && { width: 600 },
-                          ]}
-                        >
-                          {stat.desc}
-                        </Text>
+                        <Text style={[style.orderMsg]}>{stat.desc}</Text>
                       </View>
                       <View
                         style={[
                           style.orderStateContain,
-                          Platform.OS === "web"
-                            ? phoneOrTablets
-                              ? {
-                                  position: "absolute",
-                                  bottom: -150,
-                                  justifyContent: "space-between",
-                                }
-                              : {
-                                  position: "relative",
-                                  width: "100%",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  bottom: 0,
-                                }
-                            : {
-                                position: "absolute",
-                                bottom: -150,
-                                justifyContent: "space-between",
-                              },
+                          {
+                            position: "absolute",
+                            bottom: -150,
+                            justifyContent: "space-between",
+                          },
                         ]}
                       >
-                        <View
-                          style={
-                            Platform.OS === "web" &&
-                            !phoneOrTablets && { marginHorizontal: 20 }
-                          }
-                        >
+                        <View>
                           <View style={style.timingContain}>
                             <Feather
                               name="clock"
@@ -658,12 +617,7 @@ const OrderLoading = ({ navigation }: Props) => {
                           </View>
                         </View>
                         <View style={style.progressBar}></View>
-                        <View
-                          style={
-                            Platform.OS === "web" &&
-                            !phoneOrTablets && { marginHorizontal: 20 }
-                          }
-                        >
+                        <View>
                           <View style={[style.timingContain, { opacity: 0 }]}>
                             <Feather
                               name="clock"
@@ -681,12 +635,7 @@ const OrderLoading = ({ navigation }: Props) => {
                           </View>
                         </View>
                         <View style={style.progressBar}></View>
-                        <View
-                          style={
-                            Platform.OS === "web" &&
-                            !phoneOrTablets && { marginHorizontal: 20 }
-                          }
-                        >
+                        <View>
                           <View style={[style.timingContain, { opacity: 0 }]}>
                             <Feather
                               name="clock"

@@ -23,7 +23,6 @@ import { RouteProp } from "@react-navigation/native";
 import { Picker } from "native-base";
 import DrawerLayout from "react-native-drawer-layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Swipeable from "react-native-gesture-handler/Swipeable";
 // import axios from "axios";
 import { connect } from "react-redux";
 
@@ -95,6 +94,7 @@ type Prop = {
   addCartItem: Function;
   getCartNo: Function;
   payment: { orderId: number | null; orderLoading: boolean };
+  user: { userRegistered: boolean };
 };
 
 type PhotoProps = {
@@ -106,6 +106,7 @@ const FoodDesc = ({
   route,
   navigation,
   payment: { orderId, orderLoading },
+  user: { userRegistered },
   fetchOrderId,
   addCartItem,
   getCartNo,
@@ -941,16 +942,20 @@ const FoodDesc = ({
                     <Pressable
                       style={style.cartBtn}
                       onPress={() => {
-                        fetchDataFromCart();
-                        makeCartItem(
-                          id,
-                          title,
-                          subtitle,
-                          weight,
-                          price,
-                          quantity
-                        );
-                        popUp();
+                        if (userRegistered) {
+                          fetchDataFromCart();
+                          makeCartItem(
+                            id,
+                            title,
+                            subtitle,
+                            weight,
+                            price,
+                            quantity
+                          );
+                          popUp();
+                        } else {
+                          navigation.navigate("Login");
+                        }
                       }}
                     >
                       <Text
@@ -1422,12 +1427,14 @@ const style = StyleSheet.create({
 // Prop types
 FoodDesc.proptypes = {
   payment: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   fetchOrderId: PropTypes.func.isRequired,
 };
 
 // Function to map states to props
 const mapStateToProps = (state: any) => ({
   payment: state.payment,
+  user: state.user,
 });
 
 export default connect(mapStateToProps, {

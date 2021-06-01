@@ -11,8 +11,10 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import "@expo/match-media";
 import { useMediaQuery } from "react-responsive";
+import { connect } from "react-redux";
 
 import { RootStackParamList } from "../../App";
+import RedirectPage from "../pages/RedirectPage";
 
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -28,12 +30,18 @@ type OrdersScreenNavProp = StackNavigationProp<RootStackParamList, "Orders">;
 
 type Props = {
   navigation: OrdersScreenNavProp;
+  user: {
+    userRegistered: boolean;
+  };
 };
 
-const Orders = ({ navigation }: Props) => {
+const Orders = ({ navigation, user: { userRegistered } }: Props) => {
   // Media query
   const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
 
+  // Checking user auth
+
+  // Show the orders screen
   return (
     <ScrollView>
       <View style={utilStyle.container}>
@@ -255,4 +263,9 @@ const style = StyleSheet.create({
   },
 });
 
-export default Orders;
+// Function to map state to props
+const mapStateToProps = (state: any) => ({
+  user: state.user,
+});
+
+export default connect(mapStateToProps, null)(Orders);
