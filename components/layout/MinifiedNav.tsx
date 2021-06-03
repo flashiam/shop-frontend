@@ -24,8 +24,21 @@ type Props = {
 
 const MinifiedNav = ({ navigation, drawer }: Props) => {
   const srchInput = useRef<HTMLAllCollection>(null);
+  const [search, setSearchValue] = useState<string>("");
 
   const [searchOpened, setSearch] = useState<boolean>(false);
+
+  // Function to search for the product
+  const searchTheProduct = (keyword: string) => {
+    setSearchValue(keyword);
+    // Redirect to the search page
+    if (search !== "") {
+      navigation.push("ProductSearch", { keyword: search });
+    }
+    setSearch(true);
+    // Clear the search
+    setSearchValue("");
+  };
 
   return (
     <Pressable style={style.nav} onPress={() => setSearch(false)}>
@@ -55,10 +68,13 @@ const MinifiedNav = ({ navigation, drawer }: Props) => {
           <AntDesign name="search1" color={primaryColor} size={24} />
           <TextInput
             ref={srchInput}
+            value={search}
+            onChange={e => setSearchValue(e.nativeEvent.text)}
             style={[
               style.searchInput,
               { display: searchOpened ? "flex" : "none" },
             ]}
+            onSubmitEditing={() => searchTheProduct(search)}
             onBlur={() => setSearch(false)}
           />
         </Pressable>

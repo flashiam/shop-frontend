@@ -3,11 +3,10 @@ import {
   ADD_CART_ITEM,
   FOOD_ERROR,
   GET_CART_NUM,
+  OPEN_LOCATION,
+  CLOSE_LOCATION,
   GET_CART_ITEMS,
 } from "../actions/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import { fetchCartItem } from "../utils/fetchCartItem";
 
 // Setting the initial state to be manipulated
 const initialState = {
@@ -17,6 +16,7 @@ const initialState = {
   cartItems: [],
   cartNum: 0,
   error: null,
+  locationOpened: false,
 };
 
 const foodReducer = (state = initialState, action: any) => {
@@ -43,6 +43,16 @@ const foodReducer = (state = initialState, action: any) => {
       return {
         ...state,
         error: action.payload,
+      };
+    case OPEN_LOCATION:
+      return {
+        ...state,
+        locationOpened: true,
+      };
+    case CLOSE_LOCATION:
+      return {
+        ...state,
+        locationOpened: false,
       };
     default:
       return state;

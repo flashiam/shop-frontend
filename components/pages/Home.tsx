@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
 import { Platform } from "react-native";
 import HomeWeb from "../web/HomeWeb";
 import HomeMobo from "../mobo/HomeMobo";
 
-const Home = ({ navigation }: { navigation: any }) => {
+import { fetchUserCredentials } from "../../actions/userActions";
+
+type Props = {
+  navigation: any;
+  fetchUserCredentials: Function;
+};
+
+const Home = ({ navigation, fetchUserCredentials }: Props) => {
+  useEffect(() => {
+    fetchUserCredentials();
+  }, []);
+
   // return <HomeMobo navigation={navigation} />;
   return Platform.OS === "web" ? (
     <HomeWeb navigation={navigation} />
@@ -12,4 +24,4 @@ const Home = ({ navigation }: { navigation: any }) => {
   );
 };
 
-export default Home;
+export default connect(null, { fetchUserCredentials })(Home);

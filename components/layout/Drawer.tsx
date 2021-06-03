@@ -36,7 +36,7 @@ type Props = {
   navigation: any;
   drawer: any;
   food: { cartItems: Object; cartNum: number };
-  user: { userRegistered: boolean; userProfile: any };
+  user: { userRegistered: boolean; userProfile: any; authLoading: boolean };
   signOutUser: Function;
 };
 
@@ -44,7 +44,7 @@ const Drawer = ({
   drawer,
   navigation,
   food: { cartItems, cartNum },
-  user: { userRegistered, userProfile },
+  user: { userRegistered, userProfile, authLoading },
   signOutUser,
 }: Props) => {
   const initialMount = useRef<boolean>(true);
@@ -52,11 +52,34 @@ const Drawer = ({
   // State for cart item num
   const [cartItemNum, setCartItemNum] = useState<number>(0);
 
+  // State for user profile
+  const [userData, setUserData] = useState<any>(null);
+
+  // State for profile loading
+  const [userLoading, setUserLoading] = useState<boolean>(false);
+
   // Function to get the total no. of cart items
   const getCartNo = async () => {
     try {
       const savedItems = await AsyncStorage.getItem("cart-items");
       if (savedItems) setCartItemNum(JSON.parse(savedItems).length);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to fetch the profile data from async storage
+  const fetchUserProfile = async () => {
+    try {
+      setUserLoading(true);
+
+      const data = await AsyncStorage.getItem("user");
+
+      if (data) {
+        setUserData(JSON.parse(data));
+      }
+
+      setUserLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -73,21 +96,24 @@ const Drawer = ({
     } else {
       updateCartNo();
     }
+
+    fetchUserProfile();
   }, []);
 
+  console.log(userData);
   return (
     <View style={style.navContain}>
-      {userProfile && userRegistered ? (
+      {userRegistered ? (
         <View style={{ marginLeft: 25 }}>
           <Pressable style={style.profileContain}>
             <Image
-              source={{ uri: userProfile.photoUrl }}
+              source={{ uri: userProfile?.photoUrl }}
               style={style.profileAvatar}
             />
 
             <View style={style.profileDetails}>
-              <Text style={style.userName}>{userProfile.name}</Text>
-              <Text style={style.userEmail}>{userProfile.email}</Text>
+              <Text style={style.userName}>{userProfile?.name}</Text>
+              <Text style={style.userEmail}>{userProfile?.email}</Text>
             </View>
           </Pressable>
           <Pressable
@@ -170,7 +196,7 @@ const Drawer = ({
         )}
         <Pressable
           onPress={() => {
-            if (!userRegistered) {
+            if (userRegistered) {
               navigation.navigate("Login");
             } else {
               navigation.navigate("Orders");
@@ -185,7 +211,7 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
-            if (!userRegistered) {
+            if (userRegistered) {
               navigation.navigate("Login");
             } else {
               navigation.navigate("Wishlist");
@@ -200,7 +226,7 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
-            if (!userRegistered) {
+            if (userRegistered) {
               navigation.navigate("Login");
             } else {
               navigation.navigate("Support");
@@ -254,6 +280,7 @@ const style = StyleSheet.create({
   },
   unauthContain: {
     // marginLeft: 25,
+    paddingHorizontal: Platform.OS === "web" ? 20 : 0,
     alignItems: "center",
   },
   loginBtn: {

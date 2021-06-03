@@ -17,6 +17,8 @@ export const registerUser = () => async (dispatch: any) => {
     const res = await Google.logInAsync({
       androidClientId:
         "712914795953-4crcea3mqdsnek1610l71psg68q0oqdj.apps.googleusercontent.com",
+      webClientId:
+        "712914795953-r145j4pqfgdcqi45asaf9hu24d3bge0f.apps.googleusercontent.com",
     });
 
     if (res.type !== "success") return console.log("Login failed");
@@ -60,7 +62,6 @@ export const registerUser = () => async (dispatch: any) => {
 // Function to fetch the user credentials from the storage when the app loads
 export const fetchUserCredentials = () => async (dispatch: any) => {
   try {
-    setLoading();
     const tokens = await AsyncStorage.getItem("tokens");
     const user = await AsyncStorage.getItem("user");
 
@@ -103,6 +104,11 @@ export const signOutUser = () => async (dispatch: any) => {
       androidClientId:
         "712914795953-4crcea3mqdsnek1610l71psg68q0oqdj.apps.googleusercontent.com",
     });
+
+    const keys = ["tokens", "user"];
+
+    // Remove the keys from async storage
+    await AsyncStorage.multiRemove(keys);
 
     // Dispatch the unauthorized state to reducer
     dispatch({

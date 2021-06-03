@@ -338,7 +338,7 @@ const OrderLoading = ({ navigation }: Props) => {
           </View>
         </DrawerLayout>
       )}
-      {phoneOrTablets && (
+      {Platform.OS !== "android" && Platform.OS !== "ios" && phoneOrTablets && (
         <View style={[style.scrollContainer, { height: windowHeight }]}>
           <View style={utilStyle.container}>
             {Platform.OS === "web" && !phoneOrTablets && (

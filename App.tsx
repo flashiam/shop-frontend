@@ -23,6 +23,9 @@ import CartWeb from "./components/web/CartWeb";
 import NavbarWeb from "./components/web/NavbarWeb";
 import ProductSearch from "./components/pages/ProductSearch";
 import Login from "./components/pages/Login";
+import AuthLoading from "./components/pages/AuthLoading";
+
+import LocationModal from "./components/layout/LocationModal";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -43,6 +46,7 @@ export interface FoodType {
 }
 
 export type RootStackParamList = {
+  AuthLoading: undefined;
   Home: undefined;
   Food: { food: FoodType };
   NavbarWeb: undefined;
@@ -62,26 +66,9 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App = () => {
-  useEffect(() => {
-    console.log("Hello user");
-    checkAuthStatus();
-  });
-
   const [isRegistered, setStatus] = useState<boolean>(false);
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
-
-  // Function to check the auth status of user
-  const checkAuthStatus = async () => {
-    try {
-      const status = await AsyncStorage.getItem("tokens");
-      if (!status) return setStatus(false);
-
-      setStatus(true);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   if (!isLoadingComplete) {
     return null;
@@ -96,6 +83,7 @@ const App = () => {
               initialRouteName="Home"
               screenOptions={{ headerShown: false }}
             >
+              <Stack.Screen name="AuthLoading" component={AuthLoading} />
               <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="Food" component={FoodDesc} />
               <Stack.Screen name="Categories" component={Categories} />
@@ -111,6 +99,7 @@ const App = () => {
               <Stack.Screen name="NavbarWeb" component={NavbarWeb} />
               <Stack.Screen name="ProductSearch" component={ProductSearch} />
             </Stack.Navigator>
+            <LocationModal />
           </NavigationContainer>
         </SafeAreaProvider>
       </Provider>

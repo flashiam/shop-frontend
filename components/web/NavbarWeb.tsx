@@ -15,18 +15,21 @@ import {
   FontAwesome,
   EvilIcons,
 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import appLogo from "../../img/app-logo-min 1.png";
 import utilStyle from "../../styles/utilStyle";
 import { lightColor, primaryColor, bgColor } from "../../styles/_variables";
 
-import { getCartNo } from "../../actions/foodActions";
+import { getCartNo, openLocation } from "../../actions/foodActions";
 
 type Props = {
   drawer: any;
   food?: { cartItems: any; cartNum: any };
   getCartNo: Function;
+  openLocation: Function;
   navigation?: any;
+  openLocationModal: any;
 };
 
 const NavbarWeb = ({
@@ -34,13 +37,38 @@ const NavbarWeb = ({
   food: { cartItems, cartNum },
   getCartNo,
   navigation,
+  openLocationModal,
+  openLocation,
 }: Props) => {
   const [cartItemNum, setItemNum] = useState<number>(0);
+  const [city, setCity] = useState<string>("");
+  // State for the search keyword
+  const [search, setSearch] = useState<string>("");
+
+  const fetchAddress = async () => {
+    try {
+      const savedAddress = await AsyncStorage.getItem("user-address");
+      if (savedAddress) setCity(JSON.parse(savedAddress).components.city);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to search for the product
+  const searchTheProduct = (keyword: string) => {
+    setSearch(keyword);
+    // Redirect to the search page
+    if (search !== "") {
+      navigation.navigate("ProductSearch", { keyword: search });
+    }
+    // Clear the search
+    setSearch("");
+  };
 
   useEffect(() => {
     // getCartNo();
-    console.log(cartItems, cartNum);
-  }, [cartItems]);
+    fetchAddress();
+  }, []);
 
   return (
     <View style={style.navbar}>
@@ -57,25 +85,31 @@ const NavbarWeb = ({
         <AntDesign name="search1" size={24} color={primaryColor} />
         <TextInput
           style={style.searchInput}
+          value={search}
+          onChange={e => setSearch(e.nativeEvent.text)}
+          onSubmitEditing={() => searchTheProduct(search)}
           placeholder="Search for products"
         />
       </View>
 
-      <View style={[utilStyle.card, style.location]}>
+      <Pressable
+        style={[utilStyle.card, style.location]}
+        onPress={() => openLocation()}
+      >
         <Ionicons
           name="location-outline"
           size={24}
           color={primaryColor}
           style={style.locateIcon}
         />
-        <Text style={style.locationCity}>Bhopal</Text>
+        <Text style={style.locationCity}>Home</Text>
         <FontAwesome
           name="sort-down"
           style={{ marginLeft: 10 }}
           color={primaryColor}
           size={15}
         />
-      </View>
+      </Pressable>
 
       <Pressable
         onPress={() => drawer.current.openDrawer()}
@@ -143,4 +177,4 @@ const mapStateToProps = (state: any) => ({
   food: state.food,
 });
 
-export default connect(mapStateToProps, { getCartNo })(NavbarWeb);
+export default connect(mapStateToProps, { getCartNo, openLocation })(NavbarWeb);

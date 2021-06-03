@@ -7,17 +7,25 @@ import {
   StatusBar,
   TextInput,
 } from "react-native";
+import { connect } from "react-redux";
 import { Ionicons, EvilIcons, AntDesign } from "@expo/vector-icons";
+
+import { openLocation } from "../../actions/foodActions";
 
 import { secondaryColor, primaryColor } from "../../styles/_variables";
 import utilStyle from "../../styles/utilStyle";
 
-const NavbarMobo = ({ drawer }: any) => {
+type Props = {
+  drawer: any;
+  openLocation: Function;
+};
+
+const NavbarMobo = ({ drawer, openLocation }: Props) => {
   return (
     <View>
       <View style={style.nav}>
         {/* Access location */}
-        <Pressable onPress={() => console.log("location")}>
+        <Pressable onPress={() => openLocation()}>
           <View style={style.leftContent}>
             <Ionicons
               name="location-outline"
@@ -96,4 +104,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default NavbarMobo;
+export default connect(null, { openLocation })(NavbarMobo);

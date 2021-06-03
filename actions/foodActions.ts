@@ -1,4 +1,11 @@
-import { SET_LOADING, ADD_CART_ITEM, FOOD_ERROR, GET_CART_NUM } from "./types";
+import {
+  SET_LOADING,
+  ADD_CART_ITEM,
+  FOOD_ERROR,
+  GET_CART_NUM,
+  OPEN_LOCATION,
+  CLOSE_LOCATION,
+} from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface CartItem {
@@ -66,6 +73,20 @@ export const getCartNo = () => async (dispatch: any) => {
       payload: err,
     });
   }
+};
+
+// Function to open location modal
+export const openLocation = () => {
+  return {
+    type: OPEN_LOCATION,
+  };
+};
+
+// Function to close location modal
+export const closeLocation = () => {
+  return {
+    type: CLOSE_LOCATION,
+  };
 };
 
 // Function to set loading

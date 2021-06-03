@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -33,9 +33,31 @@ type Props = {
   navigation: PromoNavScreenProp;
 };
 
+interface Promo {
+  id: number;
+  code: string;
+  desc: string;
+  discount: number;
+}
+
 const Promo = ({ navigation }: Props) => {
   // Media query
   const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
+
+  const [promos, setPromos] = useState<Promo[]>([
+    {
+      id: 1,
+      code: "firsttime",
+      desc: "Get 25% OFF up to ₹100 on your first buy",
+      discount: 25,
+    },
+    {
+      id: 2,
+      code: "exotic",
+      desc: "Get 50% OFF up to ₹200 on exotic meat",
+      discount: 50,
+    },
+  ]);
 
   return (
     <ScrollView>
@@ -582,24 +604,29 @@ const Promo = ({ navigation }: Props) => {
                   </View>
                 )}
               </View>
-              {phoneOrTablets && (
-                <View style={[style.applySection]}>
-                  <Pressable
-                    android_ripple={{ color: secondaryColor, borderless: true }}
-                  >
-                    <Text
-                      style={{
-                        color: primaryColor,
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        paddingRight: 10,
+              {Platform.OS !== "android" &&
+                Platform.OS !== "ios" &&
+                phoneOrTablets && (
+                  <View style={[style.applySection]}>
+                    <Pressable
+                      android_ripple={{
+                        color: secondaryColor,
+                        borderless: true,
                       }}
                     >
-                      Apply
-                    </Text>
-                  </Pressable>
-                </View>
-              )}
+                      <Text
+                        style={{
+                          color: primaryColor,
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          paddingRight: 10,
+                        }}
+                      >
+                        Apply
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
               {Platform.OS !== "web" && (
                 <View style={[style.applySection]}>
                   <Pressable

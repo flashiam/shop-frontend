@@ -13,6 +13,10 @@ export const REGISTER_ERROR = "REGISTER_ERROR";
 export const USER_AUTHORIZED = "USER_AUTHORIZED";
 export const USER_UNAUTHORIZED = "USER_UNAUTHORIZED";
 
+// Location
+export const OPEN_LOCATION = "OPEN_LOCATION";
+export const CLOSE_LOCATION = "CLOSE_LOCATION";
+
 // Errors
 export const FOOD_ERROR = "FOOD_ERROR";
 export const PAYMENT_ERROR = "PAYMENT_ERROR";

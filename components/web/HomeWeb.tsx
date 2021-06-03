@@ -10,18 +10,28 @@ import {
   Pressable,
   DrawerLayoutAndroid,
 } from "react-native";
+import * as Location from "expo-location";
 import "@expo/match-media";
+import Modal from "react-native-modal";
 import { useMediaQuery } from "react-responsive";
 import DrawerLayout from "react-native-drawer-layout";
 import utilStyle from "../../styles/utilStyle";
-import { primaryColor, lightColor, darkColor } from "../../styles/_variables";
+import {
+  primaryColor,
+  lightColor,
+  darkColor,
+  bgColor,
+} from "../../styles/_variables";
 import {
   AntDesign,
   Ionicons,
   EvilIcons,
   FontAwesome5,
   MaterialIcons,
+  Entypo,
 } from "@expo/vector-icons";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import OfferItem from "../foodComponents/OfferItem";
 import Food from "../foodComponents/Food";
@@ -32,6 +42,7 @@ import Footer from "../layout/Footer";
 import NavbarWeb from "./NavbarWeb";
 import NavbarMobo from "../mobo/NavbarMobo";
 import Drawer from "../layout/Drawer";
+// import DraggableScroll from "../layout/DraggableScrollbar";
 
 import offerImg1 from "../../img/food_coupons.jpg";
 import offerImg2 from "../../img/food_coupons_2.jpg";
@@ -151,6 +162,8 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
 
   const [drawerClosed, setDrawer] = useState<boolean>(true);
   const [defaultMargin] = useState<number>(18);
+
+  const scroll = useRef(null);
 
   // State for the offer carousel
   const [offers, setOffers] = useState<Offer[]>([
@@ -369,8 +382,162 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
 
   const [drawerDisabled, setDrawerState] = useState<boolean>(true);
 
+  // State for location modal
+  const [openLocation, setLocationModal] = useState<boolean>(false);
+
+  // State for the location
+  const [address, setAddress] = useState<any>(null);
+
+  // State for the search keyword
+  const [search, setSearch] = useState<string>("");
+
+  // State for the loader in location
+  const [locationLoading, setLocationLoading] = useState<boolean>(false);
+
   const ref = useRef(null);
   const drawer = useRef<any>(null);
+
+  // Function to save the location to localstorage
+  const saveAddress = async (address: any) => {
+    try {
+      await AsyncStorage.setItem("user-address", JSON.stringify(address));
+      console.log("address saved");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to fetch the current location
+  const getCurrentLocation = async () => {
+    try {
+      setLocationLoading(true);
+      // Close the modal after location is fetched
+      setLocationModal(false);
+
+      Location.setGoogleApiKey("AIzaSyCZX4KUU0zczuldjhK5Sm39xkr94jMw1LQ");
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      // Checking permission status
+      if (status !== "granted") {
+        console.log("Permission denied");
+      } else {
+        const isServicesEnabled = await Location.hasServicesEnabledAsync();
+        if (!isServicesEnabled)
+          return console.log("Please enable the location");
+
+        // If permission granted then fetch the location
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+
+        // Fetching current address through coordinates
+        const currentAddress = await Location.reverseGeocodeAsync({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        });
+
+        // Set the current address
+        setAddress(currentAddress);
+
+        // Save the address also
+        saveAddress(currentAddress);
+
+        // Disable loading
+        setLocationLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to delete the address
+  const deleteAddress = async () => {
+    try {
+      await AsyncStorage.removeItem("user-address");
+      setAddress(null);
+      console.log("address deleted");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Function to search for the product
+  const searchTheProduct = (keyword: string) => {
+    setSearch(keyword);
+    // Redirect to the search page
+    if (search !== "") {
+      navigation.navigate("ProductSearch", { keyword: search });
+    }
+    // Clear the search
+    setSearch("");
+  };
+
+  // const openLocationModal = (shouldOpen: boolean) => {
+  //   setLocationModal(shouldOpen);
+  // }
+
+  // Location modal currently for apps only
+  const LocateModal = () => {
+    return (
+      <Modal
+        onBackdropPress={() => setLocationModal(false)}
+        onSwipeComplete={() => setLocationModal(false)}
+        style={{
+          position: "relative",
+          padding: 0,
+          margin: 0,
+        }}
+        isVisible={openLocation}
+        swipeDirection="down"
+      >
+        <View style={style.locationContain}>
+          <View style={style.locationHeader}>
+            <Text style={{ fontSize: 18 }}>Select Location</Text>
+            <Pressable onPress={() => setLocationModal(false)}>
+              <AntDesign name="close" color={medColor} size={18} />
+            </Pressable>
+          </View>
+          <View style={style.locationSection}>
+            <Pressable
+              style={style.currentLocationBtn}
+              onPress={() => getCurrentLocation()}
+            >
+              <MaterialIcons
+                name="my-location"
+                color={primaryColor}
+                size={18}
+              />
+              <Text
+                style={{ color: primaryColor, marginLeft: 15, fontSize: 15 }}
+              >
+                Use current location
+              </Text>
+            </Pressable>
+            <View style={style.savedAddressContain}>
+              <Text style={{ fontSize: 16, paddingBottom: 10 }}>
+                Saved Address
+              </Text>
+              {address && address[0] && (
+                <View style={style.addressItem}>
+                  <View style={style.addressLeftContent}>
+                    <Entypo name="home" color={darkColor} size={18} />
+                    <Text style={{ marginLeft: 15 }}>{address[0].city}</Text>
+                  </View>
+                  <Pressable onPress={() => deleteAddress()}>
+                    <MaterialIcons
+                      name="delete-outline"
+                      color={primaryColor}
+                      size={20}
+                    />
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
 
   return (
     <View style={{ overflow: "hidden" }}>
@@ -386,18 +553,25 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
         onDrawerOpen={() => setDrawerState(false)}
         onDrawerClose={() => setDrawerState(true)}
       >
+        <LocateModal />
         {/* <ScrollView> */}
         <View style={[utilStyle.container, style.container]}>
           {phoneOrTablets ? (
             <NavbarMobo drawer={drawer} />
           ) : (
-            <NavbarWeb drawer={drawer} navigation={navigation} />
+            <NavbarWeb
+              drawer={drawer}
+              navigation={navigation}
+              openLocationModal={setLocationModal}
+            />
           )}
         </View>
 
         <View style={utilStyle.container}>
           <View style={[utilStyle.mt1]}>
             <ScrollView
+              ref={scroll}
+              keyboardDismissMode="interactive"
               // style={style.scrollWidth}
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -425,6 +599,7 @@ const HomeWeb = ({ navigation }: { navigation: any }) => {
           <View style={utilStyle.container}>
             <Text style={utilStyle.head}>Categories</Text>
             <ScrollView
+              keyboardDismissMode="on-drag"
               // style={style.scrollWidth}
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -980,6 +1155,46 @@ const style = StyleSheet.create({
   //   flexDirection: 'row',
   //   alignItems: 'center'
   // }
+  locationContain: {
+    backgroundColor: lightColor,
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: "50%",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  locationHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  locationSection: {
+    marginTop: 50,
+  },
+  currentLocationBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  savedAddressContain: {
+    marginTop: 25,
+  },
+  addressLeftContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addressItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: bgColor,
+  },
 });
 
 export default HomeWeb;

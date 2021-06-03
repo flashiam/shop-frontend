@@ -39,6 +39,7 @@ import foodImg from "../../img/indian_food_1.png";
 import { RootStackParamList, FoodType } from "../../App";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import DrawerLayout from "react-native-drawer-layout";
+import MinifiedNav from "../layout/MinifiedNav";
 
 // Type checking
 type CategoryScreenNavProp = StackNavigationProp<
@@ -251,8 +252,7 @@ const Categories = ({ route, navigation }: Props) => {
     >
       <View style={[utilStyle.container, { paddingBottom: 0 }]}>
         {/* Navbar */}
-        <Pressable style={style.nav} onPress={() => setSearch(false)}>
-          {/* Back btn */}
+        {/* <Pressable style={style.nav} onPress={() => setSearch(false)}>
           <TouchableWithoutFeedback
             style={style.leftContent}
             onPress={() => navigation.goBack()}
@@ -261,7 +261,6 @@ const Categories = ({ route, navigation }: Props) => {
             <MaterialIcons name="arrow-back" size={30} color={darkColor} />
           </TouchableWithoutFeedback>
           <View style={style.rightContent}>
-            {/* Search bar */}
             <Pressable
               style={[
                 utilStyle.card,
@@ -286,7 +285,6 @@ const Categories = ({ route, navigation }: Props) => {
               />
             </Pressable>
 
-            {/* Navbar btn */}
             <Pressable
               onPress={() => {
                 drawer?.current.openDrawer();
@@ -299,7 +297,8 @@ const Categories = ({ route, navigation }: Props) => {
               <EvilIcons name="navicon" size={35} color="red" />
             </Pressable>
           </View>
-        </Pressable>
+        </Pressable> */}
+        <MinifiedNav navigation={navigation} drawer={drawer} />
       </View>
       <View style={utilStyle.container}>
         {Platform.OS === "web" ? (

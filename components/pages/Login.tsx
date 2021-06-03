@@ -6,14 +6,18 @@ import {
   Pressable,
   StatusBar,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import * as Google from "expo-google-app-auth";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { connect } from "react-redux";
 
+import "@expo/match-media";
+import { useMediaQuery } from "react-responsive";
+
 import { registerUser, fetchUserCredentials } from "../../actions/userActions";
 
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import utilStyle from "../../styles/utilStyle";
@@ -38,19 +42,21 @@ type Props = {
 const Login = ({ navigation, registerUser, fetchUserCredentials }: Props) => {
   // State for the login page loading
   const [loginLoading, setLoading] = useState<boolean>(false);
+  const phoneOrTablets = useMediaQuery({ maxWidth: 768 });
 
   const registerTheUser = () => {
     registerUser();
     navigation.navigate("Home");
   };
 
-  useEffect(() => {
-    fetchUserCredentials();
-  }, []);
+  //   useEffect(() => {
+  //     fetchUserCredentials();
+  //   }, []);
 
   return (
     <View
       style={{
+        position: "relative",
         flex: 1,
         // marginTop: StatusBar.currentHeight,
         // paddingTop: 20,
@@ -58,13 +64,32 @@ const Login = ({ navigation, registerUser, fetchUserCredentials }: Props) => {
       }}
     >
       <View style={utilStyle.container}>
+        <View style={style.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <MaterialIcons name="arrow-back" color={darkColor} size={30} />
+          </Pressable>
+        </View>
         <View style={style.loginHeader}>
           <View style={style.testLogo}></View>
           <Text style={{ color: darkColor, fontSize: 24, fontWeight: "bold" }}>
             Sign in to <Text style={{ color: primaryColor }}>Fresh Fred</Text>
           </Text>
         </View>
-        <Pressable style={style.signInBtn} onPress={() => registerTheUser()}>
+
+        <Pressable
+          style={[
+            style.signInBtn,
+            {
+              width:
+                Platform.OS === "web"
+                  ? phoneOrTablets
+                    ? "100%"
+                    : "30%"
+                  : "100%",
+            },
+          ]}
+          onPress={() => registerTheUser()}
+        >
           <AntDesign name="google" color={lightColor} size={15} />
           <Text
             style={{
@@ -84,6 +109,12 @@ const Login = ({ navigation, registerUser, fetchUserCredentials }: Props) => {
 };
 
 const style = StyleSheet.create({
+  header: {
+    position: "absolute",
+    top: -200,
+    // marginTop: StatusBar.currentHeight,
+    paddingVertical: 15,
+  },
   loginHeader: {
     alignItems: "center",
     // marginTop: 30,

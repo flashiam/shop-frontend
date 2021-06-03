@@ -36,7 +36,6 @@ import {
 } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
 import { fetchUserCredentials } from "../../actions/userActions";
 
 import OfferItem from "../foodComponents/OfferItem";
@@ -415,21 +414,8 @@ const HomeMobo = ({
   };
 
   useEffect(() => {
-    fetchUserCredentials();
     fetchAddress();
-    console.log("home load");
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchUserCredentials();
-    }, [])
-  );
-
-  // useEffect(() => {
-  //   fetchUserCredentials();
-  //   console.log("home updated");
-  // }, [isFocused]);
 
   // Location modal currently for apps only
   const LocateModal = () => {
@@ -494,357 +480,356 @@ const HomeMobo = ({
     );
   };
 
-  if (authLoading) {
+  if (authLoading)
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color={primaryColor} />
       </View>
     );
-  } else {
-    return (
-      <DrawerLayout
-        ref={drawer}
-        renderNavigationView={() => (
-          <Drawer drawer={drawer} navigation={navigation} />
-        )}
-        drawerBackgroundColor={lightColor}
-        drawerPosition="right"
-        drawerWidth={300}
-      >
-        <LocateModal />
-        <ScrollView>
-          <View style={[utilStyle.container]}>
-            {/* Navbar */}
-            <View style={style.nav}>
-              {/* Access location */}
-              <Pressable onPress={() => setLocationModal(true)}>
-                <View style={style.leftContent}>
-                  {/* <View style={[utilStyle.card, style.locationBtn]}> */}
-                  <Ionicons
-                    name="location-outline"
-                    size={30}
-                    color={primaryColor}
-                  />
-                  {/* </View> */}
-                  {locationLoading && locationLoading ? (
-                    <View
-                      style={{
-                        marginLeft: 10,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ActivityIndicator color={primaryColor} />
+
+  return (
+    <DrawerLayout
+      ref={drawer}
+      renderNavigationView={() => (
+        <Drawer drawer={drawer} navigation={navigation} />
+      )}
+      drawerBackgroundColor={lightColor}
+      drawerPosition="right"
+      drawerWidth={300}
+    >
+      <LocateModal />
+      <ScrollView>
+        <View style={[utilStyle.container]}>
+          {/* Navbar */}
+          <View style={style.nav}>
+            {/* Access location */}
+            <Pressable onPress={() => setLocationModal(true)}>
+              <View style={style.leftContent}>
+                {/* <View style={[utilStyle.card, style.locationBtn]}> */}
+                <Ionicons
+                  name="location-outline"
+                  size={30}
+                  color={primaryColor}
+                />
+                {/* </View> */}
+                {locationLoading && locationLoading ? (
+                  <View
+                    style={{
+                      marginLeft: 10,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ActivityIndicator color={primaryColor} />
+                  </View>
+                ) : (
+                  address &&
+                  address[0] && (
+                    <View>
+                      <Text
+                        style={[
+                          style.locationTxt,
+                          { fontWeight: "bold", fontSize: 18 },
+                        ]}
+                      >
+                        {address[0].city}
+                      </Text>
+                      <Text style={style.locationTxt}>
+                        {address[0].name}, {address[0].district} -{" "}
+                        {address[0].postalCode}
+                      </Text>
                     </View>
+                  )
+                )}
+              </View>
+            </Pressable>
+            {/* Navbar btn */}
+            <Pressable onPress={() => drawer?.current.openDrawer()}>
+              <EvilIcons name="navicon" size={35} color="red" />
+            </Pressable>
+          </View>
+          <View style={[utilStyle.card, style.searchBar]}>
+            <AntDesign name="search1" size={24} color={primaryColor} />
+            <TextInput
+              style={style.searchInput}
+              placeholder="Search for products"
+              value={search}
+              onChange={e => setSearch(e.nativeEvent.text)}
+              onSubmitEditing={() => searchTheProduct(search)}
+            />
+          </View>
+        </View>
+
+        <View style={utilStyle.containerBlock}>
+          <View style={style.offersContain}>
+            <ScrollView
+              style={{
+                width: SliderWidth,
+
+                // justifyContent: "space-between",
+              }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToOffsets={[0, 300]}
+            >
+              {offers &&
+                offers.map((offer, i) =>
+                  i === 0 ? (
+                    <OfferItem
+                      key={offer.id}
+                      marginStyle={{ marginHorizontal: defaultMargin }}
+                    />
                   ) : (
-                    address &&
-                    address[0] && (
-                      <View>
-                        <Text
-                          style={[
-                            style.locationTxt,
-                            { fontWeight: "bold", fontSize: 18 },
-                          ]}
-                        >
-                          {address[0].city}
-                        </Text>
-                        <Text style={style.locationTxt}>
-                          {address[0].name}, {address[0].district} -{" "}
-                          {address[0].postalCode}
-                        </Text>
-                      </View>
-                    )
-                  )}
+                    <OfferItem
+                      key={offer.id}
+                      marginStyle={{ marginRight: defaultMargin }}
+                    />
+                  )
+                )}
+            </ScrollView>
+          </View>
+        </View>
+
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
+            <Text style={utilStyle.head}>Categories</Text>
+          </View>
+          <ScrollView
+            style={{ width: SliderWidth }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {categories &&
+              categories.map((cat, i) =>
+                i === 0 ? (
+                  <CatItem
+                    key={cat.id}
+                    cat={cat}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <CatItem
+                    key={cat.id}
+                    cat={cat}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
+        </View>
+
+        {/* Todays deal */}
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
+            <Text style={[utilStyle.head]}>Today's deal</Text>
+          </View>
+
+          <ScrollView
+            style={{ width: SliderWidth }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {foods &&
+              foods.map((food, i) =>
+                i === 0 ? (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
+        </View>
+
+        {/* Most selling */}
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
+            <Text style={[utilStyle.head]}>Most Selling</Text>
+          </View>
+
+          <ScrollView
+            style={{ width: SliderWidth }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {foods &&
+              foods.map((food, i) =>
+                i === 0 ? (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
+        </View>
+
+        {/* Suggested */}
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
+            <Text style={[utilStyle.head]}>Suggested</Text>
+          </View>
+
+          <ScrollView
+            style={{ width: SliderWidth }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {foods &&
+              foods.map((food, i) =>
+                i === 0 ? (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <Food
+                    key={food.id}
+                    navigation={navigation}
+                    food={food}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
+        </View>
+
+        {/* Offers */}
+        <View style={[utilStyle.mt1, utilStyle.containerBlock]}>
+          <View style={style.offersContain}>
+            <ScrollView
+              style={{
+                width: SliderWidth,
+
+                // justifyContent: "space-between",
+              }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToOffsets={[0, 300]}
+            >
+              {offers &&
+                offers.map((offer, i) =>
+                  i === 0 ? (
+                    <OfferItem
+                      key={offer.id}
+                      marginStyle={{ marginHorizontal: defaultMargin }}
+                    />
+                  ) : (
+                    <OfferItem
+                      key={offer.id}
+                      marginStyle={{ marginRight: defaultMargin }}
+                    />
+                  )
+                )}
+            </ScrollView>
+          </View>
+        </View>
+
+        {/* Special recipies */}
+        <View style={utilStyle.mt1}>
+          <View style={utilStyle.container}>
+            <Text style={utilStyle.head}>Special Recipies</Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            // snapToOffsets={[50, 200]}
+          >
+            {recipes &&
+              recipes.map((recipe, i) =>
+                i === 0 ? (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    marginStyle={{ marginHorizontal: defaultMargin }}
+                  />
+                ) : (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    marginStyle={{ marginRight: defaultMargin }}
+                  />
+                )
+              )}
+          </ScrollView>
+        </View>
+
+        <View style={[utilStyle.container, { marginBottom: 100 }]}>
+          {/* Advertisment */}
+          <View style={utilStyle.mt1}>
+            <Text style={utilStyle.head}>Also available on</Text>
+            <View style={style.advContain}>
+              <Pressable>
+                <View>
+                  <Image style={style.advImg} source={playStore} />
                 </View>
               </Pressable>
-              {/* Navbar btn */}
-              <Pressable onPress={() => drawer?.current.openDrawer()}>
-                <EvilIcons name="navicon" size={35} color="red" />
+              <Pressable>
+                <View>
+                  <Image style={style.advImg} source={appStore} />
+                </View>
               </Pressable>
             </View>
-            <View style={[utilStyle.card, style.searchBar]}>
-              <AntDesign name="search1" size={24} color={primaryColor} />
-              <TextInput
-                style={style.searchInput}
-                placeholder="Search for products"
-                value={search}
-                onChange={e => setSearch(e.nativeEvent.text)}
-                onSubmitEditing={() => searchTheProduct(search)}
-              />
-            </View>
           </View>
 
-          <View style={utilStyle.containerBlock}>
-            <View style={style.offersContain}>
-              <ScrollView
-                style={{
-                  width: SliderWidth,
-
-                  // justifyContent: "space-between",
-                }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToOffsets={[0, 300]}
-              >
-                {offers &&
-                  offers.map((offer, i) =>
-                    i === 0 ? (
-                      <OfferItem
-                        key={offer.id}
-                        marginStyle={{ marginHorizontal: defaultMargin }}
-                      />
-                    ) : (
-                      <OfferItem
-                        key={offer.id}
-                        marginStyle={{ marginRight: defaultMargin }}
-                      />
-                    )
-                  )}
-              </ScrollView>
-            </View>
+          {/* Illustration */}
+          <View
+            style={
+              (utilStyle.mt1,
+              {
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 5,
+                alignContent: "center",
+              })
+            }
+          >
+            <SvgComponent />
           </View>
 
+          {/* Why fresh fred */}
           <View style={utilStyle.mt1}>
-            <View style={utilStyle.container}>
-              <Text style={utilStyle.head}>Categories</Text>
-            </View>
-            <ScrollView
-              style={{ width: SliderWidth }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
-              {categories &&
-                categories.map((cat, i) =>
-                  i === 0 ? (
-                    <CatItem
-                      key={cat.id}
-                      cat={cat}
-                      marginStyle={{ marginHorizontal: defaultMargin }}
-                    />
-                  ) : (
-                    <CatItem
-                      key={cat.id}
-                      cat={cat}
-                      marginStyle={{ marginRight: defaultMargin }}
-                    />
-                  )
-                )}
-            </ScrollView>
+            <Text style={style.concludeTxt}>Why Fresh Fred?</Text>
+            {conclusions &&
+              conclusions.map(conclusion => (
+                <View
+                  key={conclusion.id}
+                  style={[utilStyle.card, style.concludeCard]}
+                >
+                  <Text style={style.concludeTitle}>{conclusion.title}</Text>
+                  <Text style={style.concludeDesc}>{conclusion.msg}</Text>
+                  <Text style={[style.apostrophe, style.leftApost]}>"</Text>
+                  <Text style={[style.apostrophe, style.rightApost]}>"</Text>
+                </View>
+              ))}
           </View>
+        </View>
 
-          {/* Todays deal */}
-          <View style={utilStyle.mt1}>
-            <View style={utilStyle.container}>
-              <Text style={[utilStyle.head]}>Today's deal</Text>
-            </View>
-
-            <ScrollView
-              style={{ width: SliderWidth }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
-              {foods &&
-                foods.map((food, i) =>
-                  i === 0 ? (
-                    <Food
-                      key={food.id}
-                      navigation={navigation}
-                      food={food}
-                      marginStyle={{ marginHorizontal: defaultMargin }}
-                    />
-                  ) : (
-                    <Food
-                      key={food.id}
-                      navigation={navigation}
-                      food={food}
-                      marginStyle={{ marginRight: defaultMargin }}
-                    />
-                  )
-                )}
-            </ScrollView>
-          </View>
-
-          {/* Most selling */}
-          <View style={utilStyle.mt1}>
-            <View style={utilStyle.container}>
-              <Text style={[utilStyle.head]}>Most Selling</Text>
-            </View>
-
-            <ScrollView
-              style={{ width: SliderWidth }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
-              {foods &&
-                foods.map((food, i) =>
-                  i === 0 ? (
-                    <Food
-                      key={food.id}
-                      navigation={navigation}
-                      food={food}
-                      marginStyle={{ marginHorizontal: defaultMargin }}
-                    />
-                  ) : (
-                    <Food
-                      key={food.id}
-                      navigation={navigation}
-                      food={food}
-                      marginStyle={{ marginRight: defaultMargin }}
-                    />
-                  )
-                )}
-            </ScrollView>
-          </View>
-
-          {/* Suggested */}
-          <View style={utilStyle.mt1}>
-            <View style={utilStyle.container}>
-              <Text style={[utilStyle.head]}>Suggested</Text>
-            </View>
-
-            <ScrollView
-              style={{ width: SliderWidth }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
-              {foods &&
-                foods.map((food, i) =>
-                  i === 0 ? (
-                    <Food
-                      key={food.id}
-                      navigation={navigation}
-                      food={food}
-                      marginStyle={{ marginHorizontal: defaultMargin }}
-                    />
-                  ) : (
-                    <Food
-                      key={food.id}
-                      navigation={navigation}
-                      food={food}
-                      marginStyle={{ marginRight: defaultMargin }}
-                    />
-                  )
-                )}
-            </ScrollView>
-          </View>
-
-          {/* Offers */}
-          <View style={[utilStyle.mt1, utilStyle.containerBlock]}>
-            <View style={style.offersContain}>
-              <ScrollView
-                style={{
-                  width: SliderWidth,
-
-                  // justifyContent: "space-between",
-                }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToOffsets={[0, 300]}
-              >
-                {offers &&
-                  offers.map((offer, i) =>
-                    i === 0 ? (
-                      <OfferItem
-                        key={offer.id}
-                        marginStyle={{ marginHorizontal: defaultMargin }}
-                      />
-                    ) : (
-                      <OfferItem
-                        key={offer.id}
-                        marginStyle={{ marginRight: defaultMargin }}
-                      />
-                    )
-                  )}
-              </ScrollView>
-            </View>
-          </View>
-
-          {/* Special recipies */}
-          <View style={utilStyle.mt1}>
-            <View style={utilStyle.container}>
-              <Text style={utilStyle.head}>Special Recipies</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              // snapToOffsets={[50, 200]}
-            >
-              {recipes &&
-                recipes.map((recipe, i) =>
-                  i === 0 ? (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                      marginStyle={{ marginHorizontal: defaultMargin }}
-                    />
-                  ) : (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                      marginStyle={{ marginRight: defaultMargin }}
-                    />
-                  )
-                )}
-            </ScrollView>
-          </View>
-
-          <View style={[utilStyle.container, { marginBottom: 100 }]}>
-            {/* Advertisment */}
-            <View style={utilStyle.mt1}>
-              <Text style={utilStyle.head}>Also available on</Text>
-              <View style={style.advContain}>
-                <Pressable>
-                  <View>
-                    <Image style={style.advImg} source={playStore} />
-                  </View>
-                </Pressable>
-                <Pressable>
-                  <View>
-                    <Image style={style.advImg} source={appStore} />
-                  </View>
-                </Pressable>
-              </View>
-            </View>
-
-            {/* Illustration */}
-            <View
-              style={
-                (utilStyle.mt1,
-                {
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingTop: 5,
-                  alignContent: "center",
-                })
-              }
-            >
-              <SvgComponent />
-            </View>
-
-            {/* Why fresh fred */}
-            <View style={utilStyle.mt1}>
-              <Text style={style.concludeTxt}>Why Fresh Fred?</Text>
-              {conclusions &&
-                conclusions.map(conclusion => (
-                  <View
-                    key={conclusion.id}
-                    style={[utilStyle.card, style.concludeCard]}
-                  >
-                    <Text style={style.concludeTitle}>{conclusion.title}</Text>
-                    <Text style={style.concludeDesc}>{conclusion.msg}</Text>
-                    <Text style={[style.apostrophe, style.leftApost]}>"</Text>
-                    <Text style={[style.apostrophe, style.rightApost]}>"</Text>
-                  </View>
-                ))}
-            </View>
-          </View>
-
-          <Footer />
-        </ScrollView>
-      </DrawerLayout>
-    );
-  }
+        <Footer />
+      </ScrollView>
+    </DrawerLayout>
+  );
 };
 
 const style = StyleSheet.create({
