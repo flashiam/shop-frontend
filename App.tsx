@@ -24,6 +24,7 @@ import NavbarWeb from "./components/web/NavbarWeb";
 import ProductSearch from "./components/pages/ProductSearch";
 import Login from "./components/pages/Login";
 import AuthLoading from "./components/pages/AuthLoading";
+import SpecialFoodDesc from "./components/pages/SpecialFoodDesc";
 
 import LocationModal from "./components/layout/LocationModal";
 
@@ -43,6 +44,7 @@ export interface FoodType {
   stars: number;
   reviews: number;
   tags?: string[];
+  isSpecial?: boolean;
 }
 
 export type RootStackParamList = {
@@ -60,6 +62,7 @@ export type RootStackParamList = {
   Promo: undefined;
   CartWeb?: { cartid: number };
   ProductSearch: { keyword: string };
+  SpecialFoodDesc: { food: FoodType };
   Login: undefined;
 };
 
@@ -98,6 +101,10 @@ const App = () => {
               <Stack.Screen name="CartWeb" component={CartWeb} />
               <Stack.Screen name="NavbarWeb" component={NavbarWeb} />
               <Stack.Screen name="ProductSearch" component={ProductSearch} />
+              <Stack.Screen
+                name="SpecialFoodDesc"
+                component={SpecialFoodDesc}
+              />
             </Stack.Navigator>
             <LocationModal />
           </NavigationContainer>

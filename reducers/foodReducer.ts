@@ -5,7 +5,9 @@ import {
   GET_CART_NUM,
   OPEN_LOCATION,
   CLOSE_LOCATION,
-  GET_CART_ITEMS,
+  FETCH_CART_ITEMS,
+  REMOVE_CART_ITEM,
+  CALCULATE_CART_TOTAL,
 } from "../actions/types";
 
 // Setting the initial state to be manipulated
@@ -14,6 +16,7 @@ const initialState = {
   searchedFoods: [],
   loading: true,
   cartItems: [],
+  cartTotalPrice: 0,
   cartNum: 0,
   error: null,
   locationOpened: false,
@@ -29,8 +32,32 @@ const foodReducer = (state = initialState, action: any) => {
     case ADD_CART_ITEM:
       return {
         ...state,
-        cartItems: action.payload,
+        cartItems: [...state.cartItems, action.payload],
         cartNum: action.payload.length,
+        loading: false,
+      };
+    case FETCH_CART_ITEMS:
+      return {
+        ...state,
+        cartItems: action.payload,
+        loading: false,
+      };
+    case REMOVE_CART_ITEM:
+      return {
+        ...state,
+        cartItems: state.cartItems.filter(
+          (item: any) => item.id !== action.payload
+        ),
+      };
+    case CALCULATE_CART_TOTAL:
+      return {
+        ...state,
+        cartTotalPrice:
+          state.cartItems.length > 0
+            ? state.cartItems
+                .push(action.payload)
+                .reduce((prevItem, curItem) => prevItem + curItem.price, 0)
+            : action.payload.price,
       };
     case GET_CART_NUM: {
       return {

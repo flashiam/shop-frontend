@@ -264,7 +264,7 @@ const ProductSearch = ({ route, navigation }: Props) => {
         <MinifiedNav navigation={navigation} drawer={drawer} />
         <View style={style.searchContain}>
           {searchRes && searchRes.length ? (
-            <View style={style.searchResultsBox}>
+            <View>
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
                 Search results for "{keyword}"
               </Text>

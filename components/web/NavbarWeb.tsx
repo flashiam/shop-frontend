@@ -29,7 +29,7 @@ type Props = {
   getCartNo: Function;
   openLocation: Function;
   navigation?: any;
-  openLocationModal: any;
+  openLocationModal?: any;
 };
 
 const NavbarWeb = ({

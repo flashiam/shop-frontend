@@ -40,11 +40,11 @@ const NavbarMobo = ({ drawer, openLocation }: Props) => {
                   { fontWeight: "bold", fontSize: 18 },
                 ]}
               >
-                Bhopal
+                Home
               </Text>
-              <Text style={style.locationTxt}>
+              {/* <Text style={style.locationTxt}>
                 10 no. market near arera colony...
-              </Text>
+              </Text> */}
             </View>
           </View>
         </Pressable>

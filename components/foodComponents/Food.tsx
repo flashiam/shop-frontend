@@ -69,17 +69,26 @@ const Food = ({
   //   }).start();
   // };
 
-  const { id, title, price, img, rating, stars, reviews } = food;
+  const { title, price, img, rating, stars, reviews, isSpecial } = food;
+
+  // Function to navigate to pages
+  const navigateToPage = () => {
+    if (isSpecial) {
+      updatePage
+        ? navigation.push("SpecialFoodDesc", { food })
+        : navigation.navigate("SpecialFoodDesc", { food });
+    } else {
+      updatePage
+        ? navigation.push("Food", { food })
+        : navigation.navigate("Food", { food });
+    }
+  };
 
   return (
     <TouchableWithoutFeedback
       // onPressIn={() => expandCard()}
       // onPressOut={() => contractCard()}
-      onPress={() =>
-        updatePage
-          ? navigation.push("Food", { food })
-          : navigation.navigate("Food", { food })
-      }
+      onPress={() => navigateToPage()}
     >
       <View
         style={[

@@ -3,8 +3,11 @@ import {
   ADD_CART_ITEM,
   FOOD_ERROR,
   GET_CART_NUM,
+  CALCULATE_CART_TOTAL,
   OPEN_LOCATION,
   CLOSE_LOCATION,
+  FETCH_CART_ITEMS,
+  REMOVE_CART_ITEM,
 } from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -35,10 +38,8 @@ export const addCartItem = (item: CartItem) => async (dispatch: any) => {
 
     dispatch({
       type: ADD_CART_ITEM,
-      payload: items,
+      payload: item,
     });
-
-    console.log("added to cart");
   } catch (err) {
     dispatch({
       type: FOOD_ERROR,
@@ -47,14 +48,65 @@ export const addCartItem = (item: CartItem) => async (dispatch: any) => {
   }
 };
 
-// Function to update the cart item
-// export const updateCart = (cartItems: CartItem[]) => async (dispatch: any) => {
-//   try {
+// Function to fetch the cart items from storage when page refreshes
+export const fetchCartItems = () => async (dispatch: any) => {
+  try {
+    const savedItems = await AsyncStorage.getItem("cart-items");
+    if (savedItems) {
+      dispatch({
+        type: FETCH_CART_ITEMS,
+        payload: JSON.parse(savedItems),
+      });
+    } else {
+      dispatch({
+        type: FETCH_CART_ITEMS,
+        payload: [],
+      });
+    }
+  } catch (err) {
+    dispatch({
+      type: FOOD_ERROR,
+      payload: err,
+    });
+  }
+};
 
-//   } catch (err) {
+// Function to delete a item from cart
+export const deleteCartItem = (id: number) => async (dispatch: any) => {
+  try {
+    const savedItems = await AsyncStorage.getItem("cart-items");
 
-//   }
-// }
+    if (savedItems) {
+      const items = JSON.parse(savedItems);
+      const filteredItems = items.filter((item: CartItem) => item.id !== id);
+
+      await AsyncStorage.setItem("cart-items", JSON.stringify(filteredItems));
+    }
+
+    dispatch({
+      type: REMOVE_CART_ITEM,
+      payload: id,
+    });
+  } catch (err) {
+    dispatch({
+      type: FOOD_ERROR,
+      payload: err,
+    });
+  }
+};
+
+// Function to calculate total cart price
+export const calculateTotalPrice =
+  (newItem: CartItem) => async (dispatch: any) => {
+    try {
+      dispatch({
+        type: CALCULATE_CART_TOTAL,
+        payload: newItem,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 // Function to get the num of items in cart
 export const getCartNo = () => async (dispatch: any) => {

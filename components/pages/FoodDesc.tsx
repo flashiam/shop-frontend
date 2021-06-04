@@ -28,7 +28,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { connect } from "react-redux";
 
 import { fetchOrderId } from "../../actions/paymentActions";
-import { addCartItem, getCartNo } from "../../actions/foodActions";
+import {
+  addCartItem,
+  fetchCartItems,
+  deleteCartItem,
+  calculateTotalPrice,
+  getCartNo,
+} from "../../actions/foodActions";
 
 import utilStyle from "../../styles/utilStyle";
 import {
@@ -74,11 +80,6 @@ interface CartItem {
   weight: number;
 }
 
-interface PickerValue {
-  label: string;
-  value: string;
-}
-
 interface CartData {
   quantity: number;
   price: number;
@@ -93,9 +94,13 @@ type Prop = {
   navigation: FoodDescScreenNavProp;
   fetchOrderId: Function;
   addCartItem: Function;
+  fetchCartItems: Function;
+  deleteCartItem: Function;
+  calculateTotalPrice: Function;
   getCartNo: Function;
   payment: { orderId: number | null; orderLoading: boolean };
   user: { userRegistered: boolean };
+  food: { cartItems: any; cartTotalPrice: number; loading: boolean };
 };
 
 type PhotoProps = {
@@ -108,15 +113,19 @@ const FoodDesc = ({
   navigation,
   payment: { orderId, orderLoading },
   user: { userRegistered },
+  food: { cartItems, cartTotalPrice, loading },
   fetchOrderId,
   addCartItem,
+  fetchCartItems,
+  deleteCartItem,
+  calculateTotalPrice,
   getCartNo,
 }: Prop) => {
   // Media query
   const phoneOrTablets = useMediaQuery({ maxDeviceWidth: 768 });
   const [mainFood] = useState<FoodType>(route.params.food);
   const {
-    id,
+    id: foodId,
     title,
     subtitle,
     price: foodPrice,
@@ -233,7 +242,7 @@ const FoodDesc = ({
   let defaultPrice = foodPrice;
   const drawer = useRef<any>(null);
   const cartAnim = useRef(new Animated.Value(1)).current;
-  const cartSlideAnim = useRef(new Animated.Value(100)).current;
+  const cartSlideAnim = useRef(new Animated.Value(0)).current;
   const cartTranslateX = useRef(new Animated.Value(0)).current;
 
   const qty = useRef<number>(0);
@@ -242,7 +251,7 @@ const FoodDesc = ({
   const [showCart, setCart] = useState<boolean>(false);
 
   // State for cart items
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // State for weight
   const [weight, setWeight] = useState<number>(defaultWeight);
@@ -253,17 +262,6 @@ const FoodDesc = ({
   // State for price
   const [price, setPrice] = useState<number>(defaultPrice);
 
-  // State for price
-  const [updatedPrice, setUpdatedPrice] = useState<number>(1);
-
-  const [itemData, setItemData] = useState<any>({
-    itemQty: 1,
-    itemPrice: defaultPrice,
-  });
-
-  // State for price track
-  const [priceTrack, setPriceTrack] = useState<number[]>([]);
-
   // State for cart status
   const [itemAdded, setCartStatus] = useState<boolean>(false);
 
@@ -271,7 +269,7 @@ const FoodDesc = ({
   const [cartData, setCartData] = useState<CartData>({ quantity: 0, price: 0 });
 
   // State for status loading
-  const [statusLoading, setStatusLoading] = useState<boolean>(true);
+  const [statusLoading, setStatusLoading] = useState<boolean>(false);
 
   // State for cart item
   const [totalCartItems, setTotalCart] = useState<number>(0);
@@ -284,6 +282,8 @@ const FoodDesc = ({
 
   // State for default margin
   const [defaultMargin] = useState<number>(18);
+
+  const [totalPrice, setTotalPrice] = useState<number>(0);
 
   // Function to share the food
   const shareFood = async () => {
@@ -358,19 +358,6 @@ const FoodDesc = ({
     setPrice(price * quantity);
   };
 
-  // Function to fetch the cart items
-  const fetchCartItems = async () => {
-    try {
-      const storedItems = await AsyncStorage.getItem("cart-items");
-
-      // Set the items to the state
-      if (storedItems) setCartItems(JSON.parse(storedItems));
-      console.log("items fetched successfully");
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   // Function to check the cart
   const checkCart = async () => {
     try {
@@ -408,63 +395,7 @@ const FoodDesc = ({
     setCartStatus(true);
 
     addCartItem(newCartItem);
-    saveItem(newCartItem);
-    // getCartNo();
-    console.log(newCartItem);
-  };
-
-  // Function to save the cart item
-  const saveItem = async (item: CartItem) => {
-    let items;
-    try {
-      // Add to the state
-      setCartItems([...cartItems, item]);
-      // Save to the storage too
-      const existingData = await AsyncStorage.getItem("cart-items");
-
-      if (existingData) {
-        items = JSON.parse(existingData);
-      } else {
-        items = [];
-      }
-
-      items.push(item);
-      await AsyncStorage.setItem("cart-items", JSON.stringify(items));
-      console.log("added to cart");
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // Function to delete item from the cart
-  const deleteItem = async (id: number) => {
-    try {
-      // Delete from the state
-      const updatedItems = cartItems.filter(item => item.id !== id);
-      setCartItems(updatedItems);
-
-      // Delete from storage too
-      const storedItems = await AsyncStorage.getItem("cart-items");
-
-      if (storedItems) {
-        const filteredItems = JSON.parse(storedItems).filter(
-          (item: { id: number }) => item.id !== id
-        );
-        await AsyncStorage.setItem("cart-items", JSON.stringify(filteredItems));
-      }
-
-      if (!storedItems) {
-        popDown();
-      } else {
-        fetchDataFromCart();
-      }
-      console.log("item removed");
-
-      // Enable the cart btn to add item
-      setCartStatus(false);
-    } catch (err) {
-      console.log(err);
-    }
+    fetchDataFromCart(newCartItem);
   };
 
   // Function to auto close modal after checking condition
@@ -477,29 +408,27 @@ const FoodDesc = ({
   };
 
   // Function to fetch the item quantity and price from the cart
-  const fetchDataFromCart = async () => {
+  const fetchDataFromCart = async (item: CartItem) => {
     try {
       const savedItems = await AsyncStorage.getItem("cart-items");
       let initQuantity = 0;
       let initPrice = 0;
+      let total = 0;
 
       if (savedItems) {
-        JSON.parse(savedItems).forEach((item: any) => {
-          initQuantity = parseInt(item.quantity) + quantity;
-          initPrice = parseInt(item.price) + price;
-        });
-
-        // const isItemPresent = JSON.parse(savedItems).filter((item:CartItem) => item.id === id)
-
-        // if(!isItemPresent) {
-        //   setCartData({ quantity: quantity,price: foodPrice });
-        // }
+        const totalPrice = JSON.parse(savedItems).reduce(
+          (prevItem: CartItem, curItem: CartItem) => prevItem + curItem.price,
+          0
+        );
+        total = totalPrice;
       } else {
-        initQuantity = quantity;
-        initPrice = foodPrice;
+        // initQuantity = quantity;
+        // initPrice = foodPrice;
+        total = item.price;
       }
-      console.log(initQuantity, initPrice);
-      setCartData({ quantity: initQuantity, price: initPrice });
+      setTotalPrice(total);
+      // console.log(initQuantity, initPrice);
+      // setCartData({ quantity: initQuantity, price: initPrice });
     } catch (err) {
       console.log(err);
     }
@@ -508,6 +437,7 @@ const FoodDesc = ({
   // Function to check the cart item status and maniputate the cart according to that
   const checkCartStatus = async (id: number) => {
     try {
+      setStatusLoading(true);
       const storedItems = await AsyncStorage.getItem("cart-items");
 
       if (storedItems) {
@@ -545,18 +475,6 @@ const FoodDesc = ({
     // navigation.navigate("Payment", { orderid: orderId });
   };
 
-  // Function to get total price from the cart
-  // const fetchTotalPrice = async () => {
-  //   try {
-  //     const savedItems = AsyncStorage.getItem('cart-items');
-  //     if(savedItems) {
-
-  //     }
-  //   } catch (err) {
-
-  //   }
-  // }
-
   // Function to pop up the cart message
   const popUp = () => {
     setCartMsg(true);
@@ -577,6 +495,30 @@ const FoodDesc = ({
     }).start();
   };
 
+  // Function to add item
+  const addItem = () => {
+    makeCartItem(foodId, title, subtitle, weight, price, quantity);
+    // calculateTotalPrice(cartItems);
+    // console.log(cartTotalPrice);
+    popUp();
+  };
+
+  // Function to delete the item
+  const deleteItem = (id: number) => {
+    deleteCartItem(id);
+    if (id === foodId) {
+      setCartStatus(false);
+    }
+  };
+
+  const testTotal = (items: CartItem[]) => {
+    const total = items.reduce(
+      (prevItem, curItem) => prevItem + curItem.price,
+      0
+    );
+    setTotalPrice(total);
+  };
+
   // Photo component
   const PhotoItem = ({ photo, marginStyle }: PhotoProps) => {
     return (
@@ -589,7 +531,6 @@ const FoodDesc = ({
   // Cart popup component
   const CartPopUp = () => {
     return (
-      // <Swipeable>
       <Animated.View
         style={[
           style.popUpContain,
@@ -621,7 +562,7 @@ const FoodDesc = ({
                   alignItems: "center",
                 }}
               >
-                ₹{cartData.price}{" "}
+                ₹{totalPrice}{" "}
               </Text>
               <Text style={{ color: lightColor, fontSize: 12 }}>
                 plus taxes
@@ -641,19 +582,10 @@ const FoodDesc = ({
           </Pressable>
         </View>
       </Animated.View>
-      // </Swipeable>
     );
   };
 
   const CartModal = () => {
-    // Cart quantity
-    const [cartQuantity, setCartQuantity] = useState<number>(quantity);
-
-    // Function to increment cart quantity
-    // const increaseCartQuantity = () => {
-
-    // }
-
     return (
       <Modal
         isVisible={showCart}
@@ -662,8 +594,13 @@ const FoodDesc = ({
       >
         <View style={style.cartContain}>
           <ScrollView style={style.cartSection}>
-            {cartItems &&
-              cartItems.map(item => (
+            {loading ? (
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            ) : (
+              cartItems &&
+              cartItems.map((item: CartItem) => (
                 <View key={item?.id} style={[utilStyle.card, style.cartItem]}>
                   <View>
                     <Text style={{ fontSize: 18, fontWeight: "bold" }}>
@@ -704,12 +641,7 @@ const FoodDesc = ({
                       </View>
                     </View>
                   </View>
-                  <Pressable
-                    onPress={() => {
-                      deleteItem(item?.id);
-                      autoCloseCart();
-                    }}
-                  >
+                  <Pressable onPress={() => deleteItem(item.id)}>
                     <MaterialIcons
                       name="delete-outline"
                       color={darkColor}
@@ -717,12 +649,13 @@ const FoodDesc = ({
                     />
                   </Pressable>
                 </View>
-              ))}
+              ))
+            )}
           </ScrollView>
           <View style={[utilStyle.card, style.cartFooter]}>
             <View>
               <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                ₹ {cartData.price}
+                ₹ {cartTotalPrice}
               </Text>
               <Text style={{ fontWeight: "bold", fontSize: 20 }}>Total</Text>
             </View>
@@ -763,347 +696,334 @@ const FoodDesc = ({
 
   useEffect(() => {
     fetchCartItems();
-    checkCartStatus(id);
+    checkCartStatus(foodId);
     checkCart();
-    fetchDataFromCart();
+    // fetchDataFromCart();
+    // console.log(cartTotalPrice);
   }, []);
+  // console.log(totalPrice);
 
   return (
     // Comment out this view below to make the app compatible on the web temporary it is commented
-    <View style={{ overflow: "hidden" }}>
-      <DrawerLayout
-        ref={drawer}
-        renderNavigationView={() => (
-          <Drawer drawer={drawer} navigation={navigation} />
-        )}
-        drawerPosition="right"
-        drawerWidth={300}
-        drawerBackgroundColor={lightColor}
-        // style={{ alignItems: "center" }}
-      >
-        <ScrollView>
-          {Platform.OS !== "web" && <CartModal />}
-          <View style={[utilStyle.container]}>
-            {Platform.OS === "web" &&
-              (phoneOrTablets ? (
-                <NavbarMobo drawer={drawer} />
-              ) : (
-                <NavbarWeb drawer={drawer} navigation={navigation} />
-              ))}
+    // <View style={{ overflow: "hidden" }}>
+    <DrawerLayout
+      ref={drawer}
+      renderNavigationView={() => (
+        <Drawer drawer={drawer} navigation={navigation} />
+      )}
+      drawerPosition="right"
+      drawerWidth={300}
+      drawerBackgroundColor={lightColor}
+      // style={{ alignItems: "center" }}
+    >
+      <ScrollView>
+        {Platform.OS !== "web" && <CartModal />}
+        <View style={[utilStyle.container]}>
+          {Platform.OS === "web" &&
+            (phoneOrTablets ? (
+              <NavbarMobo drawer={drawer} />
+            ) : (
+              <NavbarWeb drawer={drawer} navigation={navigation} />
+            ))}
+          <View
+            style={[
+              style.mainHeader,
+              {
+                flexDirection:
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? "column"
+                      : "row"
+                    : "column",
+              },
+            ]}
+          >
             <View
               style={[
-                style.mainHeader,
+                style.imgContain,
                 {
-                  flexDirection:
+                  width:
                     Platform.OS === "web"
                       ? phoneOrTablets
-                        ? "column"
-                        : "row"
-                      : "column",
+                        ? "100%"
+                        : "50%"
+                      : "100%",
                 },
               ]}
             >
-              <View
+              <Image
+                source={img}
                 style={[
-                  style.imgContain,
-                  {
-                    width:
-                      Platform.OS === "web"
-                        ? phoneOrTablets
-                          ? "100%"
-                          : "50%"
-                        : "100%",
-                  },
+                  style.foodImg,
+                  Platform.OS === "web"
+                    ? phoneOrTablets
+                      ? { height: 200, width: 200 }
+                      : { height: 450, width: 450 }
+                    : { height: 200, width: 200 },
                 ]}
-              >
-                <Image
-                  source={img}
-                  style={[
-                    style.foodImg,
+              />
+            </View>
+            <View style={style.foodContent}>
+              <View
+                style={{
+                  width:
                     Platform.OS === "web"
                       ? phoneOrTablets
-                        ? { height: 200, width: 200 }
-                        : { height: 450, width: 450 }
-                      : { height: 200, width: 200 },
-                  ]}
-                />
-              </View>
-              <View style={style.foodContent}>
-                <View
-                  style={{
-                    width:
-                      Platform.OS === "web"
-                        ? phoneOrTablets
-                          ? "100%"
-                          : "25%"
-                        : "100%",
-                  }}
-                >
-                  <Text style={style.title}>{title}</Text>
-                  {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
-                  <View style={style.ratings}>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: secondaryColor,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {rating}
-                    </Text>
-                    <View style={style.ratingsContain}>
-                      {[1, 2, 3, 4, 5].map(star =>
-                        star <= stars ? (
-                          <MaterialIcons
-                            key={star}
-                            name="star"
-                            size={15}
-                            color={primaryColor}
-                          />
-                        ) : (
-                          <MaterialIcons
-                            key={star}
-                            name="star"
-                            size={15}
-                            color={secondaryColor}
-                          />
-                        )
-                      )}
-                    </View>
-                  </View>
-                  <Text style={style.description}>{desc}</Text>
-                </View>
-
-                <View style={style.bottomContent}>
-                  <View
-                    style={[
-                      style.controls,
-                      {
-                        width:
-                          Platform.OS === "web"
-                            ? phoneOrTablets
-                              ? "100%"
-                              : "25%"
-                            : "100%",
-                      },
-                    ]}
+                        ? "100%"
+                        : "25%"
+                      : "100%",
+                }}
+              >
+                <Text style={style.title}>{title}</Text>
+                {subtitle && <Text style={style.subTitle}>{subtitle}</Text>}
+                <View style={style.ratings}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: secondaryColor,
+                      fontWeight: "bold",
+                    }}
                   >
-                    <View style={style.control}>
-                      <Text style={style.label}>Weight</Text>
-
-                      <View
-                        style={[
-                          utilStyle.card,
-                          { height: 50, borderRadius: 10 },
-                        ]}
-                      >
-                        <Picker
-                          note
-                          mode="dropdown"
-                          style={{ width: 120, borderWidth: 0 }}
-                          selectedValue={weight}
-                          onValueChange={value => ctrlWeight(value)}
-                          itemStyle={{ backgroundColor: lightColor }}
-                          placeholder="Select"
-                        >
-                          <Picker.Item label="500g" value="500" />
-                          <Picker.Item label="1000g" value="1000" />
-                          <Picker.Item label="1500g" value="1500" />
-                          <Picker.Item label="2000g" value="2000" />
-                        </Picker>
-                      </View>
-                    </View>
-                    <View style={style.control}>
-                      <Text style={style.label}>Quantity</Text>
-                      <View style={[utilStyle.card, style.quantityCtrl]}>
-                        <Pressable
-                          onPress={() => {
-                            decreaseQuantity();
-                          }}
-                          style={{
-                            paddingHorizontal: 15,
-                            height: 30,
-                          }}
-                          android_ripple={{
-                            color: secondaryColor,
-                            borderless: true,
-                          }}
-                        >
-                          <Text style={style.quantityBtn}>-</Text>
-                        </Pressable>
-                        <TextInput
-                          keyboardType="numeric"
-                          value={quantity.toString()}
-                          style={style.quantityField}
-                          // onChangeText={qty => ctrlQuantity(qty)}
-                        />
-                        <Pressable
-                          onPress={() => {
-                            increaseQuantity();
-                          }}
-                          style={{
-                            paddingHorizontal: 15,
-                            height: 30,
-                          }}
-                          android_ripple={{
-                            color: secondaryColor,
-                            borderless: true,
-                          }}
-                        >
-                          <Text style={style.quantityBtn}>+</Text>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </View>
-
-                  <View
-                    style={[
-                      utilStyle.card,
-                      style.cartBtnContain,
-                      {
-                        width:
-                          Platform.OS === "web"
-                            ? phoneOrTablets
-                              ? "100%"
-                              : "25%"
-                            : "100%",
-                      },
-                    ]}
-                  >
-                    <Text>
-                      <Text style={{ fontSize: 17, color: medColor }}>
-                        ₹{price.toString()}.00/
-                      </Text>
-                      <Text style={{ color: medColor }}>
-                        {weight.toString()}g
-                      </Text>
-                    </Text>
-                    {!itemAdded ? (
-                      <Pressable
-                        style={style.cartBtn}
-                        onPress={() => {
-                          if (userRegistered) {
-                            fetchDataFromCart();
-                            makeCartItem(
-                              id,
-                              title,
-                              subtitle,
-                              weight,
-                              price,
-                              quantity
-                            );
-                            popUp();
-                          } else {
-                            navigation.navigate("Login");
-                          }
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 17,
-                            fontWeight: "bold",
-                            marginRight: 10,
-                            color: primaryColor,
-                          }}
-                        >
-                          Add to cart
-                        </Text>
-                        <MaterialCommunityIcons
-                          name="cart-outline"
+                    {rating}
+                  </Text>
+                  <View style={style.ratingsContain}>
+                    {[1, 2, 3, 4, 5].map(star =>
+                      star <= stars ? (
+                        <MaterialIcons
+                          key={star}
+                          name="star"
+                          size={15}
                           color={primaryColor}
-                          size={17}
                         />
-                      </Pressable>
-                    ) : (
-                      <Pressable
-                        style={style.cartBtn}
-                        onPress={() => setCart(true)}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 17,
-                            fontWeight: "bold",
-                            marginRight: 10,
-                            color: secondaryColor,
-                          }}
-                        >
-                          Added to cart
-                        </Text>
-                        <Octicons
-                          name="check"
+                      ) : (
+                        <MaterialIcons
+                          key={star}
+                          name="star"
+                          size={15}
                           color={secondaryColor}
-                          size={17}
                         />
-                      </Pressable>
+                      )
                     )}
                   </View>
+                </View>
+                <Text style={style.description}>{desc}</Text>
+              </View>
 
-                  {/* <Pressable
-                  style={[style.closeBtn]}
-                  android_ripple={{ color: secondaryColor, borderless: true }}
-                  onPress={() => navigation.goBack()}
-                  >
-                  <AntDesign name="close" color={darkColor} size={20} />
-                </Pressable> */}
+              <View style={style.bottomContent}>
+                <View
+                  style={[
+                    style.controls,
+                    {
+                      width:
+                        Platform.OS === "web"
+                          ? phoneOrTablets
+                            ? "100%"
+                            : "25%"
+                          : "100%",
+                    },
+                  ]}
+                >
+                  <View style={style.control}>
+                    <Text style={style.label}>Weight</Text>
+
+                    <View
+                      style={[utilStyle.card, { height: 50, borderRadius: 10 }]}
+                    >
+                      <Picker
+                        note
+                        mode="dropdown"
+                        style={{ width: 120, borderWidth: 0 }}
+                        selectedValue={weight}
+                        onValueChange={value => ctrlWeight(value)}
+                        itemStyle={{ backgroundColor: lightColor }}
+                        placeholder="Select"
+                      >
+                        <Picker.Item label="500g" value="500" />
+                        <Picker.Item label="1000g" value="1000" />
+                        <Picker.Item label="1500g" value="1500" />
+                        <Picker.Item label="2000g" value="2000" />
+                      </Picker>
+                    </View>
+                  </View>
+                  <View style={style.control}>
+                    <Text style={style.label}>Quantity</Text>
+                    <View style={[utilStyle.card, style.quantityCtrl]}>
+                      <Pressable
+                        onPress={() => {
+                          decreaseQuantity();
+                        }}
+                        style={{
+                          paddingHorizontal: 15,
+                          height: 30,
+                        }}
+                        android_ripple={{
+                          color: secondaryColor,
+                          borderless: true,
+                        }}
+                      >
+                        <Text style={style.quantityBtn}>-</Text>
+                      </Pressable>
+                      <TextInput
+                        keyboardType="numeric"
+                        value={quantity.toString()}
+                        style={style.quantityField}
+                        // onChangeText={qty => ctrlQuantity(qty)}
+                      />
+                      <Pressable
+                        onPress={() => {
+                          increaseQuantity();
+                        }}
+                        style={{
+                          paddingHorizontal: 15,
+                          height: 30,
+                        }}
+                        android_ripple={{
+                          color: secondaryColor,
+                          borderless: true,
+                        }}
+                      >
+                        <Text style={style.quantityBtn}>+</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+
+                <View
+                  style={[
+                    utilStyle.card,
+                    style.cartBtnContain,
+                    {
+                      width:
+                        Platform.OS === "web"
+                          ? phoneOrTablets
+                            ? "100%"
+                            : "25%"
+                          : "100%",
+                    },
+                  ]}
+                >
+                  <Text>
+                    <Text style={{ fontSize: 17, color: medColor }}>
+                      ₹{price.toString()}.00/
+                    </Text>
+                    <Text style={{ color: medColor }}>
+                      {weight.toString()}g
+                    </Text>
+                  </Text>
+                  {statusLoading ? (
+                    <View
+                      style={{
+                        padding: 16,
+                      }}
+                    >
+                      <ActivityIndicator color={primaryColor} size="small" />
+                    </View>
+                  ) : !itemAdded ? (
+                    <Pressable
+                      style={style.cartBtn}
+                      onPress={() => {
+                        if (userRegistered) {
+                          addItem();
+                          console.log(cartTotalPrice);
+                        } else {
+                          navigation.navigate("Login");
+                        }
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "bold",
+                          marginRight: 10,
+                          color: primaryColor,
+                        }}
+                      >
+                        Add to cart
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="cart-outline"
+                        color={primaryColor}
+                        size={17}
+                      />
+                    </Pressable>
+                  ) : (
+                    <Pressable
+                      style={style.cartBtn}
+                      onPress={() => setCart(true)}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "bold",
+                          marginRight: 10,
+                          color: secondaryColor,
+                        }}
+                      >
+                        Added to cart
+                      </Text>
+                      <Octicons name="check" color={secondaryColor} size={17} />
+                    </Pressable>
+                  )}
                 </View>
               </View>
-              <View style={style.sideContent}>
-                <Pressable
-                  style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
-                  onPress={() => setFavorite(() => !favorite)}
-                >
-                  <FontAwesome
-                    name={favorite ? "heart" : "heart-o"}
-                    color={primaryColor}
-                    size={15}
-                  />
-                </Pressable>
-                <Pressable
-                  style={[utilStyle.card, style.btn]}
-                  onPress={() => shareFood()}
-                >
-                  <Entypo name="share" color={primaryColor} size={15} />
-                </Pressable>
-              </View>
+            </View>
+            <View style={style.sideContent}>
               <Pressable
-                style={style.closeBtn}
-                onPress={() => navigation.goBack()}
+                style={[utilStyle.card, style.btn, { marginBottom: 10 }]}
+                onPress={() => setFavorite(() => !favorite)}
               >
-                <MaterialIcons name="arrow-back" color={darkColor} size={30} />
+                <FontAwesome
+                  name={favorite ? "heart" : "heart-o"}
+                  color={primaryColor}
+                  size={15}
+                />
+              </Pressable>
+              <Pressable
+                style={[utilStyle.card, style.btn]}
+                onPress={() => shareFood()}
+              >
+                <Entypo name="share" color={primaryColor} size={15} />
               </Pressable>
             </View>
+            <Pressable
+              style={style.closeBtn}
+              onPress={() => navigation.goBack()}
+            >
+              <MaterialIcons name="arrow-back" color={darkColor} size={30} />
+            </Pressable>
           </View>
+        </View>
 
-          {/* Photos */}
-          {Platform.OS !== "web" && (
-            <View style={utilStyle.mt1}>
-              <View style={utilStyle.container}>
-                <Text style={utilStyle.head}>Photos</Text>
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {photos &&
-                  photos.map((photo, i) =>
-                    i === 0 ? (
-                      <PhotoItem
-                        key={photo.id}
-                        photo={photo}
-                        marginStyle={{ marginHorizontal: defaultMargin }}
-                      />
-                    ) : (
-                      <PhotoItem
-                        key={photo.id}
-                        photo={photo}
-                        marginStyle={{ marginRight: defaultMargin }}
-                      />
-                    )
-                  )}
-              </ScrollView>
+        {/* Photos */}
+        {Platform.OS !== "web" && (
+          <View style={utilStyle.mt1}>
+            <View style={utilStyle.container}>
+              <Text style={utilStyle.head}>Photos</Text>
             </View>
-          )}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {photos &&
+                photos.map((photo, i) =>
+                  i === 0 ? (
+                    <PhotoItem
+                      key={photo.id}
+                      photo={photo}
+                      marginStyle={{ marginHorizontal: defaultMargin }}
+                    />
+                  ) : (
+                    <PhotoItem
+                      key={photo.id}
+                      photo={photo}
+                      marginStyle={{ marginRight: defaultMargin }}
+                    />
+                  )
+                )}
+            </ScrollView>
+          </View>
+        )}
 
-          {/* Related */}
-          {/* This above section is only for the mobile app */}
-          {/* <View
+        {/* Related */}
+        {/* This above section is only for the mobile app */}
+        <View
           style={[
             utilStyle.mt1,
             Platform.OS === "web" && !phoneOrTablets && { marginTop: 55 },
@@ -1150,63 +1070,63 @@ const FoodDesc = ({
                 )
               )}
           </ScrollView>
-        </View> */}
-          {/* This is specific for the web */}
-          <View
-            style={[
-              utilStyle.mt1,
-              Platform.OS === "web" && !phoneOrTablets && { marginTop: 55 },
-            ]}
-          >
-            <View style={utilStyle.container}>
-              <Text style={utilStyle.head}>More like this</Text>
+        </View>
+        {/* This is specific for the web */}
+        {/* <View
+          style={[
+            utilStyle.mt1,
+            Platform.OS === "web" && !phoneOrTablets && { marginTop: 55 },
+          ]}
+        >
+          <View style={utilStyle.container}>
+            <Text style={utilStyle.head}>More like this</Text>
 
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={
-                  [
-                    // style.scrollWidth,
-                    // {`5
-                    //   width:
-                    //     Platform.OS === "web"
-                    //       ? phoneOrTablets
-                    //         ? "90%"
-                    //         : "83%"
-                    //       : "90%",
-                    // },
-                  ]
-                }
-              >
-                {related &&
-                  related.map((food, i) =>
-                    i === 0 ? (
-                      <Food
-                        key={food.id}
-                        navigation={navigation}
-                        food={food}
-                        marginStyle={{ marginRight: defaultMargin }}
-                        updatePage
-                      />
-                    ) : (
-                      <Food
-                        key={food.id}
-                        navigation={navigation}
-                        food={food}
-                        marginStyle={{ marginRight: defaultMargin }}
-                        updatePage
-                      />
-                    )
-                  )}
-              </ScrollView>
-            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={
+                [
+                  // style.scrollWidth,
+                  // {`5
+                  //   width:
+                  //     Platform.OS === "web"
+                  //       ? phoneOrTablets
+                  //         ? "90%"
+                  //         : "83%"
+                  //       : "90%",
+                  // },
+                ]
+              }
+            >
+              {related &&
+                related.map((food, i) =>
+                  i === 0 ? (
+                    <Food
+                      key={food.id}
+                      navigation={navigation}
+                      food={food}
+                      marginStyle={{ marginRight: defaultMargin }}
+                      updatePage
+                    />
+                  ) : (
+                    <Food
+                      key={food.id}
+                      navigation={navigation}
+                      food={food}
+                      marginStyle={{ marginRight: defaultMargin }}
+                      updatePage
+                    />
+                  )
+                )}
+            </ScrollView>
           </View>
-          {/* </View> */}
-        </ScrollView>
-        {/* Cart pop up */}
-        {Platform.OS !== "web" && <CartPopUp />}
-      </DrawerLayout>
-    </View>
+        </View> */}
+        {/* </View> */}
+      </ScrollView>
+      {/* Cart pop up */}
+      {Platform.OS !== "web" && <CartPopUp />}
+    </DrawerLayout>
+    // </View>
   );
 };
 
@@ -1482,10 +1402,14 @@ FoodDesc.proptypes = {
 const mapStateToProps = (state: any) => ({
   payment: state.payment,
   user: state.user,
+  food: state.food,
 });
 
 export default connect(mapStateToProps, {
   fetchOrderId,
   addCartItem,
+  fetchCartItems,
   getCartNo,
+  deleteCartItem,
+  calculateTotalPrice,
 })(FoodDesc);

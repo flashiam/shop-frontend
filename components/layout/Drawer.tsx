@@ -100,7 +100,6 @@ const Drawer = ({
     fetchUserProfile();
   }, []);
 
-  console.log(userData);
   return (
     <View style={style.navContain}>
       {userRegistered ? (
@@ -196,7 +195,7 @@ const Drawer = ({
         )}
         <Pressable
           onPress={() => {
-            if (userRegistered) {
+            if (!userRegistered) {
               navigation.navigate("Login");
             } else {
               navigation.navigate("Orders");
@@ -211,7 +210,7 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
-            if (userRegistered) {
+            if (!userRegistered) {
               navigation.navigate("Login");
             } else {
               navigation.navigate("Wishlist");
@@ -226,7 +225,7 @@ const Drawer = ({
         </Pressable>
         <Pressable
           onPress={() => {
-            if (userRegistered) {
+            if (!userRegistered) {
               navigation.navigate("Login");
             } else {
               navigation.navigate("Support");
