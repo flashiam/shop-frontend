@@ -27,6 +27,8 @@ import AuthLoading from "./components/pages/AuthLoading";
 import SpecialFoodDesc from "./components/pages/SpecialFoodDesc";
 
 import LocationModal from "./components/layout/LocationModal";
+import CartPopUp from "./components/layout/CartPopUp";
+import CartModal from "./components/layout/CartModal";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -45,6 +47,15 @@ export interface FoodType {
   reviews: number;
   tags?: string[];
   isSpecial?: boolean;
+}
+
+export interface CartItem {
+  id: number;
+  title: string;
+  subtitle?: string;
+  price: number;
+  quantity: number;
+  weight: number;
 }
 
 export type RootStackParamList = {
@@ -107,6 +118,8 @@ const App = () => {
               />
             </Stack.Navigator>
             <LocationModal />
+            <CartPopUp />
+            <CartModal />
           </NavigationContainer>
         </SafeAreaProvider>
       </Provider>

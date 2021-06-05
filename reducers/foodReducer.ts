@@ -8,6 +8,11 @@ import {
   FETCH_CART_ITEMS,
   REMOVE_CART_ITEM,
   CALCULATE_CART_TOTAL,
+  SHOW_CART_POP_UP,
+  HIDE_CART_POP_UP,
+  OPEN_CART,
+  CLOSE_CART,
+  REMOVED_CART_ITEM,
 } from "../actions/types";
 
 // Setting the initial state to be manipulated
@@ -17,8 +22,12 @@ const initialState = {
   loading: true,
   cartItems: [],
   cartTotalPrice: 0,
+  cartTotalQuantity: 1,
   cartNum: 0,
+  removedCartItem: null,
   error: null,
+  showPopup: false,
+  cartOpened: false,
   locationOpened: false,
 };
 
@@ -40,6 +49,8 @@ const foodReducer = (state = initialState, action: any) => {
       return {
         ...state,
         cartItems: action.payload,
+        cartTotalPrice: action.payload.totalPrice,
+        cartTotalQuantity: action.payload.totalQuantity,
         loading: false,
       };
     case REMOVE_CART_ITEM:
@@ -48,16 +59,14 @@ const foodReducer = (state = initialState, action: any) => {
         cartItems: state.cartItems.filter(
           (item: any) => item.id !== action.payload
         ),
+        removedCartItem: action.payload,
       };
     case CALCULATE_CART_TOTAL:
       return {
         ...state,
-        cartTotalPrice:
-          state.cartItems.length > 0
-            ? state.cartItems
-                .push(action.payload)
-                .reduce((prevItem, curItem) => prevItem + curItem.price, 0)
-            : action.payload.price,
+        cartTotalPrice: action.payload.totalPrice,
+        cartTotalQuantity: action.payload.totalQuantity,
+        loading: false,
       };
     case GET_CART_NUM: {
       return {
@@ -70,6 +79,26 @@ const foodReducer = (state = initialState, action: any) => {
       return {
         ...state,
         error: action.payload,
+      };
+    case SHOW_CART_POP_UP:
+      return {
+        ...state,
+        showPopup: true,
+      };
+    case HIDE_CART_POP_UP:
+      return {
+        ...state,
+        showPopup: false,
+      };
+    case OPEN_CART:
+      return {
+        ...state,
+        cartOpened: true,
+      };
+    case CLOSE_CART:
+      return {
+        ...state,
+        cartOpened: false,
       };
     case OPEN_LOCATION:
       return {

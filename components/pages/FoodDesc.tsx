@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useReducer } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Image,
   TextInput,
   Dimensions,
-  // Modal,
   ActivityIndicator,
   Share,
   Platform,
@@ -34,6 +33,8 @@ import {
   deleteCartItem,
   calculateTotalPrice,
   getCartNo,
+  showCartPopup,
+  openCartModal,
 } from "../../actions/foodActions";
 
 import utilStyle from "../../styles/utilStyle";
@@ -98,9 +99,16 @@ type Prop = {
   deleteCartItem: Function;
   calculateTotalPrice: Function;
   getCartNo: Function;
+  showCartPopup: Function;
+  openCartModal: Function;
   payment: { orderId: number | null; orderLoading: boolean };
   user: { userRegistered: boolean };
-  food: { cartItems: any; cartTotalPrice: number; loading: boolean };
+  food: {
+    cartItems: any;
+    cartTotalPrice: number;
+    removedCartItem: number | null;
+    loading: boolean;
+  };
 };
 
 type PhotoProps = {
@@ -113,11 +121,13 @@ const FoodDesc = ({
   navigation,
   payment: { orderId, orderLoading },
   user: { userRegistered },
-  food: { cartItems, cartTotalPrice, loading },
+  food: { cartItems, cartTotalPrice, removedCartItem, loading },
   fetchOrderId,
   addCartItem,
   fetchCartItems,
   deleteCartItem,
+  showCartPopup,
+  openCartModal,
   calculateTotalPrice,
   getCartNo,
 }: Prop) => {
@@ -498,9 +508,7 @@ const FoodDesc = ({
   // Function to add item
   const addItem = () => {
     makeCartItem(foodId, title, subtitle, weight, price, quantity);
-    // calculateTotalPrice(cartItems);
-    // console.log(cartTotalPrice);
-    popUp();
+    showCartPopup();
   };
 
   // Function to delete the item
@@ -540,7 +548,7 @@ const FoodDesc = ({
         ]}
       >
         <View style={[utilStyle.card, style.popUpStyle]}>
-          <View style={style.cartMsg}>
+          <Pressable style={style.cartMsg} onPress={() => popDown()}>
             <Text
               style={{
                 color: lightColor,
@@ -568,7 +576,7 @@ const FoodDesc = ({
                 plus taxes
               </Text>
             </View>
-          </View>
+          </Pressable>
           <Pressable
             style={style.showCartBtn}
             onPress={() => {
@@ -695,7 +703,7 @@ const FoodDesc = ({
   };
 
   useEffect(() => {
-    fetchCartItems();
+    // fetchCartItems();
     checkCartStatus(foodId);
     checkCart();
     // fetchDataFromCart();
@@ -918,7 +926,7 @@ const FoodDesc = ({
                     >
                       <ActivityIndicator color={primaryColor} size="small" />
                     </View>
-                  ) : !itemAdded ? (
+                  ) : !itemAdded && removedCartItem !== foodId ? (
                     <Pressable
                       style={style.cartBtn}
                       onPress={() => {
@@ -949,7 +957,7 @@ const FoodDesc = ({
                   ) : (
                     <Pressable
                       style={style.cartBtn}
-                      onPress={() => setCart(true)}
+                      onPress={() => openCartModal()}
                     >
                       <Text
                         style={{
@@ -1124,7 +1132,7 @@ const FoodDesc = ({
         {/* </View> */}
       </ScrollView>
       {/* Cart pop up */}
-      {Platform.OS !== "web" && <CartPopUp />}
+      {/* {Platform.OS !== "web" && <CartPopUp />} */}
     </DrawerLayout>
     // </View>
   );
@@ -1412,4 +1420,6 @@ export default connect(mapStateToProps, {
   getCartNo,
   deleteCartItem,
   calculateTotalPrice,
+  showCartPopup,
+  openCartModal,
 })(FoodDesc);

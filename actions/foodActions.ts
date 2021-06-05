@@ -8,6 +8,11 @@ import {
   CLOSE_LOCATION,
   FETCH_CART_ITEMS,
   REMOVE_CART_ITEM,
+  SHOW_CART_POP_UP,
+  HIDE_CART_POP_UP,
+  REMOVED_CART_ITEM,
+  OPEN_CART,
+  CLOSE_CART,
 } from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -24,6 +29,8 @@ interface CartItem {
 export const addCartItem = (item: CartItem) => async (dispatch: any) => {
   let items;
   try {
+    // Set loading initially
+    // setLoading();
     // Save to the storage too
     const existingData = await AsyncStorage.getItem("cart-items");
 
@@ -34,11 +41,31 @@ export const addCartItem = (item: CartItem) => async (dispatch: any) => {
     }
 
     items.push(item);
+
+    const totalPrice = items.reduce(
+      (prevItem: any, curItem: any) => prevItem + curItem.price,
+      0
+    );
+
+    const totalQuantity = items.reduce(
+      (prevItem: any, curItem: any) => prevItem + curItem.quantity,
+      0
+    );
+
     await AsyncStorage.setItem("cart-items", JSON.stringify(items));
 
     dispatch({
       type: ADD_CART_ITEM,
       payload: item,
+    });
+
+    // Dispatch the total price to the reducer
+    dispatch({
+      type: CALCULATE_CART_TOTAL,
+      payload: {
+        totalPrice,
+        totalQuantity,
+      },
     });
   } catch (err) {
     dispatch({
@@ -53,9 +80,31 @@ export const fetchCartItems = () => async (dispatch: any) => {
   try {
     const savedItems = await AsyncStorage.getItem("cart-items");
     if (savedItems) {
+      // Calculating total price and quantity also
+      const items = JSON.parse(savedItems);
+
+      const totalPrice = items.reduce(
+        (prevItem: any, curItem: any) => prevItem + curItem.price,
+        0
+      );
+      const totalQuantity = items.reduce(
+        (prevItem: any, curItem: any) => prevItem + curItem.quantity,
+        0
+      );
+
+      // Dispatch the cart items to reducer
       dispatch({
         type: FETCH_CART_ITEMS,
-        payload: JSON.parse(savedItems),
+        payload: items,
+      });
+
+      // Dispatch the total price and quantity to reducer
+      dispatch({
+        type: CALCULATE_CART_TOTAL,
+        payload: {
+          totalPrice,
+          totalQuantity,
+        },
       });
     } else {
       dispatch({
@@ -80,13 +129,30 @@ export const deleteCartItem = (id: number) => async (dispatch: any) => {
       const items = JSON.parse(savedItems);
       const filteredItems = items.filter((item: CartItem) => item.id !== id);
 
-      await AsyncStorage.setItem("cart-items", JSON.stringify(filteredItems));
-    }
+      const totalPrice = filteredItems.reduce(
+        (prevItem: any, curItem: any) => prevItem + curItem.price,
+        0
+      );
+      const totalQuantity = filteredItems.reduce(
+        (prevItem: any, curItem: any) => prevItem + curItem.quantity,
+        0
+      );
 
-    dispatch({
-      type: REMOVE_CART_ITEM,
-      payload: id,
-    });
+      await AsyncStorage.setItem("cart-items", JSON.stringify(filteredItems));
+
+      dispatch({
+        type: REMOVE_CART_ITEM,
+        payload: id,
+      });
+
+      dispatch({
+        type: CALCULATE_CART_TOTAL,
+        payload: {
+          totalPrice,
+          totalQuantity,
+        },
+      });
+    }
   } catch (err) {
     dispatch({
       type: FOOD_ERROR,
@@ -125,6 +191,34 @@ export const getCartNo = () => async (dispatch: any) => {
       payload: err,
     });
   }
+};
+
+// Function to show the cart pop up
+export const showCartPopup = () => {
+  return {
+    type: SHOW_CART_POP_UP,
+  };
+};
+
+// Function to hide the cart pop up
+export const hideCartPopup = () => {
+  return {
+    type: HIDE_CART_POP_UP,
+  };
+};
+
+// Function to open the cart modal
+export const openCartModal = () => {
+  return {
+    type: OPEN_CART,
+  };
+};
+
+// Function to close the cart modal
+export const closeCartModal = () => {
+  return {
+    type: CLOSE_CART,
+  };
 };
 
 // Function to open location modal
